@@ -10,6 +10,9 @@
   --on-accent: #F5F6F5;
   --danger: #A12B2B;
   --danger-bg: #F3E4E3;
+  --cert: #0B5C6B; --cert-bg: #E3F0F2; --cert-line: #9CCBD3;
+  --role-admin: #6D3FB5; --role-mgr: #1F5FBF;
+  --live: #D91F26; --on-live: #FFFFFF;
   --radius: 8px;
   --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   --tap: 48px;
@@ -20,6 +23,9 @@
     --bg: #121615; --bg-sub: #1B2120; --strong: #F7FAF9; --text: #D6DDDA; --muted: #98A3A0;
     --line: #343C3A; --accent: #6FC4AA; --on-accent: #0E1513;
     --danger: #F29B9B; --danger-bg: #3A2323;
+    --cert: #7CC4D4; --cert-bg: #1A3036; --cert-line: #2F5560;
+    --role-admin: #C4A7F5; --role-mgr: #8DB8FF;
+    --live: #D91F26; --on-live: #FFFFFF;
   }
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -28,6 +34,9 @@
   --bg: #121615; --bg-sub: #1B2120; --strong: #F7FAF9; --text: #D6DDDA; --muted: #98A3A0;
   --line: #343C3A; --accent: #6FC4AA; --on-accent: #0E1513;
   --danger: #F29B9B; --danger-bg: #3A2323;
+  --cert: #7CC4D4; --cert-bg: #1A3036; --cert-line: #2F5560;
+  --role-admin: #C4A7F5; --role-mgr: #8DB8FF;
+  --live: #D91F26; --on-live: #FFFFFF;
 }
 
 * { box-sizing: border-box; }
@@ -197,7 +206,7 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); }
 .stage:-webkit-full-screen, .pstage:-webkit-full-screen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; background: #000; }
 
 /* 인증 목회자 배지: 테두리형(채움 accent는 LIVE 전용), 글자 필수, 신규 토큰 없음 */
-.vbadge { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg-sub); color: var(--accent); font-size: .85rem; font-weight: 600; line-height: 1.5; vertical-align: middle; white-space: nowrap; }
+.vbadge { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border: 1px solid var(--cert-line); border-radius: 999px; background: var(--cert-bg); color: var(--cert); font-size: .85rem; font-weight: 600; line-height: 1.5; vertical-align: middle; white-space: nowrap; }
 .vbadge.lg { padding: 3px 12px; font-size: .95rem; margin-left: 6px; }
 
 /* 전체화면 아이콘 버튼(유튜브식): 글자 없이 아이콘, 접근성 이름은 aria-label */
@@ -250,6 +259,9 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); }
 /* 글자 위계(designer-typo): 라벨은 --muted, 값은 --strong 700, 본문 링크는 --accent + 밑줄 */
 p a:not(.btn):not(.card), .help a { color: var(--strong); text-decoration: underline; font-weight: 600; }
 strong, .cnt, .viewers { font-variant-numeric: tabular-nums; }
+.tag.host { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.tag.adm { color: var(--role-admin); border-color: var(--role-admin); }
+.tag.mgr { color: var(--role-mgr); border-color: var(--role-mgr); }
 .tag.bad, .badge.plain.bad { color: var(--danger); border-color: var(--danger); }
 .btn.primary .slot { font-weight: 700; border-style: solid; }
 .price { font-size: 1.1rem; }

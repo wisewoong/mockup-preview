@@ -21,7 +21,7 @@
       return (i ? '<hr>' : '') + '<h2>' + g[0] + '</h2>' + g[1].map(function (n) {
         // 운영자 권한은 최고 관리자 전용이라 일반 운영자에게는 항목명만 "감사 로그"
         var nm = n[0] === 'audit' && b.dataset.role !== 'super' ? '감사 로그' : n[1];
-        return '<a href="' + n[0] + '.html"' + (act === n[0] ? ' aria-current="page"' : '') + '><span>' + nm + '</span>' + (n[2] ? '<span class="tag">최고 관리자</span>' : '') + '</a>';
+        return '<a href="' + n[0] + '.html"' + (act === n[0] ? ' aria-current="page"' : '') + '><span>' + nm + '</span>' + (n[2] ? '<span class="tag adm">최고 관리자</span>' : '') + '</a>';
       }).join('');
     }).join('');
   }
@@ -58,7 +58,7 @@
     g.innerHTML = '<b>내 역할</b><button data-set="role:op">일반 운영자</button><button data-set="role:super">최고 관리자</button>';
   });
   function render() {
-    document.querySelectorAll('.role').forEach(function (r) { r.textContent = ROLE[b.dataset.role] || b.dataset.role; });
+    document.querySelectorAll('.role').forEach(function (r) { r.textContent = ROLE[b.dataset.role] || b.dataset.role; r.classList.remove('adm', 'mgr'); r.classList.add(b.dataset.role === 'super' ? 'adm' : 'mgr'); });
     nav();
     // 페이지를 옮겨도 내 역할·테마 유지
     document.querySelectorAll('a[href]').forEach(function (a) {

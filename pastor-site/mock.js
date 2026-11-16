@@ -71,7 +71,7 @@
       document.querySelector('.bottombar').innerHTML = nav(role, a, true);
       [['me-members', role === 'mgr'], ['me-station', role === 'mgr'], ['me-sanc', role === 'mgr'], ['me-verify', role === 'mgr'], ['me-donation', role === 'mgr' || role === 'adm0'], ['me-settle', role !== 'owner']].forEach(function (x) { var l = document.getElementById(x[0]); if (l) l.hidden = x[1]; });
       document.querySelector('.bottombar').style.gridTemplateColumns = 'repeat(' + (role === 'mgr' ? 1 : 4) + ',1fr)';
-      document.querySelectorAll('.role').forEach(function (r) { r.textContent = ROLE[role] || role; });
+      document.querySelectorAll('.role').forEach(function (r) { r.textContent = ROLE[role] || role; r.classList.remove('host', 'adm', 'mgr'); r.classList.add(role === 'owner' ? 'host' : role === 'mgr' ? 'mgr' : 'adm'); });
     }
     document.querySelectorAll('[data-show]').forEach(function (el) {
       el.hidden = !el.dataset.show.split(' ').every(function (c) {
