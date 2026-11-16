@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>탈퇴 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
+  .terms { list-style: none; margin: 0; padding: 0; }
+  .terms li { padding: 12px 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+  .terms .k { color: var(--muted); font-size: .92rem; }
+</style>
+</head>
+<body data-default="s:normal">
+<!-- 탈퇴. 시청자 화면에는 목회자 소유자 안내를 두지 않는다(목회자 사이트 소관). 잔액이 남은 채 탈퇴 허용·환불 방식(§22-13), 처리 중 결제 때 차단 여부는 사용자 결정 전. -->
+<header id="site-header" data-active="my"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:normal">기본</button><button data-set="s:zero">잔액 0</button><button data-set="s:pending">처리 중 결제 있음</button><button data-set="s:running">탈퇴 진행 중</button><button data-set="s:done">완료</button><button data-set="s:fail">실패</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button><button data-set="s:guest">비로그인</button>
+  </div>
+  <p class="muted">잔액이 남은 채 탈퇴 허용 여부와 환불 방식, 처리 중 결제가 있을 때 차단 여부는 사용자 결정 전이에요. 탈퇴하기 확인은 실제로 동작해요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <div data-show="s=normal|zero|pending|running|fail">
+    <h1 id="h-wd" tabindex="-1">탈퇴</h1>
+    <div class="notice" style="margin-top:16px"><strong>탈퇴 후 복구 가능 여부는 <span class="slot">복구 정책 [법무 7-2]</span></strong></div>
+    <div class="notice danger" role="alert" data-show="s=pending" style="margin-top:16px"><strong>처리 중인 결제가 있어요</strong><p>결제가 끝난 뒤 탈퇴할 수 있어요. <span class="slot">차단 여부 정책</span></p></div>
+    <div class="notice danger" role="alert" data-show="s=fail" style="margin-top:16px"><strong>탈퇴하지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep>다시 시도</button></p></div>
+
+    <h2 style="margin-top:24px">탈퇴 전에 확인해 주세요</h2>
+    <ul class="terms" style="margin-top:8px">
+      <li><span class="k">남은 열매</span><strong data-show="s=normal|pending|running|fail"><span class="slot">S1 명칭</span> 3,500개(샘플)가 남아 있어요</strong><strong data-show="s=zero">남은 열매가 없어요</strong><span class="small muted" data-show="s=normal|pending|running|fail"><span class="slot">S2 환불 요건</span></span></li>
+      <li><span class="k">진행 중 결제</span><strong data-show="s=pending">처리 중인 결제 1건</strong><strong data-show="s=normal|zero|running|fail">처리 중인 결제가 없어요</strong></li>
+      <li><span class="k">삭제되는 것</span><strong>구독 3곳, 즐겨찾기 4개가 삭제돼요</strong></li>
+      <li><span class="k">보존되는 것</span><strong>후원·결제 기록은 보존돼요 <span class="slot">거래 기록 보존 안내 [법무 7-2]</span></strong></li>
+      <li><span class="k">채팅·댓글</span><span class="slot">익명화·보존 기간 안내 [법무 7-2]</span></li>
+    </ul>
+
+    <label class="check" style="margin-top:16px"><input type="checkbox" id="ack"><span>위 내용을 확인했어요 (필수)</span></label>
+    <p class="help" id="ack-h">내용을 확인해 주세요</p>
+    <p style="margin-top:12px">
+      <button class="btn bad block" id="go" type="button" disabled aria-describedby="ack-h">탈퇴하기</button>
+      <button class="btn block" type="button" id="busy" disabled aria-busy="true" hidden>탈퇴하는 중</button>
+    </p>
+    <p style="margin-top:12px;text-align:center"><a href="my.html">돌아가기</a></p>
+  </div>
+
+  <div data-show="s=done" role="status">
+    <h1 id="h-done" tabindex="-1">탈퇴했어요</h1>
+    <p style="margin-top:8px">그동안 말씀ON을 이용해 주셔서 감사해요.</p>
+    <p style="margin-top:16px"><a class="btn primary" href="main.html">처음으로</a></p>
+  </div>
+
+  <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:16px"><h1>탈퇴</h1><p class="muted">불러오는 중</p><div class="skeleton" style="height:48px;margin-top:12px"></div><div class="skeleton" style="height:48px;margin-top:12px"></div></div>
+  <div data-show="s=loaderr"><h1>탈퇴</h1><div class="notice danger" role="alert" style="margin-top:16px"><strong>탈퇴 전 확인 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div><p style="margin-top:12px"><button class="btn block" disabled>탈퇴하기</button></p></div>
+  <div data-show="s=guest"><h1>탈퇴</h1><div class="notice" style="margin-top:16px"><strong>로그인하면 탈퇴할 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=withdraw.html">로그인</a></p></div></div>
+</div></main>
+
+<dialog id="dlg" aria-labelledby="dt">
+  <h2 id="dt" tabindex="-1">정말 탈퇴할까요?</h2>
+  <p style="margin-top:8px">탈퇴 후 재가입·복구 안내 <span class="slot">재가입·복구 정책 [법무 7-2]</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end">
+    <button class="btn" id="cancel" autofocus>취소</button>
+    <button class="btn bad solid" id="ok">탈퇴하기</button>
+  </div>
+</dialog>
+<script src="mock.js"></script>
+<script>
+// 목업: 확인 체크 전·처리 중 결제 있음·진행 중에는 탈퇴하기 비활성, 체크하면 확인 dialog
+var ack = document.getElementById('ack'), go = document.getElementById('go'), dlg = document.getElementById('dlg');
+function sync() {
+  var s = document.body.dataset.s, blocked = s === 'pending' || s === 'running';
+  go.disabled = !ack.checked || blocked; go.hidden = s === 'running'; document.getElementById('busy').hidden = s !== 'running';
+  document.getElementById('ack-h').hidden = ack.checked && !blocked; document.getElementById('ack-h').textContent = blocked ? (s === 'pending' ? '처리 중인 결제가 끝난 뒤 탈퇴할 수 있어요' : '') : '내용을 확인해 주세요';
+}
+ack.addEventListener('change', sync);
+document.addEventListener('click', function () { setTimeout(sync, 0); });
+go.onclick = function () { dlg.showModal(); document.getElementById('cancel').focus(); };
+document.getElementById('cancel').onclick = function () { dlg.close(); go.focus(); };
+document.getElementById('ok').onclick = function () { dlg.close(); document.body.dataset.s = 'running'; window.mockRender(); sync(); };
+sync();
+</script>
+</body>
+</html>

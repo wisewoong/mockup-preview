@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>신고·모더레이션 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-reports.css">
+</head>
+<body data-default="role:op s:normal">
+<!-- 신고 수는 참고 정보. 자동 정지·자동 제재 없음(명세 §16.2). 모든 이름·수치는 샘플. -->
+<header id="site-header" data-active="reports"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>신고·모더레이션</h1>
+    <p class="muted small">신고 수는 참고 정보예요. 신고 건수만으로 정지하거나 정산을 보류하지 않아요. 도배 판단 기준 <span class="slot">기준 미정</span> · 신고 기록 보존기간 <span class="slot">보존기간 미정</span></p>
+
+    <div class="filters">
+      <div class="chips" role="group" aria-label="대상 종류">
+        <button class="chip" type="button" data-t="" aria-pressed="true">전체</button>
+        <button class="chip" type="button" data-t="콘텐츠" aria-pressed="false">콘텐츠</button>
+        <button class="chip" type="button" data-t="권리" aria-pressed="false">권리</button>
+        <button class="chip" type="button" data-t="채팅" aria-pressed="false">채팅</button>
+        <button class="chip" type="button" data-t="댓글" aria-pressed="false">댓글</button>
+        <button class="chip" type="button" data-t="외부 후원 유도" aria-pressed="false">외부 후원 유도</button>
+      </div>
+      <label class="row" style="gap:8px"><span>상태</span>
+        <select class="input" id="st"><option value="">전체</option><option>검토 대기</option><option>검토 중</option><option>처리 완료</option><option>이의제기</option></select></label>
+    </div>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:48px;margin-top:8px"></div><div class="skeleton" style="height:48px;margin-top:8px"></div><div class="skeleton" style="height:48px;margin-top:8px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>신고 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=empty"><p><strong>처리할 신고가 없어요</strong></p><p>새 신고가 들어오면 여기에 보여요.</p></div>
+    <div class="empty" id="none" hidden><p><strong>조건에 맞는 신고가 없어요</strong></p></div>
+
+    <div class="tbl-wrap cards" data-show="s=normal" id="list"><table><caption class="sr">신고 목록 (샘플)</caption>
+      <thead><tr><th scope="col">접수일</th><th scope="col">대상 종류</th><th scope="col">대상</th><th scope="col">신고 수 <span class="muted">참고</span></th><th scope="col">상태</th><th scope="col">담당자</th><th scope="col"><span class="sr">상세</span></th></tr></thead>
+      <tbody>
+        <tr data-t="외부 후원 유도" data-st="검토 대기"><td data-label="접수일">샘플 날짜</td><td data-label="대상 종류"><span class="tag">외부 후원 유도</span></td><td data-label="대상">채팅 메시지 “샘플 문구…”<br><span class="muted small">자동 탐지: 검토 대기</span></td><td class="muted" data-label="신고 수(참고)">샘플 3</td><td data-label="상태"><span class="tag">검토 대기</span></td><td class="muted" data-label="담당자">미배정</td><td><a class="btn" href="report-detail.html">상세</a></td></tr>
+        <tr data-t="콘텐츠" data-st="검토 중"><td data-label="접수일">샘플 날짜</td><td data-label="대상 종류"><span class="tag">콘텐츠</span></td><td data-label="대상">샘플 설교 영상 제목</td><td class="muted" data-label="신고 수(참고)">샘플 1</td><td data-label="상태"><span class="tag">검토 중</span></td><td data-label="담당자">샘플 운영자</td><td><a class="btn" href="report-detail.html">상세</a></td></tr>
+        <tr class="lock-row" data-t="댓글" data-st="검토 중"><td data-label="접수일">샘플 날짜</td><td data-label="대상 종류"><span class="tag">댓글</span></td><td data-label="대상">VOD 댓글 “샘플 문구…”</td><td data-label="신고 수(참고)">샘플 2</td><td data-label="상태"><span class="tag">검토 중</span></td><td data-label="담당자">샘플 운영자2<br><span class="small">다른 운영자가 처리 중</span></td><td><a class="btn" href="report-detail.html?s=locked" aria-label="상세, 읽기 전용">상세 (읽기 전용)</a></td></tr>
+        <tr data-t="권리" data-st="이의제기"><td data-label="접수일">샘플 날짜</td><td data-label="대상 종류"><span class="tag">권리</span></td><td data-label="대상">샘플 VOD 제목</td><td class="muted" data-label="신고 수(참고)">샘플 1</td><td data-label="상태"><span class="tag bad">이의제기</span></td><td data-label="담당자">샘플 운영자</td><td><a class="btn" href="report-detail.html?s=appeal">상세</a></td></tr>
+        <tr data-t="채팅" data-st="처리 완료"><td data-label="접수일">샘플 날짜</td><td data-label="대상 종류"><span class="tag">채팅</span></td><td data-label="대상">채팅 메시지 “샘플 문구…”</td><td class="muted" data-label="신고 수(참고)">샘플 5</td><td data-label="상태"><span class="tag">처리 완료</span></td><td data-label="담당자">샘플 운영자</td><td><a class="btn" href="report-detail.html">상세</a></td></tr>
+      </tbody></table></div>
+  </main>
+</div>
+<div class="wrap op-narrow"><div class="empty"><p><strong>운영사 사이트는 PC에서 이용해 주세요</strong></p></div></div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var t = '', $ = function (i) { return document.getElementById(i); };
+  function f() {
+    var n = 0;
+    document.querySelectorAll('#list tbody tr').forEach(function (r) {
+      var ok = (!t || r.dataset.t === t) && (!$('st').value || r.dataset.st === $('st').value);
+      r.hidden = !ok; if (ok) n++;
+    });
+    $('none').hidden = !(n === 0 && document.body.dataset.s === 'normal');
+  }
+  window.mockAfter = f;
+  $('st').addEventListener('change', f);
+  document.querySelectorAll('.chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      t = c.dataset.t;
+      document.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', String(x === c)); });
+      f();
+    });
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

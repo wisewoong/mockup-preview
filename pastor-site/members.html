@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구성원 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal lim:ok dlg:closed">
+<!-- 구성원 관리(DESIGN-STATION §2). 숫자·기간은 슬롯. 후원 금액·정산은 구성원에게 공개하지 않는다. -->
+<header id="site-header" data-active="members"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:empty">0명</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">실패</button><button data-set="s:conflict">동시 변경</button></div>
+  <div class="group"><b>한도</b><button data-set="lim:ok">여유</button><button data-set="lim:admin">관리자 도달</button><button data-set="lim:mgr">매니저 도달</button><button data-set="lim:over">한도 초과</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:open">열림</button><button data-set="dlg:nouser">대상 없음</button><button data-set="dlg:member">이미 구성원</button><button data-set="dlg:invited">이미 초대함</button><button data-set="dlg:limit">한도 도달</button><button data-set="dlg:fail">실패</button><button data-set="dlg:ok">성공</button></div>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 사용자 결정 전: 거절됨 행 보존 기간, 승격·강등 재초대, 방송국 복수, 초대자 표기(471행 따름). 부여 스위치의 "스트림 키"는 저장 실패 시연용이에요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 <span class="slot">관리자 이상</span>만 쓸 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<div class="stack" data-show="role=owner|adm0|admall">
+<div class="mem-head"><h1>구성원</h1><button class="btn primary" type="button" id="inv" data-open="inv-dlg" aria-describedby="inv-why">구성원 초대</button></div>
+<p class="help" id="inv-why" hidden></p>
+<p class="small" id="lim-line"></p>
+<p class="small" id="lim-note"></p>
+<div class="notice" role="status" data-show="dlg=ok"><strong>초대를 보냈어요</strong></div>
+<div class="notice danger" role="alert" data-show="s=conflict"><strong>권한이 바뀌어서 작업하지 못했어요</strong><p>화면을 새로 불러올게요.</p></div>
+
+<section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="empty" data-show="s=empty"><p><strong>아직 구성원이 없어요</strong></p><p>매니저를 초대해 방송 중 채팅을 함께 관리해 보세요.</p><p><button class="btn primary" type="button" data-open="inv-dlg" id="inv2">구성원 초대</button></p></div>
+
+<section data-show="s=normal|conflict" aria-label="구성원 목록">
+  <table class="mem"><caption class="sr">구성원 목록</caption>
+    <thead><tr><th scope="col">이름(닉네임)</th><th scope="col">역할</th><th scope="col">상태</th><th scope="col">초대한 사람</th><th scope="col">날짜</th><th scope="col">작업</th></tr></thead>
+    <tbody id="tb"></tbody></table>
+  <div class="mcards" id="cards"></div>
+</section>
+
+<p class="help">후원 금액과 정산은 구성원에게 공개되지 않아요. 소유자만 볼 수 있어요.</p>
+</div>
+</main>
+
+<dialog class="sheet" id="inv-dlg" aria-labelledby="inv-t"><h2 id="inv-t">구성원 초대</h2>
+  <form class="stack" id="inv-f" onsubmit="return false" style="margin-top:12px">
+    <div class="notice danger" role="alert" data-show="dlg=fail"><strong>초대하지 못했어요. 다시 시도해 주세요</strong></div>
+    <label class="field"><span class="label">닉네임 검색</span>
+      <input class="input" id="nick" type="search" autocomplete="off" aria-describedby="nick-e" placeholder="닉네임을 입력해 주세요">
+      <span class="err" id="nick-e" role="alert" hidden></span></label>
+    <fieldset><legend class="label" style="font-weight:700">역할</legend>
+      <label class="check"><input type="radio" name="r" id="r-m" value="매니저" checked><span>매니저</span></label>
+      <p class="help" id="r-m-h" hidden></p>
+      <label class="check"><input type="radio" name="r" id="r-a" value="관리자"><span>관리자</span></label>
+      <p class="help" id="r-a-h" hidden></p></fieldset>
+    <p class="small">후원 내용과 정산은 초대받은 사람에게 보이지 않아요.</p>
+    <p class="muted small">초대는 <span class="slot">7일</span> 동안 유효해요. 상대가 수락하면 구성원이 돼요.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close>취소</button><button class="btn primary" type="button" id="send">초대 보내기</button></div>
+  </form>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); }, dlg = $('inv-dlg');
+  var ROW = [
+    { id: 'o', n: '샘플소유', r: 'owner', st: 'a', by: '—' },
+    { id: 'a1', n: '샘플관리자1', r: 'admin', st: 'a', by: '샘플소유' },
+    { id: 'a2', n: '샘플관리자2', r: 'admin', st: 'a', by: '샘플소유' },
+    { id: 'm1', n: '샘플매니저1', r: 'mgr', st: 'a', by: '샘플관리자1' },
+    { id: 'm2', n: '샘플매니저2', r: 'mgr', st: 'p', by: '샘플관리자1' },
+    { id: 'm3', n: '샘플매니저3', r: 'mgr', st: 'p', by: '샘플관리자2' },
+    { id: 'm4', n: '샘플매니저4', r: 'mgr', st: 'x', by: '샘플소유' },
+    { id: 'm5', n: '샘플매니저5', r: 'mgr', st: 'd', by: '샘플관리자1' }
+  ];
+  var G = ['방송 시작·종료', 'TTS 제어', '후원 메시지 확인', '스트림 키', '최소액 설정'];
+  var ST = { a: '활동 중', p: '수락 대기', x: '만료됨', d: '거절함' }, RN = { owner: '소유자', admin: '관리자', mgr: '매니저' };
+  var open = {}, on = { a1: [1, 1, 0, 0, 0], a2: [0, 0, 0, 0, 0] }, msg = {};
+  function B(t, c, id, k) { return '<button class="btn ' + (c || '') + '" type="button" data-a="' + k + '" data-id="' + id + '">' + t + '</button>'; }
+  function me() { return b.dataset.role === 'owner' ? 'owner' : 'adm'; }
+  function acts(x) {
+    var o = me() === 'owner', h = '', t = function (s) { return '<span class="help" style="margin:0">' + s + '</span>'; };
+    if (x.r === 'owner') return t('변경할 수 없어요 · 소유자 교체는 운영사에 문의');
+    if (x.st === 'd') return '<span class="sr">작업 없음</span>—';
+    if (x.st === 'x') return B('다시 보내기', '', x.id, 'resend');
+    if (x.st === 'p') return (o || x.by === '샘플관리자1') ? B('초대 취소', '', x.id, 'cancel') + B('다시 보내기', '', x.id, 'resend') : t('초대한 사람만 취소할 수 있어요');
+    if (x.r === 'admin') {
+      if (!o) return x.id === 'a1' ? t('내 계정이에요 · 탈퇴는 <a href="dashboard.html">내 역할</a>에서') : t('소유자만 변경·해제할 수 있어요');
+      var n = on[x.id].reduce(function (s, v) { return s + v; }, 0);
+      return B('역할 변경', '', x.id, 'role') + B('해제', 'bad', x.id, 'del') +
+        '<button class="btn ik" type="button" data-a="tg" data-id="' + x.id + '" aria-expanded="' + !!open[x.id] + '" aria-controls="g-' + x.id + '">권한 부여 · ' + n + '/5 켜짐 ' + (open[x.id] ? '▴' : '▾') + '</button>';
+    }
+    return B('해제', 'bad', x.id, 'del');
+  }
+  function grants(x) {
+    if (!(me() === 'owner' && x.r === 'admin' && open[x.id])) return '';
+    return '<div class="grants" id="g-' + x.id + '"><p class="small muted" style="margin-top:8px">권한을 켜고 끄면 바로 저장돼요.</p>' + G.map(function (g, i) {
+      var k = x.id + i, v = on[x.id][i];
+      return '<label class="check"><span>' + g + '</span><span class="row" style="gap:12px"><span class="gs" id="s' + k + '">' + (v ? '켜짐' : '꺼짐') + '</span><input type="checkbox" role="switch" data-g="' + x.id + ':' + i + '"' + (v ? ' checked' : '') + '></span></label>' +
+        (msg[k] === 'ok' ? '<p class="help" role="status">저장했어요</p>' : msg[k] === 'err' ? '<p class="err" role="alert">저장하지 못했어요 <button class="btn" type="button" data-a="retry" data-id="' + k + '">다시 시도</button></p>' : '');
+    }).join('') + '<p class="help">후원 금액과 정산은 부여할 수 없어요.</p></div>';
+  }
+  function date(x) { return x.st === 'p' ? '초대 <span class="slot">날짜</span> · <span class="slot">7일</span> 뒤 만료' : x.st === 'a' ? '<span class="slot">날짜</span>' : '<span class="slot">날짜</span>'; }
+  function render() {
+    var rows = b.dataset.s === 'empty' ? [] : ROW.slice();
+    if (b.dataset.dlg === 'ok') rows.push({ id: 'm6', n: '새로 초대한 닉네임', r: 'mgr', st: 'p', by: me() === 'owner' ? '샘플소유' : '샘플관리자1' });
+    $('tb').innerHTML = rows.map(function (x) {
+      return '<tr><th scope="row" style="color:var(--strong)">' + x.n + (x.id === 'a1' && me() !== 'owner' ? ' (나)' : '') + '</th><td><span class="tag">' + RN[x.r] + '</span></td><td>' + ST[x.st] + '</td><td>' + x.by + '</td><td>' + date(x) + '</td><td><div class="mem-acts">' + acts(x) + '</div></td></tr>' +
+        (grants(x) ? '<tr class="sub"><td colspan="6">' + grants(x) + '</td></tr>' : '');
+    }).join('');
+    $('cards').innerHTML = rows.map(function (x) {
+      return '<div class="mc"><p><strong>' + x.n + (x.id === 'a1' && me() !== 'owner' ? ' (나)' : '') + '</strong> <span class="tag">' + RN[x.r] + '</span></p><p class="help" style="margin:0">' + ST[x.st] + ' · ' + date(x) + '</p>' +
+        (x.by !== '—' ? '<p class="small">초대: ' + x.by + '</p>' : '') + '<div class="mem-acts">' + acts(x) + '</div>' + grants(x) + '</div>';
+    }).join('');
+  }
+  function lim() {
+    var l = b.dataset.lim, can = b.dataset.role === 'owner';
+    var aFull = l === 'admin' || l === 'over', mFull = l === 'mgr' || l === 'over';
+    $('lim-line').innerHTML = '관리자 <span class="slot">N</span> / <span class="slot">M</span> · 매니저 <span class="slot">N</span> / <span class="slot">M</span> (수락 대기 포함)' + (aFull || mFull ? ' <span class="tag bad">한도 도달</span>' : '');
+    $('lim-note').innerHTML = aFull || mFull ? '대기 중인 초대를 취소하거나 만료되면 자리가 생겨요.' : '';
+    if (l === 'over') $('lim-note').innerHTML += ' 한도보다 <span class="slot">N-M</span>명 많아요. 기존 구성원은 그대로 유지돼요.';
+    var aOff = !can || aFull, mOff = mFull;
+    $('r-a').disabled = aOff; $('r-m').disabled = mOff;
+    var ah = !can ? '관리자 초대는 소유자만 할 수 있어요' : aFull ? '관리자 한도에 도달했어요. 대기 중인 초대를 취소하면 자리가 생겨요' : '';
+    $('r-a-h').textContent = ah; $('r-a-h').hidden = !ah;
+    $('r-m-h').textContent = mOff ? '매니저 한도에 도달했어요. 대기 중인 초대를 취소하면 자리가 생겨요' : ''; $('r-m-h').hidden = !mOff;
+    if (aOff && !mOff) $('r-m').checked = true; else if (mOff && !aOff) $('r-a').checked = true;
+    var none = aOff && mOff, why = none ? (can ? '관리자·매니저 한도에 모두 도달해서 초대할 수 없어요' : '매니저 한도에 도달해서 초대할 수 없어요') : '';
+    [$('inv'), $('inv2'), $('send')].forEach(function (e) { if (e) e.disabled = !!why; });
+    $('inv-why').textContent = why; $('inv-why').hidden = !why;
+  }
+  window.mockAfter = function () {
+    var d = b.dataset.dlg, e = $('nick-e'), role = $('r-a').checked ? '관리자' : '매니저';
+    render(); lim();
+    var txt = { nouser: '찾을 수 없는 닉네임이에요', member: '이미 이 방송국의 구성원이에요', invited: '이미 초대했어요. 수락을 기다리고 있어요', limit: role + ' 한도에 도달했어요. 대기 중인 초대를 취소하면 자리가 생겨요' }[d];
+    e.textContent = txt || ''; e.hidden = !txt; $('nick').setAttribute('aria-invalid', txt ? 'true' : 'false');
+    var show = ['open', 'nouser', 'member', 'invited', 'limit', 'fail'].indexOf(d) > -1;
+    if (show && !dlg.open && b.dataset.role !== 'mgr') { dlg._opener = $('inv'); dlg.showModal(); dlg.querySelector('h2').tabIndex = -1; dlg.querySelector('h2').focus(); }
+    if (!show && dlg.open) dlg.close();
+  };
+  dlg.addEventListener('close', function () { if (b.dataset.dlg !== 'ok' && b.dataset.dlg !== 'closed') { b.dataset.dlg = 'closed'; window.mockRender(); } if (dlg._opener) dlg._opener.focus(); });
+  $('send').addEventListener('click', function () { b.dataset.dlg = 'ok'; window.mockRender(); });
+  $('inv-f').addEventListener('change', function () { window.mockRender(); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-a]'); if (!t) return;
+    var id = t.dataset.id, a = t.dataset.a;
+    if (a === 'tg') { open[id] = !open[id]; window.mockRender(); var nb = document.querySelector('[data-a="tg"][data-id="' + id + '"][aria-expanded]'); if (nb) nb.focus(); }
+    if (a === 'retry') { var p = [id.slice(0, -1), +id.slice(-1)]; on[p[0]][p[1]] = 1; msg[id] = 'ok'; window.mockRender(); }
+    if (a === 'cancel' || a === 'del' || a === 'resend' || a === 'role') { b.dataset.s = a === 'del' ? 'conflict' : b.dataset.s; window.mockRender(); } // 목업: 해제는 동시 변경 안내 시연
+  });
+  document.addEventListener('change', function (e) {
+    var g = e.target.dataset && e.target.dataset.g; if (!g) return;
+    var p = g.split(':'), i = +p[1], k = p[0] + i;
+    if (i === 3) { e.target.checked = !e.target.checked; msg[k] = 'err'; } else { on[p[0]][i] = e.target.checked ? 1 : 0; msg[k] = 'ok'; }
+    window.mockRender(); var c = document.querySelector('[data-g="' + g + '"]'); if (c) c.focus();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

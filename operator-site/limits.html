@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후원·TTS 한도 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+</head>
+<body data-default="role:super s:normal size:small">
+<!-- 정책 틀 복제(fees.html). 값·환산은 모두 슬롯. -->
+<header id="site-header" data-active="limits"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:conflict">충돌</button></div>
+  <div class="group"><b>변경 폭</b><button data-set="size:small">보통</button><button data-set="size:big">큼 [V6]</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>후원·TTS 한도</h1>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:120px;margin-top:12px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>후원·TTS 한도 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+
+    <div class="stack" data-show="s=normal|empty|saveerr|conflict">
+      <div class="notice" data-show="role=op"><strong>최고 관리자만 변경할 수 있어요</strong><p class="small">값과 이력은 볼 수 있어요.</p></div>
+      <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 값은 그대로 두었어요. 잠시 뒤 다시 추가해 주세요.</p></div>
+      <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 운영자가 먼저 바꿨어요</strong><p>입력한 값은 그대로 두었어요. 새로 불러온 뒤 다시 확인해 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">새로 불러오기</button></p></div>
+
+      <div class="empty" data-show="s=empty"><p><strong>한도 정책이 없어요</strong></p><p>한도가 없으면 후원과 TTS 최소·최대 금액을 정할 수 없어요. 아래에서 첫 버전을 추가해 주세요.</p></div>
+
+      <section aria-labelledby="h-cur" data-show="s=normal|saveerr|conflict"><h2 id="h-cur">현재 값</h2>
+        <div class="cur" style="margin-top:8px">
+          <div><span class="muted">후원 최소</span><span class="v"><span class="slot">V4</span></span></div>
+          <div><span class="muted">후원 최대</span><span class="v"><span class="slot">V4</span></span></div>
+          <div><span class="muted">TTS 최소</span><span class="v"><span class="slot">V5</span></span></div>
+          <div><span class="muted">TTS 최대</span><span class="v"><span class="slot">V5</span></span></div>
+          <p class="muted small" style="flex-basis:100%">적용 시작 날짜 <span class="slot">샘플 날짜</span> · 목회자는 이 한도 안에서 최소 금액을 정해요</p>
+        </div></section>
+
+      <section aria-labelledby="h-res"><h2 id="h-res">예약된 버전</h2>
+        <div data-show="s=empty"><p class="muted" style="margin-top:8px">예약된 변경이 없어요</p></div>
+        <div data-show="s=normal|saveerr|conflict">
+          <div class="item" style="margin-top:8px"><p><strong>적용 시작일 <span class="slot">샘플 날짜</span></strong> · 후원 <span class="slot">V4</span> / TTS <span class="slot">V5</span> · <span class="muted">등록자 샘플 운영자</span></p>
+            <button class="linkbtn" type="button" data-open="cancel-dlg" data-role="super" aria-describedby="cx-why">예약 취소</button> <span class="help" id="cx-why" data-show="role=op">최고 관리자만 변경할 수 있어요</span></div>
+        </div></section>
+
+      <section aria-labelledby="h-add"><h2 id="h-add">새 버전 추가</h2>
+        <p class="muted small" style="margin:4px 0 8px">한도는 덮어쓰지 않고 적용 시작일이 있는 새 버전으로 추가해요.</p>
+        <p data-show="role=op"><button class="btn" type="button" disabled aria-describedby="ro-why">새 버전 추가</button></p>
+        <p class="help" id="ro-why" data-show="role=op">최고 관리자만 변경할 수 있어요</p>
+        <details class="add" data-show="role=super"><summary>새 버전 추가</summary>
+          <form class="stack" id="frm" onsubmit="return false" aria-label="한도 새 버전">
+            <label class="field"><span class="label">후원 최소</span><input class="input" id="f-dmin" inputmode="numeric" placeholder="현재 값 V4" aria-describedby="f-dmin-e"><span class="err" id="f-dmin-e" hidden>1 이상 정수로 입력해 주세요.</span></label>
+            <label class="field"><span class="label">후원 최대</span><input class="input" id="f-dmax" inputmode="numeric" placeholder="현재 값 V4" aria-describedby="f-dmax-e"><span class="err" id="f-dmax-e" hidden>최소 이상 정수로 입력해 주세요.</span></label>
+            <label class="field"><span class="label">TTS 최소</span><input class="input" id="f-tmin" inputmode="numeric" placeholder="현재 값 V5" aria-describedby="f-tmin-e"><span class="err" id="f-tmin-e" hidden>1 이상 정수로 입력해 주세요.</span></label>
+            <label class="field"><span class="label">TTS 최대</span><input class="input" id="f-tmax" inputmode="numeric" placeholder="현재 값 V5" aria-describedby="f-tmax-e"><span class="err" id="f-tmax-e" hidden>최소 이상 정수로 입력해 주세요.</span></label>
+            <label class="field"><span class="label">적용 시작일 <span class="muted">필수</span></span><span class="help">내일부터 고를 수 있어요 <span class="slot">사용자 결정 전</span></span><input class="input" id="f-date" type="date" aria-describedby="f-date-e"><span class="err" id="f-date-e" hidden>내일 이후 날짜를 골라 주세요.</span></label>
+            <label class="field"><span class="label">사유 <span class="muted">필수</span></span><textarea class="textarea" id="f-why" rows="3" aria-describedby="f-why-e"></textarea><span class="err" id="f-why-e" hidden>사유를 입력해 주세요.</span></label>
+            <h3>변경 전 → 후</h3>
+            <div class="tbl-wrap"><table><caption class="sr">변경 전후 비교</caption>
+              <thead><tr><th scope="col">항목</th><th scope="col">현재</th><th scope="col">새 값</th></tr></thead>
+              <tbody><tr><th scope="row">후원 최소</th><td><span class="slot">V4</span></td><td id="c-dmin" class="muted">—</td></tr>
+              <tr><th scope="row">후원 최대</th><td><span class="slot">V4</span></td><td id="c-dmax" class="muted">—</td></tr>
+              <tr><th scope="row">TTS 최소</th><td><span class="slot">V5</span></td><td id="c-tmin" class="muted">—</td></tr>
+              <tr><th scope="row">TTS 최대</th><td><span class="slot">V5</span></td><td id="c-tmax" class="muted">—</td></tr></tbody></table></div>
+            <p class="small" id="impact">한도 밖이 되는 목회자 <span class="slot">N</span>명은 끝값으로 자동 조정되고 알림이 가요.</p>
+            <p class="row"><button class="btn primary" type="button" id="add">새 버전 추가</button></p>
+          </form></details></section>
+
+      <section aria-labelledby="h-his"><h2 id="h-his">이력</h2>
+        <div data-show="s=empty"><p class="muted" style="margin-top:8px">아직 이력이 없어요</p></div>
+        <div class="tbl-wrap cards" style="margin-top:8px" data-show="s=normal|saveerr|conflict"><table><caption class="sr">한도 이력</caption>
+          <thead><tr><th scope="col">적용 시작일</th><th scope="col">값(후원 / TTS)</th><th scope="col">등록자</th><th scope="col">등록 시각</th><th scope="col">상태</th></tr></thead>
+          <tbody>
+            <tr><td data-label="적용 시작일"><span class="slot">샘플 날짜</span></td><td data-label="값(후원 / TTS)"><span class="slot">V4</span> / <span class="slot">V5</span></td><td data-label="등록자">샘플 운영자</td><td data-label="등록 시각">샘플 시각</td><td data-label="상태"><span class="tag">예약</span></td></tr>
+            <tr><td data-label="적용 시작일"><span class="slot">샘플 날짜</span></td><td data-label="값(후원 / TTS)"><span class="slot">V4</span> / <span class="slot">V5</span></td><td data-label="등록자">샘플 운영자</td><td data-label="등록 시각">샘플 시각</td><td data-label="상태"><span class="tag">적용 중</span></td></tr>
+            <tr><td data-label="적용 시작일"><span class="slot">샘플 날짜</span></td><td data-label="값(후원 / TTS)"><span class="slot">V4</span> / <span class="slot">V5</span></td><td data-label="등록자">샘플 운영자</td><td data-label="등록 시각">샘플 시각</td><td data-label="상태"><span class="tag">종료</span></td></tr>
+          </tbody></table></div></section>
+    </div>
+  </main>
+</div>
+
+<dialog id="add-dlg" aria-labelledby="add-t"><h2 id="add-t">후원·TTS 한도 새 버전을 추가할까요?</h2>
+  <div class="tbl-wrap" style="margin-top:12px"><table><caption class="sr">변경 전후 비교</caption>
+    <thead><tr><th scope="col">항목</th><th scope="col">현재</th><th scope="col">새 값</th></tr></thead>
+    <tbody><tr><th scope="row">후원 최소</th><td><span class="slot">V4</span></td><td id="d-dmin">—</td></tr>
+    <tr><th scope="row">후원 최대</th><td><span class="slot">V4</span></td><td id="d-dmax">—</td></tr>
+    <tr><th scope="row">TTS 최소</th><td><span class="slot">V5</span></td><td id="d-tmin">—</td></tr>
+    <tr><th scope="row">TTS 최대</th><td><span class="slot">V5</span></td><td id="d-tmax">—</td></tr></tbody></table></div>
+  <p style="margin-top:12px">적용 시작일 <span id="d-date">—</span>부터 쓰여요.</p>
+  <p>한도 밖이 되는 목회자 <span class="slot">N</span>명은 끝값으로 자동 조정되고 알림이 가요.</p>
+  <div class="notice danger" style="margin-top:12px" data-show="size=big"><strong>변경 폭이 커요 <span class="slot">V6</span></strong>
+    <label class="check" style="margin-top:8px"><input type="checkbox" id="d-ok"> 내용을 확인했어요</label>
+</div>
+  <p class="muted small" style="margin-top:12px">변경자와 시각이 기록돼요.</p>
+  <p class="help" id="d-why" hidden>내용을 확인하면 눌러 볼 수 있어요</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" id="d-go">추가</button></div>
+</dialog>
+
+<dialog id="cancel-dlg" aria-labelledby="cx-t"><h2 id="cx-t">예약을 취소할까요?</h2><p class="muted small" style="margin-top:8px">취소하면 이 버전은 적용되지 않아요. 기록은 이력에 남아요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>돌아가기</button><button class="btn danger" type="button" data-close>예약 취소</button></div></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var K = ['dmin', 'dmax', 'tmin', 'tmax'], int = function (v) { return /^[1-9]\d*$/.test(v.trim()); };
+  function cmp() {
+    K.forEach(function (k) { var v = $('f-' + k).value.trim(), c = $('c-' + k); c.className = v ? 'chg' : 'muted'; c.textContent = v ? v + ' 변경' : '—'; });
+  }
+  window.mockAfter = function () {
+    document.querySelectorAll('[data-role="super"]').forEach(function (x) { x.disabled = b.dataset.role !== 'super'; });
+    var off = b.dataset.size === 'big' && !$('d-ok').checked; $('d-go').disabled = off; $('d-why').hidden = !off;
+  };
+  document.addEventListener('input', function (e) { if (e.target.closest('#frm')) cmp(); if (e.target.id === 'd-ok') window.mockRender(); });
+  $('d-go').addEventListener('click', function () {
+    var g = this; g.disabled = true; g.textContent = '저장 중…'; $('add').disabled = true;
+    setTimeout(function () { $('add-dlg').close(); g.textContent = '추가'; $('add').disabled = false; b.dataset.s = 'normal'; window.mockRender(); }, 600);
+  });
+  function validate(ids) {
+    var first = null;
+    ids.forEach(function (k) {
+      var bad = k[1]; $(k[0] + '-e').hidden = !bad; $(k[0]).setAttribute('aria-invalid', String(bad));
+      if (bad && !first) first = $(k[0]);
+    });
+    if (first) first.focus();
+    return !first;
+  }
+  function openDlg() { $('d-ok').checked = false; $('d-go').textContent = '추가'; window.mockRender(); var d = $('add-dlg'); d._opener = $('add'); d.showModal(); }
+  // 빈 칸은 "변경 없음". 입력한 칸만 검사하고, 최대는 같은 쌍의 최소 이상이어야 한다
+  $('add').addEventListener('click', function () {
+    var v = {}; K.forEach(function (k) { v[k] = $('f-' + k).value.trim(); });
+    var any = K.some(function (k) { return v[k] !== ''; });
+    var bad = function (k, pair) { return v[k] !== '' && (!int(v[k]) || (pair && v[pair] !== '' && int(v[pair]) && +v[k] < +v[pair])); };
+    var ok = validate([['f-dmin', bad('dmin') || !any], ['f-dmax', bad('dmax', 'dmin')], ['f-tmin', bad('tmin')], ['f-tmax', bad('tmax', 'tmin')], ['f-date', !$('f-date').value], ['f-why', !$('f-why').value.trim()]]);
+    if (!ok) return;
+    K.forEach(function (k) { $('d-' + k).textContent = v[k] || '변경 없음'; }); $('d-date').textContent = $('f-date').value; openDlg();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이의제기 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-reports.css">
+<link rel="stylesheet" href="operator-verify.css">
+<style>
+/* 모바일 카드: 1행 제목+상태 / 2행 종류·날짜·담당자 / 버튼 (operator-audit.css의 .k 카드 방식) */
+@media (max-width: 1023px) {
+  .tbl-wrap.cards.ap tr { align-items: baseline; gap: 4px 8px; }
+  .tbl-wrap.cards.ap tr::after { content: ""; order: 3; flex: 1 0 100%; height: 0; }
+  .tbl-wrap.cards.ap td.c-title { flex: 1 1 50%; min-width: 0; font-size: 1.05rem; overflow-wrap: break-word; word-break: keep-all; }
+  .tbl-wrap.cards.ap td.c-tag { margin-left: 0; max-width: 45%; text-align: right; }
+  .tbl-wrap.cards.ap td.c-kind { order: 4; }
+  .tbl-wrap.cards.ap td.c-meta:first-child { order: 5; }
+  .tbl-wrap.cards.ap td.c-meta:first-child::before, .tbl-wrap.cards.ap td.c-meta:nth-child(5)::before { display: inline; content: "· "; }
+  .tbl-wrap.cards.ap td.c-meta:nth-child(5) { order: 6; }
+  .tbl-wrap.cards.ap td.c-act { margin-top: 8px; }
+}
+</style>
+</head>
+<body data-default="role:op s:normal">
+<!-- 신고 건수 열 없음(조치 근거 아님, 명세 §16.2). 목록에서 바로 처리하는 버튼 없음. 모든 이름은 샘플.
+     상태 대응(목회자 sanctions appeal:): 접수=sent, 보완 제출됨=sent, 검토 중=review, 보완 요청 중=more, 인용=ok, 기각=no -->
+<header id="site-header" data-active="appeals"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:filtered0">필터 결과 0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>이의제기</h1>
+    <p class="muted small">신고 건수는 조치 근거가 아니에요 · 처리 기한 <span class="slot">처리 기한 미정</span> · 이의제기 가능 기간 <span class="slot">가능 기간 미정</span></p>
+
+    <div class="filters">
+      <div class="chips" role="group" aria-label="조치 종류">
+        <button class="chip" type="button" data-k="" aria-pressed="true">전체</button>
+        <button class="chip" type="button" data-k="station-l" aria-pressed="false">방송국 제한</button>
+        <button class="chip" type="button" data-k="station-s" aria-pressed="false">방송국 정지</button>
+        <button class="chip" type="button" data-k="station-c" aria-pressed="false">방송국 폐쇄</button>
+        <button class="chip" type="button" data-k="content" aria-pressed="false">영상 공개 제한</button>
+        <button class="chip" type="button" data-k="settle" aria-pressed="false">정산 보류</button>
+        <button class="chip" type="button" data-k="ext" aria-pressed="false">외부 후원 정보 검토</button>
+      </div>
+      <label class="row" style="gap:8px"><span>상태</span>
+        <select class="input" id="st"><option value="wait" selected>처리 대기 (접수·보완 제출됨)</option><option>검토 중</option><option>보완 요청 중</option><option>인용</option><option>기각</option><option value="">전체</option></select></label>
+    </div>
+    <p class="sr" role="status" id="cnt"></p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:48px;margin-top:8px"></div><div class="skeleton" style="height:48px;margin-top:8px"></div><div class="skeleton" style="height:48px;margin-top:8px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>이의제기 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=empty"><p><strong>처리할 이의제기가 없어요</strong></p></div>
+    <div class="empty" id="none" hidden><p><strong>조건에 맞는 이의제기가 없어요</strong></p><button class="btn" type="button" id="clear">필터 지우기</button></div>
+
+    <div class="tbl-wrap cards v ap" data-show="s=normal" id="list"><table><caption class="sr">이의제기 목록 (샘플)</caption>
+      <thead><tr><th scope="col">접수일</th><th scope="col">조치 종류</th><th scope="col">대상</th><th scope="col">상태</th><th scope="col">담당자</th><th scope="col"><span class="sr">상세</span></th></tr></thead>
+      <tbody>
+        <tr data-k="content" data-st="wait"><td class="c-meta">샘플 날짜</td><td class="c-meta c-kind"><span class="tag">영상 공개 제한</span></td><td class="c-title">샘플 설교 영상 제목</td><td class="c-tag"><span class="tag">접수</span></td><td class="c-meta">— <span class="sr">담당자 없음</span></td><td class="c-act"><a class="btn" href="appeal-detail.html?kind=content&amp;st=sent" aria-label="샘플 설교 영상 제목 이의제기 상세">상세</a></td></tr>
+        <tr data-k="settle" data-st="wait"><td class="c-meta">샘플 날짜</td><td class="c-meta c-kind"><span class="tag">정산 보류</span></td><td class="c-title">샘플 방송국A</td><td class="c-tag"><span class="tag">보완 제출됨</span><span class="muted small c-note" data-show="role=op">결정은 최고 관리자</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="btn" href="appeal-detail.html?kind=settle&amp;st=resub" aria-label="샘플 방송국A 이의제기 상세">상세</a></td></tr>
+        <tr data-k="station-l" data-st="검토 중"><td class="c-meta">샘플 날짜</td><td class="c-meta c-kind"><span class="tag">방송국 제한</span></td><td class="c-title">샘플 방송국B</td><td class="c-tag"><span class="tag">검토 중</span></td><td class="c-meta">샘플 운영자2<span class="muted small c-note">내가 조치한 건 · 처리 불가</span></td><td class="c-act"><a class="btn" href="appeal-detail.html?kind=station-l&amp;st=review&amp;s=self" aria-label="샘플 방송국B 이의제기 보기, 읽기 전용">보기</a></td></tr>
+        <tr data-k="ext" data-st="보완 요청 중"><td class="c-meta">샘플 날짜</td><td class="c-meta c-kind"><span class="tag">외부 후원 정보 검토</span></td><td class="c-title">샘플 방송국C</td><td class="c-tag"><span class="tag">보완 요청 중</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="btn" href="appeal-detail.html?kind=ext&amp;st=more" aria-label="샘플 방송국C 이의제기 상세">상세</a></td></tr>
+        <tr data-k="station-s" data-st="인용"><td class="c-meta">샘플 날짜</td><td class="c-meta c-kind"><span class="tag">방송국 정지</span></td><td class="c-title">샘플 방송국D</td><td class="c-tag"><span class="tag">인용</span><span class="muted small c-note" data-show="role=op">결정은 최고 관리자</span></td><td class="c-meta">샘플 운영자3</td><td class="c-act"><a class="btn" href="appeal-detail.html?kind=station-s&amp;st=ok" aria-label="샘플 방송국D 이의제기 보기">보기</a></td></tr>
+        <tr data-k="station-c" data-st="기각"><td class="c-meta">샘플 날짜</td><td class="c-meta c-kind"><span class="tag">방송국 폐쇄</span></td><td class="c-title">샘플 방송국E</td><td class="c-tag"><span class="tag">기각</span><span class="muted small c-note" data-show="role=op">결정은 최고 관리자</span></td><td class="c-meta">샘플 운영자3</td><td class="c-act"><a class="btn" href="appeal-detail.html?kind=station-c&amp;st=no" aria-label="샘플 방송국E 이의제기 보기">보기</a></td></tr>
+      </tbody></table></div>
+    <p class="muted small" data-show="s=normal"><span class="slot">기간 지난 이의제기 접수 여부 미정</span></p>
+  </main>
+</div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var k = '', $ = function (i) { return document.getElementById(i); };
+  function f() {
+    var n = 0, s = document.body.dataset.s;
+    document.querySelectorAll('#list tbody tr').forEach(function (r) {
+      var ok = (!k || r.dataset.k === k) && (!$('st').value || r.dataset.st === $('st').value);
+      r.hidden = !ok; if (ok) n++;
+    });
+    if (s === 'filtered0') n = 0;
+    $('list').hidden = s !== 'normal' || n === 0;
+    $('none').hidden = !(n === 0 && (s === 'normal' || s === 'filtered0'));
+    $('cnt').textContent = s === 'normal' || s === 'filtered0' ? n + '건' : '';
+  }
+  function chip(v) {
+    k = v;
+    document.querySelectorAll('.chip').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.k === v)); });
+  }
+  window.mockAfter = f;
+  $('st').addEventListener('change', f);
+  document.querySelectorAll('.chip').forEach(function (c) { c.addEventListener('click', function () { chip(c.dataset.k); f(); }); });
+  $('clear').addEventListener('click', function () {
+    chip(''); $('st').value = ''; document.body.dataset.s = 'normal'; window.mockRender(); $('st').focus();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

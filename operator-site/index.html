@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>운영사 홈 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+</head>
+<body data-default="role:op">
+<header id="site-header" data-active="index"></header>
+<div class="mockbar"><div class="wrap"><div data-rolebar></div></div></div>
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>운영사 홈</h1>
+    <section class="notice" data-show="role=op"><strong>일반 운영자예요</strong><p>신고·심사·환불·파트너 화면에서 처리할 수 있어요. 위험 설정(상품·수수료율·한도)은 볼 수만 있고, 변경은 최고 관리자만 할 수 있어요.</p></section>
+    <section class="notice" data-show="role=super"><strong>최고 관리자예요</strong><p>모든 화면을 쓸 수 있고, 위험 설정은 새 버전을 추가해 바꿔요. 운영자 권한도 이곳에서 관리해요.</p></section>
+    <section aria-labelledby="h-go"><h2 id="h-go">바로가기</h2>
+      <ul class="plain" style="margin-top:8px">
+        <li><a href="reports.html">신고·모더레이션</a></li>
+        <li><a href="verification.html">목회자 심사</a></li>
+        <li><a href="refunds.html">환불·결제 오류</a></li>
+        <li><a href="partners.html">파트너 지정</a></li>
+        <li><a href="products.html">열매 충전 상품</a> <span class="tag">최고 관리자</span></li>
+        <li><a href="fees.html">수수료율</a> <span class="tag">최고 관리자</span></li>
+        <li><a href="limits.html">후원·TTS 한도</a> <span class="tag">최고 관리자</span></li>
+        <li><a href="audit.html">감사 로그·운영자 권한</a></li>
+      </ul></section>
+  </main>
+</div>
+<script src="operator-shell.js"></script>
+</body>
+</html>

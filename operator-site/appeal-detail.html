@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이의제기 상세 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-reports.css">
+<style>
+/* 원 조치 접힘: 펼침 화살표 + 증거 포함 안내(모바일) */
+#orig > summary { flex-wrap: wrap; gap: 0 8px; position: relative; padding-right: 32px; list-style: none; }
+#orig > summary::-webkit-details-marker { display: none; }
+#orig > summary::after { content: ""; position: absolute; right: 8px; top: 50%; width: 8px; height: 8px; margin-top: -6px; border: solid var(--muted); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+#orig[open] > summary::after { margin-top: -2px; transform: rotate(-135deg); }
+#orig .o-hint { display: none; flex: 1 0 100%; }
+@media (max-width: 1023px) { #orig:not([open]) .o-hint { display: block; } .rd { gap: 16px; } }
+</style>
+</head>
+<body data-default="role:super s:normal kind:content st:sent dlg:closed sv:res">
+<!-- 신고 수는 참고(조치 근거 아님). 결과는 덮어쓰지 않고 새 이력으로 남긴다. 담당자·시각은 자동 기록. 모든 이름·파일은 가상 샘플.
+     kind 키는 목회자 sanctions와 같다. st 대응(목회자 appeal:): sent·resub=sent, review=review, more=more, ok=ok, no=no
+     권한(임시, 리드 결정): content·ext·station-l은 일반 운영자도 결정, station-s·station-c·settle은 최고 관리자만 -->
+<header id="site-header" data-active="appeals"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:notfound">없는 건</button><button data-set="s:noreason">사유 미입력</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:locked">다른 운영자 처리 중</button><button data-set="s:self">내가 원 조치 담당</button><button data-set="s:saved">저장됨</button></div>
+  <div class="group"><b>조치 종류</b><button data-set="kind:station-l">방송국 제한</button><button data-set="kind:station-s">방송국 정지</button><button data-set="kind:station-c">방송국 폐쇄</button><button data-set="kind:content">영상 공개 제한</button><button data-set="kind:settle">정산 보류</button><button data-set="kind:ext">외부 후원 정보 검토</button></div>
+  <div class="group"><b>건 상태</b><button data-set="st:sent">접수</button><button data-set="st:resub">보완 제출됨</button><button data-set="st:review">검토 중</button><button data-set="st:more">보완 요청 중</button><button data-set="st:ok">인용</button><button data-set="st:no">기각</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:confirm">저장 확인</button><button data-set="dlg:file">증빙 보기</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <p><a href="appeals.html">← 이의제기 목록</a></p>
+    <h1>이의제기 상세</h1>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:160px;margin-top:8px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>이의제기를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=notfound"><p><strong>이의제기를 찾을 수 없어요</strong></p><a class="btn" href="appeals.html">목록으로</a></div>
+
+    <div class="stack" data-show="s=normal|noreason|saveerr|locked|self|saved">
+      <p class="row"><span class="tag k-name"></span><span class="tag" id="st-tag"></span><span class="muted">접수일 샘플 날짜</span><span class="muted">처리 기한 <span class="slot">처리 기한 미정</span></span></p>
+      <p class="only-m" data-show="st=sent|resub|review|more"><a class="linkbtn" href="#frm">처리하기 ↓</a></p>
+
+      <div class="notice" data-show="s=locked" role="status"><strong>다른 운영자가 처리 중이에요 (샘플 운영자2)</strong><p>먼저 연 운영자가 담당해요. 지금은 읽기만 할 수 있어요. <span class="slot">잠금 해제 방식 미정</span></p></div>
+      <div class="notice" data-show="s=self" role="status"><strong>내가 내린 조치에 대한 이의제기예요</strong><p>다른 운영자가 처리해요. 읽기만 할 수 있어요. <span class="slot">운영자가 1명일 때 처리 방법 미정</span></p></div>
+      <div class="notice danger" data-show="s=saveerr" role="alert"><strong>저장하지 못했어요</strong><p>입력한 내용은 그대로 두었어요.</p></div>
+      <div class="notice" data-show="s=saved" role="status" id="saved" tabindex="-1">
+        <strong data-show="sv=res">처리를 기록했어요</strong><p data-show="sv=res">목회자에게 알림을 보냈어요.</p>
+        <strong data-show="sv=op">검토 의견을 기록했어요</strong><p data-show="sv=op">아래 처리 이력 맨 위에서 확인할 수 있어요.</p></div>
+
+      <div class="rd">
+        <div class="stack">
+          <section aria-labelledby="h-a"><h2 id="h-a">목회자가 보낸 이의</h2>
+            <span class="sr">목회자가 쓴 사유</span>
+            <blockquote class="quote" style="margin:8px 0 0">샘플 이의 사유입니다. 조치 대상이 된 내용은 샘플 안내였다고 합니다 (가상 내용).</blockquote>
+            <h3 style="margin-top:16px">증빙 파일</h3>
+            <ul class="plain files">
+              <li><span>샘플 증빙 1.jpg</span><button class="btn" type="button" data-file="샘플 증빙 1.jpg" aria-label="샘플 증빙 1.jpg 열기">열기</button></li>
+              <li><span>샘플 증빙 2.jpg</span><button class="btn" type="button" data-file="샘플 증빙 2.jpg" aria-label="샘플 증빙 2.jpg 열기">열기</button></li>
+              <li><span>샘플 문서.pdf</span><button class="btn" type="button" data-file="샘플 문서.pdf" aria-label="샘플 문서.pdf 열기">열기</button></li>
+            </ul>
+            <p class="muted small">증빙 <span class="slot">형식·용량·개수 미정</span> · <span class="slot">열람 기록 여부 미정</span></p>
+            <div data-show="st=resub" style="margin-top:16px">
+              <h3>보완 제출 · 샘플 시각</h3>
+              <span class="sr">목회자가 쓴 보완 내용</span>
+              <blockquote class="quote" style="margin:8px 0 0">샘플 보완 내용입니다. 요청하신 자료를 추가로 보냅니다 (가상 내용).</blockquote>
+              <ul class="plain files"><li><span>샘플 보완 증빙.jpg</span><button class="btn" type="button" data-file="샘플 보완 증빙.jpg" aria-label="샘플 보완 증빙.jpg 열기">열기</button></li></ul>
+            </div></section>
+
+          <section aria-labelledby="h-o"><details class="why" id="orig" open><summary><h2 id="h-o">원 조치</h2>&nbsp;<span class="muted small"><span class="k-name"></span> · 샘플 사유</span><span class="o-hint muted small">증거 포함 · 눌러서 펼치기</span></summary>
+            <dl class="kv">
+              <dt>종류</dt><dd class="k-name"></dd>
+              <dt>대상</dt><dd><span class="k-target"></span> · <a href="../user-site/channel.html">대상으로 이동 (샘플 링크)</a></dd>
+              <dt>사유</dt><dd>샘플 사유</dd>
+              <dt>조치한 운영자</dt><dd>샘플 운영자2<span data-show="s=self"> (나)</span></dd>
+              <dt>시각</dt><dd>샘플 시각</dd>
+            </dl>
+            <h3 style="margin-top:16px">증거</h3>
+            <blockquote class="quote" style="margin:8px 0 0">샘플 원문입니다 (가상 내용).</blockquote>
+            <div class="shot" style="margin-top:8px">캡처 이미지 자리 (샘플)</div>
+            <p class="muted small" style="margin-top:8px" data-show="kind=station-l|station-s|station-c|content|ext">신고 수 샘플 N (참고, 조치 근거 아님)</p>
+            <p data-show="kind=station-l|station-s|station-c|content|ext"><a href="report-detail.html">원 신고 상세로</a></p>
+            <p class="muted" data-show="kind=settle" style="margin-top:8px">신고 없이 운영자가 직접 내린 조치예요</p>
+            <p class="muted small">증거 보존기간 <span class="slot">보존기간 미정</span></p>
+          </details></section>
+        </div>
+
+        <form class="panel stack rd-form" id="frm" onsubmit="return false" aria-labelledby="h-f" novalidate data-show="st=sent|resub|review|more">
+          <h2 id="h-f">처리</h2>
+          <fieldset class="radios" id="f-res" aria-describedby="f-res-e res-why"><legend>결과 <span class="muted">필수</span></legend>
+            <label><input type="radio" name="res" value="ok" aria-controls="f-next why-f"> 인용</label>
+            <label><input type="radio" name="res" value="no" aria-controls="why-f"> 기각</label>
+            <label><input type="radio" name="res" value="more" aria-controls="why-f"> 보완 요청</label>
+            <p class="help" id="res-why" hidden>인용·기각은 최고 관리자만 결정할 수 있어요</p>
+            <span class="err" id="f-res-e" hidden>결과를 선택해 주세요</span></fieldset>
+
+          <div class="stack" id="dec">
+            <fieldset class="radios" id="f-next" aria-describedby="f-next-e nx-h" hidden><legend>후속 조치 <span class="muted">필수</span></legend>
+              <label><input type="radio" name="nx" value="rel"> <span id="nx-rel"></span></label>
+              <label id="nx-chg-l"><input type="radio" name="nx" value="chg" aria-controls="nx-sel-f"> 조치 변경</label>
+              <label class="field" id="nx-sel-f" hidden style="display:block;min-height:0"><span class="label">바꿀 조치 <span class="slot">선택지 미정</span></span><select class="input" id="nx-sel"><option>샘플 조치 (원 조치보다 가벼운 값만)</option></select></label>
+              <p class="help" id="nx-h"></p>
+              <span class="err" id="f-next-e" hidden>후속 조치를 선택해 주세요</span></fieldset>
+            <p class="help" data-show="kind=ext">자동 탐지 건은 기각만으로 영구 제재로 이어지지 않아요</p>
+            <div id="ev-f" hidden><label class="check"><input type="checkbox" id="ev" aria-describedby="ev-e"> 증거를 직접 확인했어요 <span class="muted">필수</span></label><span class="err" id="ev-e" hidden>증거를 확인하고 체크해 주세요</span></div>
+            <label class="field" id="why-f"><span class="label" id="why-l"></span><textarea class="textarea" id="why" rows="4" aria-describedby="why-e why-h"></textarea><span class="err" id="why-e" hidden>사유를 입력해 주세요</span><span class="help" id="why-h" style="display:block">목회자 화면에 그대로 보여요. 신고자 등 제3자 정보는 적지 마세요 <span class="slot">가림 범위 미정</span></span></label>
+          </div>
+          <label class="field" id="op-f" hidden><span class="label">검토 의견</span><textarea class="textarea" id="op" rows="4" aria-describedby="op-e op-h"></textarea><span class="err" id="op-e" hidden>검토 의견을 입력해 주세요</span><span class="help" id="op-h" style="display:block">결정하는 최고 관리자에게 보여요. 목회자에게는 보이지 않아요</span></label>
+
+          <div><span class="label">담당자</span><p class="ro">샘플 운영자 (로그인한 운영자)</p></div>
+          <div><span class="label">시각</span><p class="ro muted">저장 시 자동 기록</p></div>
+          <p class="help" id="off-why" hidden></p>
+          <button class="btn primary block" type="button" id="save" aria-describedby="off-why">처리 저장</button>
+        </form>
+
+        <section class="panel stack rd-form" aria-labelledby="h-r" data-show="st=ok|no"><h2 id="h-r">결과</h2>
+          <dl class="kv">
+            <dt>결과</dt><dd><span data-show="st=ok">인용</span><span data-show="st=no">기각</span></dd>
+            <dt data-show="st=ok">후속 조치</dt><dd data-show="st=ok" class="k-rel"></dd>
+            <dt>사유</dt><dd class="u-why">샘플 사유</dd>
+            <dt>담당자</dt><dd class="u-who">샘플 운영자3</dd>
+            <dt>시각</dt><dd class="u-when">샘플 시각</dd>
+          </dl>
+          <p class="muted small"><span class="slot">추가 이의제기 가능 여부 미정</span></p>
+          <p><button class="linkbtn" type="button" id="fix" aria-describedby="fix-h" style="padding-left:0">결과 정정</button></p>
+          <p class="help" id="fix-h" style="margin-top:0"></p>
+        </section>
+      </div>
+
+      <section aria-labelledby="h-h"><h2 id="h-h">처리 이력</h2>
+        <ol class="tl" style="margin-top:8px">
+          <li data-show="s=saved sv=op"><strong>검토 의견</strong> · 샘플 운영자 · 방금<br>의견: <span id="op-out"></span></li>
+          <li data-show="st=ok"><strong class="k-rel"></strong> · <span class="u-who">샘플 운영자3</span> · <span class="u-when">샘플 시각</span></li>
+          <li data-show="st=ok"><strong>이의 인용</strong> · <span class="u-who">샘플 운영자3</span> · <span class="u-when">샘플 시각</span><br>사유: <span class="u-why">샘플 사유</span></li>
+          <li data-show="st=no"><strong>이의 기각</strong> · <span class="u-who">샘플 운영자3</span> · <span class="u-when">샘플 시각</span><br>사유: <span class="u-why">샘플 사유</span></li>
+          <li data-show="kind=station-s|station-c|settle"><strong>검토 의견</strong> · 샘플 운영자4 · 샘플 시각<br>의견: 샘플 의견</li>
+          <li data-show="st=resub"><strong>보완 제출</strong> · 목회자 · 샘플 시각</li>
+          <li data-show="st=resub|more"><strong>보완 요청</strong> · 샘플 운영자 · 샘플 시각<br>요청 내용: 샘플 요청 내용</li>
+          <li><strong>접수</strong> · 목회자 · 샘플 시각</li>
+        </ol></section>
+    </div>
+  </main>
+</div>
+
+<dialog id="confirm-dlg" aria-labelledby="c-t"><h2 id="c-t"></h2>
+  <dl class="kv" style="margin-top:12px"><dt>대상</dt><dd id="c-target"></dd><dt>결과</dt><dd id="c-res"></dd><dt>후속 조치</dt><dd id="c-next"></dd><dt>사유 요약</dt><dd id="c-why"></dd></dl>
+  <p style="margin-top:12px">목회자에게 알림이 가요. <span id="c-ok">조치가 바로 해제(변경)돼요.</span></p>
+  <p class="muted small"><span class="slot">법무 안내 문구 미정</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn" type="button" id="c-go">저장</button></div>
+</dialog>
+
+<dialog id="fix-dlg" aria-labelledby="x-t"><h2 id="x-t">결과를 정정할까요?</h2>
+  <p style="margin-top:12px">기존 결과는 지워지지 않고, 정정 내용이 새 이력으로 추가돼요. 목회자에게 알림이 가요.</p>
+  <p class="muted small"><span class="slot">정정 사유 입력 여부 미정</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn bad" type="button" id="x-go">정정</button></div>
+</dialog>
+
+<dialog id="file-dlg" aria-labelledby="f-t"><h2 id="f-t" style="overflow-wrap:anywhere"></h2>
+  <div class="shot" id="f-img" style="margin-top:12px;max-width:100%">증빙 이미지 자리 (샘플)</div>
+  <div id="f-no" style="margin-top:12px" hidden><p>미리 볼 수 없는 형식이에요</p><p style="margin-top:8px"><button class="btn" type="button">내려받기</button></p></div>
+  <p class="row" id="f-nav" style="margin-top:12px;justify-content:space-between"><button class="btn" type="button" id="f-prev">이전</button><span id="f-pos" role="status"></span><button class="btn" type="button" id="f-next-b">다음</button></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>닫기</button></div>
+</dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var all = function (s) { return [].slice.call(document.querySelectorAll(s)); };
+  var KIND = { 'station-l': '방송국 제한', 'station-s': '방송국 정지', 'station-c': '방송국 폐쇄', content: '영상 공개 제한', settle: '정산 보류', ext: '외부 후원 정보 검토' };
+  var ST = { sent: '접수', resub: '보완 제출됨', review: '검토 중', more: '보완 요청 중', ok: '인용', no: '기각' };
+  var RES = { ok: ['인용', '인용으로 저장할까요?', '인용 사유'], no: ['기각', '기각으로 저장할까요?', '기각 사유'], more: ['보완 요청', '보완을 요청할까요?', '요청 내용'] };
+  var OFF = { locked: '읽기 전용이라 저장할 수 없어요', self: '내가 내린 조치라 처리할 수 없어요' };
+  var files = [], fi = 0;
+  function val(n) { var c = document.querySelector('input[name=' + n + ']:checked'); return c ? c.value : ''; }
+  function can() { return b.dataset.role === 'super' || /^(content|ext|station-l)$/.test(b.dataset.kind); }
+  function rel() { return b.dataset.kind === 'settle' ? '정산 보류 해제' : '원 조치 해제'; }
+  function next() { return val('res') !== 'ok' ? '—' : val('nx') === 'chg' ? '조치 변경: ' + $('nx-sel').value : val('nx') ? rel() : '—'; }
+  // 고른 결과에 따라 후속 조치·증거 확인·사유 라벨을 맞춘다
+  function sync() {
+    var r = val('res'), settle = b.dataset.kind === 'settle';
+    $('f-next').hidden = r !== 'ok';
+    $('nx-rel').textContent = rel(); $('nx-chg-l').hidden = settle;
+    if (settle) document.querySelector('input[name=nx][value=rel]').checked = true;
+    $('nx-sel-f').hidden = val('nx') !== 'chg';
+    $('nx-h').textContent = settle ? '마감된 정산은 고치지 않아요. 필요하면 조정 거래를 생성해요(환불 화면)' : '저장하면 조치 해제·변경이 함께 처리돼요';
+    $('ev-f').hidden = !(b.dataset.kind === 'station-c' && r === 'no');
+    $('why-l').innerHTML = (r ? RES[r][2] : '사유') + ' <span class="muted">필수</span>';
+  }
+  // 오류 표시 후 첫 오류 칸을 돌려준다(없으면 null)
+  function check() {
+    if (!can()) { var e = !$('op').value.trim(); $('op-e').hidden = !e; $('op').setAttribute('aria-invalid', String(e)); return e ? $('op') : null; }
+    var r = val('res'), bad = [
+      [!r, 'f-res-e', document.querySelector('input[name=res]')],
+      [r === 'ok' && !val('nx'), 'f-next-e', document.querySelector('input[name=nx]')],
+      [!$('ev-f').hidden && !$('ev').checked, 'ev-e', $('ev')],
+      [!$('why').value.trim(), 'why-e', $('why')]], first = null;
+    bad.forEach(function (x) { $(x[1]).hidden = !x[0]; if (x[0] && !first) first = x[2]; });
+    $('why').setAttribute('aria-invalid', String(bad[3][0]));
+    return first;
+  }
+  function fill() {
+    var r = val('res') || 'more', w = $('why').value.trim();
+    $('c-t').textContent = RES[r][1]; $('c-target').textContent = document.querySelector('.k-target').textContent;
+    $('c-res').textContent = RES[r][0]; $('c-next').textContent = next();
+    $('c-why').textContent = w ? (w.length > 40 ? w.slice(0, 40) + '…' : w) : '—';
+    $('c-ok').hidden = r !== 'ok'; $('c-go').className = 'btn' + (r === 'more' ? '' : ' bad');
+  }
+  function show(i) {
+    files = all('[data-file]').filter(function (x) { return !x.closest('[hidden]'); });
+    fi = Math.max(0, Math.min(i, files.length - 1));
+    var n = files[fi].dataset.file, img = /\.(jpe?g|png)$/.test(n);
+    $('f-t').textContent = n; $('f-img').hidden = !img; $('f-no').hidden = img;
+    $('f-pos').textContent = (fi + 1) + ' / ' + files.length;
+    $('f-prev').disabled = fi === 0; $('f-next-b').disabled = fi === files.length - 1; $('f-nav').hidden = files.length < 2;
+  }
+  window.mockAfter = function () {
+    var s = b.dataset.s, k = b.dataset.kind, c = can();
+    var why = OFF[s] || (b.dataset.st === 'more' ? '목회자가 보완해 보내면 다시 처리할 수 있어요' : '');
+    all('.k-name').forEach(function (x) { x.textContent = KIND[k] || k; });
+    all('.k-target').forEach(function (x) { x.textContent = k === 'content' ? '샘플 설교 영상 제목' : '샘플 방송국'; });
+    all('.k-rel').forEach(function (x) { x.textContent = rel(); });
+    $('st-tag').textContent = ST[b.dataset.st] || '';
+    if (s === 'noreason' && c) { document.querySelector('input[name=res][value=no]').checked = true; $('why').value = ''; sync(); check(); }
+    if (s === 'noreason' && !c) { $('op').value = ''; check(); }
+    if (!c) all('input[name=res]').forEach(function (x) { x.checked = false; });
+    sync();
+    $('dec').hidden = !c; $('op-f').hidden = c; $('res-why').hidden = c; $('save').textContent = c ? '처리 저장' : '의견 저장';
+    all('#frm input, #frm textarea, #frm select, #save').forEach(function (x) { x.disabled = !!why || (!c && x.name === 'res'); });
+    $('off-why').hidden = !why; $('off-why').textContent = why;
+    var fixWhy = OFF[s] ? OFF[s].replace(/저장|처리/, '정정') : b.dataset.role !== 'super' ? '최고 관리자만 정정할 수 있어요' : '';
+    $('fix').disabled = !!fixWhy; $('fix-h').textContent = (fixWhy ? fixWhy + '. ' : '') + '정정하면 덮어쓰지 않고 새 이력으로 남겨요';
+    var key = b.dataset.dlg, d = key !== 'closed' && $(key + '-dlg');
+    if (d && !d.open) { if (key === 'file') show(0); else fill(); d.showModal(); }
+  };
+  ['confirm', 'file'].forEach(function (k) {
+    $(k + '-dlg').addEventListener('close', function () { if (b.dataset.dlg === k) { b.dataset.dlg = 'closed'; window.mockRender(); } });
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target.name !== 'res' && e.target.name !== 'nx') return;
+    sync(); if (all('#frm .err:not([hidden])').length) check();
+  });
+  $('save').addEventListener('click', function () {
+    var bad = check(); if (bad) { bad.focus(); return; }
+    if (can()) { fill(); $('confirm-dlg').showModal(); return; }
+    $('op-out').textContent = $('op').value.trim(); $('op').value = '';
+    b.dataset.sv = 'op'; b.dataset.s = 'saved'; window.mockRender(); $('saved').focus();
+  });
+  // 결과 정정: 확인 후 새 이력 추가(덮어쓰지 않음). Esc·닫기 시 [결과 정정]으로 포커스 복귀
+  $('fix').addEventListener('click', function () { var d = $('fix-dlg'); d._opener = $('fix'); d.showModal(); });
+  $('fix-dlg').addEventListener('close', function () { $('fix').focus(); });
+  $('x-go').addEventListener('click', function () {
+    $('fix-dlg').close();
+    var li = document.createElement('li'); li.innerHTML = '<strong>결과 정정</strong> · 샘플 운영자 · 방금<br>이전 결과: ' + (b.dataset.st === 'ok' ? '인용' : '기각') + ' (기록은 그대로 남아요)';
+    document.querySelector('.tl').prepend(li); $('fix-h').textContent = '정정을 새 이력으로 남겼어요';  });
+  $('c-go').addEventListener('click', function () {
+    $('confirm-dlg').close();
+    var w = $('why').value.trim();
+    all('.u-who').forEach(function (x) { x.textContent = '샘플 운영자'; }); all('.u-when').forEach(function (x) { x.textContent = '방금'; }); all('.u-why').forEach(function (x) { x.textContent = w; });
+    b.dataset.st = val('res') || b.dataset.st; b.dataset.sv = 'res'; b.dataset.s = 'saved'; window.mockRender(); $('saved').focus();
+  });
+  document.addEventListener('click', function (e) {
+    var f = e.target.closest('[data-file]'); if (!f) return;
+    show(all('[data-file]').filter(function (x) { return !x.closest('[hidden]'); }).indexOf(f)); $('file-dlg').showModal();
+  });
+  $('f-prev').addEventListener('click', function () { show(fi - 1); if ($('f-prev').disabled) $('f-next-b').focus(); });
+  $('f-next-b').addEventListener('click', function () { show(fi + 1); if ($('f-next-b').disabled) $('f-prev').focus(); });
+  // 모바일(1023 이하)에서는 원 조치를 접어 둔다
+  if (window.matchMedia('(max-width: 1023px)').matches) $('orig').removeAttribute('open');
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

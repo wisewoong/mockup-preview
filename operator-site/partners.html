@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>파트너 지정 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+<link rel="stylesheet" href="operator-verify.css">
+</head>
+<body data-default="role:op s:normal">
+<header id="site-header" data-active="partners"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">지정 실패</button> <span class="help" data-show="s=saveerr">샘플 화면에서는 [지정]을 누르면 이 안내가 보여요.</span></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>파트너 지정</h1>
+    <p class="muted small">파트너 지정은 플랫폼 운영자가 해요. 지정·해제할 때는 사유를 적고, 담당자와 시각이 기록으로 남아요. 지정 자격 조건: <span class="slot">자격 조건</span></p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:120px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=empty"><p><strong>방송국이 없어요</strong></p><p>방송국이 생기면 여기에서 파트너로 지정할 수 있어요.</p></div>
+
+    <div class="stack" data-show="s=normal|saveerr">
+      <div class="notice danger" role="alert" data-show="s=saveerr"><strong>지정하지 못했어요</strong><p>적은 사유는 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
+      <p id="msg" tabindex="-1" class="notice" role="status" hidden></p>
+      <div class="tbl-wrap cards v"><table><caption class="sr">방송국 파트너 현황 (샘플)</caption>
+        <thead><tr><th scope="col">방송국</th><th scope="col">소유자</th><th scope="col">인증 여부</th><th scope="col">현재 상태</th><th scope="col">파트너 요율</th><th scope="col">작업</th></tr></thead>
+        <tbody id="rows"></tbody></table></div>
+      <p class="muted small">파트너 요율은 수수료율 화면의 파트너 값이 적용돼요. 요율 값은 이 화면에서 바꾸지 않아요.</p>
+    </div>
+  </main>
+</div>
+
+<dialog id="p-dlg" aria-labelledby="p-t"><h2 id="p-t"></h2>
+  <p class="muted small" style="margin-top:4px">대상: <strong id="p-name" style="display:inline"></strong> (샘플)</p>
+  <div class="notice danger" role="alert" id="p-err" style="margin-top:12px" hidden><strong>처리하지 못했어요</strong><p>적은 사유는 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
+  <form class="stack" onsubmit="return false" style="margin-top:12px">
+    <label class="field"><span class="label">사유 <span class="muted">필수</span></span><textarea class="textarea" id="p-why" rows="4" aria-describedby="p-why-e"></textarea><span class="err" id="p-why-e" hidden>사유를 입력해 주세요.</span></label>
+    <p class="muted small">담당자: 샘플 운영자 (자동 기록) · 시각도 함께 남아요.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" id="p-go"></button></div>
+  </form></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  // 상태: before 지정 전 / on 지정됨 / off 해제됨
+  var R = [['샘플 방송국 가', '샘플 목회자 A', 1, 'before'], ['샘플 방송국 나', '샘플 목회자 B', 1, 'on'], ['샘플 방송국 다', '샘플 목회자 C', 0, 'before'], ['샘플 방송국 라', '샘플 목회자 D', 1, 'off']];
+  var LBL = { before: '지정 전', on: '지정됨', off: '해제됨' }, cur = -1;
+  function draw() {
+    $('rows').innerHTML = R.map(function (r, i) {
+      var on = r[3] === 'on';
+      return '<tr><th scope="row" class="c-title">' + r[0] + '</th><td class="c-tag"><span class="tag">' + LBL[r[3]] + '</span></td><td data-label="소유자">' + r[1] + '</td><td data-label="인증 여부">' + (r[2] ? '인증' : '미인증') + '</td>' +
+        '<td data-label="파트너 요율">' + (on ? '<span class="slot">V3</span>' : '<span class="muted">—</span>') + '</td><td class="c-act">' +
+        (r[2] || on ? '' : '<p class="help" id="why' + i + '">인증 목회자만 지정할 수 있어요</p>') + (on ? '<button class="btn bad" type="button" data-act="off" data-i="' + i + '">해제</button>'
+          : '<button class="btn" type="button" data-act="on" data-i="' + i + '"' + (r[2] ? '' : ' disabled aria-describedby="why' + i + '"') + '>지정</button>') + '</td></tr>';
+    }).join('');
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-act]');
+    if (!a) return;
+    cur = +a.dataset.i; var on = a.dataset.act === 'on', d = $('p-dlg'); d.dataset.mode = a.dataset.act;
+    $('p-t').textContent = on ? '파트너로 지정할까요?' : '파트너 지정을 해제할까요?';
+    $('p-go').textContent = on ? '지정' : '해제'; $('p-name').textContent = R[cur][0];
+    $('p-why').value = ''; $('p-why-e').hidden = true; $('p-err').hidden = true;
+    d._opener = a; d.showModal();
+  });
+  $('p-go').addEventListener('click', function () {
+    if (!$('p-why').value.trim()) { $('p-why-e').hidden = false; $('p-why').setAttribute('aria-invalid', 'true'); $('p-why').focus(); return; }
+    if (b.dataset.s === 'saveerr') { $('p-err').hidden = false; return; } // 입력 유지, 닫지 않음
+    var on = $('p-dlg').dataset.mode === 'on'; R[cur][3] = on ? 'on' : 'off';
+    $('p-dlg').close(); draw(); var ob = document.querySelector('[data-act][data-i="' + cur + '"]'); (ob || $('msg')).focus();
+    var m = $('msg'); m.hidden = false; m.textContent = (on ? '파트너 지정을 기록했어요: ' : '파트너 해제를 기록했어요: ') + R[cur][0] + '.';
+  });
+  window.mockAfter = function () { if (b.dataset.s !== 'saveerr') $('p-err').hidden = true; };
+  draw(); window.mockRender();
+})();
+</script>
+</body>
+</html>

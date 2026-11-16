@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>감사 로그·운영자 권한 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+</head>
+<body data-default="role:super s:normal">
+<header id="site-header" data-active="audit"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:daterr">기간 오류</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>감사 로그</h1>
+    <p class="muted small">정책 변경·제재·심사 기록이에요. 기록은 고치거나 지울 수 없어요. 보존 기간: <span class="slot">감사 로그 보존기간</span></p>
+
+    <form class="filters" onsubmit="return false" aria-label="감사 로그 조회">
+      <label class="field"><span class="label">시작일</span><input class="input" type="date" id="d1" aria-describedby="d-e"></label>
+      <label class="field"><span class="label">종료일</span><input class="input" type="date" id="d2" aria-describedby="d-e"></label>
+      <label class="field"><span class="label">종류</span><select class="input" id="kind"><option>전체</option><option>정책</option><option>제재</option><option>심사</option><option>금칙어</option></select></label>
+      <button class="btn" type="button" id="q">조회</button>
+    </form>
+    <p class="err" id="d-e" role="alert" hidden>종료일은 시작일 이후로 골라 주세요.</p>
+    <p class="notice danger" role="alert" data-show="s=daterr"><strong>기간이 올바르지 않아요</strong>종료일은 시작일 이후로 골라 주세요.</p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:120px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>기록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=empty"><p><strong>조건에 맞는 기록이 없어요</strong></p><p>기간이나 종류를 바꿔 보세요.</p></div>
+
+    <div class="tbl-wrap cards" data-show="s=normal"><table><caption class="sr">감사 로그 (샘플)</caption>
+      <thead><tr><th scope="col">요약·종류</th><th scope="col">시각</th><th scope="col">운영자</th><th scope="col">대상</th><th scope="col">상세</th></tr></thead>
+      <tbody>
+        <tr><td data-label="요약"><strong>파트너 요율 새 버전 추가</strong> <span class="tag">정책</span></td><td data-label="시각">샘플 시각</td><td data-label="운영자">샘플 운영자</td><td data-label="대상">수수료율</td><td><details><summary>전후 보기</summary><div class="tbl-wrap"><table class="diff"><caption class="sr">변경 전후</caption><thead><tr><th scope="col">항목</th><th scope="col">전</th><th scope="col">후</th></tr></thead>
+          <tbody><tr><th scope="row">기본 수수료율</th><td><span class="slot">V2</span></td><td><span class="slot">V2</span></td></tr>
+          <tr><th scope="row" class="chg">파트너 수수료율</th><td><span class="slot">V3</span></td><td class="chg"><span class="slot">V3</span></td></tr></tbody></table></div></details></td></tr>
+        <tr><td data-label="요약"><strong>이용 제한 조치 (사유 기록됨)</strong> <span class="tag">제재</span></td><td data-label="시각">샘플 시각</td><td data-label="운영자">샘플 운영자</td><td data-label="대상">샘플 방송국</td><td><details><summary>전후 보기</summary><div class="tbl-wrap"><table class="diff"><caption class="sr">변경 전후</caption><thead><tr><th scope="col">항목</th><th scope="col">전</th><th scope="col">후</th></tr></thead>
+          <tbody><tr><th scope="row" class="chg">방송국 상태</th><td>정상</td><td class="chg">제한</td></tr>
+          <tr><th scope="row">공개 범위</th><td>공개</td><td>공개</td></tr></tbody></table></div></details></td></tr>
+        <tr><td data-label="요약"><strong>인증 신청 승인</strong> <span class="tag">심사</span></td><td data-label="시각">샘플 시각</td><td data-label="운영자">샘플 운영자</td><td data-label="대상">샘플 목회자</td><td><details><summary>전후 보기</summary><div class="tbl-wrap"><table class="diff"><caption class="sr">변경 전후</caption><thead><tr><th scope="col">항목</th><th scope="col">전</th><th scope="col">후</th></tr></thead>
+          <tbody><tr><th scope="row" class="chg">인증 상태</th><td>신청</td><td class="chg">승인</td></tr></tbody></table></div></details></td></tr>
+      </tbody></table></div>
+
+    <hr class="sep">
+    <section aria-labelledby="h-adm" class="stack"><h2 id="h-adm">운영자 권한</h2>
+      <div class="empty" data-show="role=op"><p><strong>최고 관리자만 볼 수 있어요</strong></p></div>
+      <div data-show="role=super" class="stack">
+        <p class="muted small">역할을 바꾸면 사유와 담당자가 감사 로그에 남아요.</p>
+        <div class="tbl-wrap cards"><table><caption class="sr">운영자 권한 (샘플)</caption>
+          <thead><tr><th scope="col">운영자</th><th scope="col">역할</th><th scope="col">변경</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">샘플 운영자 1</th><td class="r" data-label="역할">최고 관리자</td><td><button class="btn" type="button" data-open="r-dlg" data-n="샘플 운영자 1">역할 변경</button></td></tr>
+            <tr><th scope="row">샘플 운영자 2</th><td class="r" data-label="역할">일반 운영자</td><td><button class="btn" type="button" data-open="r-dlg" data-n="샘플 운영자 2">역할 변경</button></td></tr>
+          </tbody></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="r-dlg" aria-labelledby="r-t"><h2 id="r-t">역할을 바꿀까요?</h2>
+  <p class="muted small" style="margin-top:4px">대상: <span id="r-n"></span></p>
+  <form class="stack" onsubmit="return false" style="margin-top:12px">
+    <label class="field"><span class="label">새 역할</span><select class="input"><option>일반 운영자</option><option>최고 관리자</option></select></label>
+    <label class="field"><span class="label">사유 <span class="muted">필수</span></span><textarea class="textarea" id="r-why" rows="3" aria-describedby="r-e"></textarea><span class="err" id="r-e" hidden>사유를 입력해 주세요.</span></label>
+    <p class="muted small">담당자: 샘플 운영자 (자동 기록)</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="r-go">변경</button></div>
+  </form></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var $ = function (i) { return document.getElementById(i); }, b = document.body;
+  document.addEventListener('click', function (e) {
+    var o = e.target.closest('[data-n]'); if (o) { $('r-n').textContent = o.dataset.n; $('r-why').value = ''; $('r-e').hidden = true; }
+  });
+  $('q').addEventListener('click', function () {
+    var a = $('d1').value, z = $('d2').value, bad = a && z && z < a;
+    $('d-e').hidden = !bad; [$('d1'), $('d2')].forEach(function (i) { i.setAttribute('aria-invalid', String(!!bad)); });
+    if (bad) { b.dataset.s = 'daterr'; $('d2').focus(); } else b.dataset.s = 'normal';
+    window.mockRender();
+  });
+  $('r-go').addEventListener('click', function () {
+    if (!$('r-why').value.trim()) { $('r-e').hidden = false; $('r-why').focus(); return; }
+    $('r-dlg').close();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

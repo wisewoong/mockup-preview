@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>영상 관리 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal pr:ready vis:private rt:need dlg:closed src:auto op:none">
+<!-- 영상 관리(DESIGN-REMAINING). 숫자·기간·재시도 한도는 슬롯. 구독자 공개·멤버십 전용은 없음. 상세 시트는 상태 막대 값(첫 행)을 그대로 보여 주는 목업 -->
+<header id="site-header" data-active="videos"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>목록</b><button data-set="s:normal">기본</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:partial">부분 실패</button><button data-set="s:loaderr">전체 실패</button></div>
+  <div class="group"><b>처리 상태</b><button data-set="pr:run">처리 중</button><button data-set="pr:ready">준비 완료</button><button data-set="pr:failed">실패</button><button data-set="pr:retrying">다시 처리 중</button><button data-set="pr:failedagain">다시 실패</button><button data-set="pr:reqsent">요청 접수</button><button data-set="pr:opproc">운영자 처리 중</button><button data-set="pr:opdone">운영자 완료</button><button data-set="pr:opfail">처리 불가</button></div>
+  <div class="group"><b>공개 범위</b><button data-set="vis:private">비공개</button><button data-set="vis:link">링크 공개</button><button data-set="vis:public">전체 공개</button><b>권리 확인</b><button data-set="rt:need">필요</button><button data-set="rt:done">완료</button><b>출처</b><button data-set="src:auto">자동 녹화</button><button data-set="src:upload">업로드</button><b>운영 조치</b><button data-set="op:none">없음</button><button data-set="op:blocked">차단</button></div>
+  <div class="group"><b>상세·대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:detail">상세 열림</button><button data-set="dlg:rc">권리 확인 게이트</button><button data-set="dlg:pub">공개 변경 확인</button><button data-set="dlg:reject">서버 거절</button><button data-set="dlg:saveerr">저장 실패</button><button data-set="dlg:conflict">동시 변경</button><button data-set="dlg:ok">성공</button></div>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 상세 시트는 어느 행의 [관리]를 눌러도 막대 값(첫 행)을 보여 주는 목업이에요. 사용자 결정 전: 운영자 재처리 요청의 수신 화면, 구독 알림 여부.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 관리자 이상만 쓸 수 있어요</strong></p><p><a class="btn" href="live-control.html">채팅 관리로</a></p></div></section>
+
+<div class="stack" data-show="role=owner|adm0|admall">
+<div class="mem-head"><h1>영상 관리</h1><a class="btn primary" href="upload.html">영상 올리기</a></div>
+<div class="notice" role="status" id="proc-note" hidden></div>
+<div class="notice danger" role="alert" data-show="s=partial"><strong>일부 영상을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>영상 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+
+<section class="stack" data-show="s=normal|partial" aria-label="필터">
+  <div class="stack hide-m" id="chipbox"></div>
+  <div class="hide-d blk"><div class="stack" id="selbox"></div></div>
+</section>
+
+<section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
+<div class="empty" data-show="s=empty"><p><strong>아직 영상이 없어요</strong></p><p>영상을 올리거나 라이브를 시작하면 여기에 모여요.</p><div class="row" style="justify-content:center"><a class="btn primary" href="upload.html">영상 올리기</a><a class="btn" href="live-start.html" data-show="role=owner|admall">라이브 시작</a></div></div>
+<div class="empty" id="f0" hidden><p><strong>조건에 맞는 영상이 없어요</strong></p><p><button class="btn" type="button" id="freset">필터 초기화</button></p></div>
+
+<section data-show="s=normal|partial" id="listbox" aria-label="영상 목록">
+  <table class="mem"><caption class="sr">영상 목록</caption>
+    <thead><tr><th scope="col">영상</th><th scope="col">출처</th><th scope="col">처리 상태</th><th scope="col">공개 범위</th><th scope="col">권리 확인</th><th scope="col">작업</th></tr></thead>
+    <tbody id="tb"></tbody></table>
+  <div class="mcards" id="cards"></div>
+</section>
+</div>
+</div></main>
+
+<!-- 영상 상세 시트 -->
+<dialog class="sheet wide" id="v-dlg" aria-labelledby="v-t"><h2 id="v-t">영상 상세</h2>
+  <div class="stack" style="margin-top:12px">
+    <p><strong id="v-name">샘플 설교 영상</strong> <span class="tag" id="v-src"></span></p>
+    <div class="notice danger" role="alert" data-show="op=blocked"><strong>운영 조치로 공개할 수 없어요</strong><p class="small">사유와 이의제기는 <a href="sanctions.html">제재 안내</a>에서 볼 수 있어요.</p></div>
+    <div class="notice danger" role="alert" data-show="dlg=reject"><strong>권리 확인이 필요해서 공개할 수 없어요</strong><p class="small">선택한 값은 그대로 남아 있어요.</p></div>
+    <div class="notice danger" role="alert" data-show="dlg=saveerr"><strong>저장하지 못했어요. 다시 시도해 주세요</strong><p class="small">선택한 값은 그대로 남아 있어요.</p></div>
+    <div class="notice danger" role="alert" data-show="dlg=conflict"><strong>다른 사람이 먼저 바꿨어요</strong><p class="small">화면을 새로 불러와 주세요.</p></div>
+    <div class="notice" role="status" data-show="dlg=ok"><strong>공개 범위를 바꿨어요</strong></div>
+
+    <div class="limit"><dl>
+      <dt>처리 상태</dt><dd id="a-pr"></dd>
+      <dt>공개 범위</dt><dd id="a-vis"></dd>
+      <dt>운영 조치</dt><dd id="a-op"></dd>
+      <dt>권리 확인</dt><dd id="a-rt"></dd>
+    </dl></div>
+
+    <section class="stack" aria-label="처리" id="proc">
+      <h3>처리</h3>
+      <p data-show="pr=run"><progress aria-label="처리 중"></progress> 영상을 처리하는 중이에요 · <span class="slot">처리 단계</span></p>
+      <p data-show="pr=ready|opdone">영상 처리가 끝났어요.</p>
+      <div class="notice danger" role="alert" data-show="pr=failed"><strong>영상 처리에 실패했어요</strong><p class="small">사유: <span class="slot">실패 사유</span></p><p style="margin-top:8px"><button class="btn" type="button" id="reproc" data-icon="retry" data-keep>다시 처리</button></p></div>
+      <p role="status" data-show="pr=retrying"><progress aria-label="다시 처리 중"></progress> 다시 처리하는 중이에요.</p>
+      <div class="notice danger" role="alert" data-show="pr=failedagain"><strong>다시 처리했지만 실패했어요</strong><p class="small">다시 처리는 <span class="slot">재시도 한도</span>까지 할 수 있어요. 한도에 도달해서 더 할 수 없어요.</p><p class="row" style="margin-top:8px"><button class="btn" type="button" disabled aria-describedby="rp-why">다시 처리</button><button class="btn" type="button" id="opreq">운영자에게 재처리 요청</button></p><p class="help" id="rp-why">재시도 한도에 도달했어요</p></div>
+      <div class="notice" role="status" data-show="pr=reqsent"><strong>요청했어요</strong><p class="small">접수됐고 결과는 알림으로 알려 드려요.</p></div>
+      <p role="status" data-show="pr=opproc">운영자가 다시 처리하는 중이에요. 결과는 알림으로 알려 드려요.</p>
+      <p role="status" data-show="pr=opdone">운영자가 다시 처리했어요. 권리 확인 뒤 공개할 수 있어요.</p>
+      <div class="notice danger" role="alert" data-show="pr=opfail"><strong>이 영상은 처리할 수 없어요</strong><p class="small">사유: <span class="slot">운영자 회신 사유</span></p><p style="margin-top:8px"><a class="btn" href="upload.html">다시 올리기</a></p></div>
+    </section>
+
+    <fieldset class="pick" id="visf" style="border:0;padding:0;margin:16px 0 0;grid-template-columns:1fr"><legend class="label" style="font-weight:700;margin-bottom:6px">공개 범위</legend>
+      <label><input type="radio" name="vis" value="public"><span><span class="t">전체 공개</span><span class="small muted">누구나 찾아서 볼 수 있어요</span></span></label>
+      <label><input type="radio" name="vis" value="link"><span><span class="t">링크 공개</span><span class="small muted">링크를 아는 사람만 볼 수 있어요</span></span></label>
+      <label><input type="radio" name="vis" value="private"><span><span class="t">비공개</span><span class="small muted">나와 구성원만 볼 수 있어요</span></span></label>
+    </fieldset>
+    <p class="help" id="vis-why" hidden></p>
+
+    <div class="notice" id="rc"><strong>공개하려면 권리 확인이 필요해요</strong>
+      <p class="row" style="margin-top:8px"><button class="btn" type="button" id="rcopen" aria-describedby="rcown">권리 확인하기</button></p>
+      <p class="help" id="rcown" hidden>권리 확인 저장은 소유자만 할 수 있어요</p>
+      <div class="stack" id="rcform" hidden style="margin-top:12px">
+        <p><span class="slot">S10 권리 확인 본문</span></p>
+        <label class="check"><input type="checkbox" id="rcchk" aria-describedby="rcwhy"><span>위 내용을 확인했고 사실과 같습니다.</span></label>
+        <p><button class="btn" type="button" id="rcsave" aria-describedby="rcwhy">확인하고 저장</button></p>
+        <p class="help" id="rcwhy"></p>
+      </div>
+    </div>
+    <p class="small muted" id="rcdone" hidden>권리 확인을 마쳤어요 (<span class="slot">날짜</span>).</p>
+
+    <div class="field" id="share"><span class="label" id="sh-l" style="font-weight:700;display:block;margin-bottom:6px">공유 링크</span>
+      <p class="help" id="sh-no" style="margin-top:0">비공개라서 링크로는 볼 수 없어요. 공개 범위를 바꾸면 링크를 쓸 수 있어요.</p>
+      <span class="row" id="sh-on"><input class="input" style="flex:1" readonly value="https://sample.example/v/sample" aria-labelledby="sh-l"><button class="btn" type="button" id="shcopy" data-icon="copy" data-label="공유 링크 복사"></button></span>
+      <p class="help" role="status" id="shok" hidden>복사했어요.</p>
+    </div>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close>닫기</button></div>
+  </div>
+</dialog>
+
+<!-- 권리 확인 게이트 -->
+<dialog id="rc-dlg" aria-labelledby="rc-t"><h2 id="rc-t">권리 확인이 필요해요</h2>
+  <p style="margin-top:8px">권리 확인을 마치면 공개할 수 있어요. 지금은 비공개로 남아 있어요.</p>
+  <p class="help" id="rc-own" hidden>권리 확인은 소유자만 할 수 있어요</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>나중에</button><button class="btn primary" type="button" id="rc-go" aria-describedby="rc-own">권리 확인하기</button></div>
+</dialog>
+
+<!-- 공개 범위 변경 확인 -->
+<dialog id="pub-dlg" aria-labelledby="pub-t"><h2 id="pub-t">공개 범위를 바꿀까요?</h2>
+  <p style="margin-top:8px"><strong id="pub-to">전체 공개</strong>로 바꿔요.</p>
+  <p class="small muted" style="margin-top:8px">구독자에게 알림이 가는지: <span class="slot">정책 확정 전</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="pub-ok">바꾸기</button></div>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); }, d = b.dataset;
+  var PL = { run: '처리 중', ready: '준비 완료', failed: '처리 실패', retrying: '다시 처리 중', failedagain: '처리 실패', reqsent: '처리 실패 · 재처리 요청함', opproc: '운영자 처리 중', opdone: '준비 완료', opfail: '처리 불가' };
+  var VL = { private: '비공개', link: '링크 공개', public: '전체 공개' }, SL = { auto: '자동 녹화', upload: '업로드' };
+  var GRP = { run: 'run', retrying: 'run', ready: 'ready', opdone: 'ready' }; // 나머지는 failed
+  var F = { pr: '', vis: '', src: '', need: new URLSearchParams(location.search).get('rt') === 'need' };
+  var pending = 'public', rcOpen = false, tm, sim = '', pubBusy = false, skipF = false;
+  function put(el, h) { if (el._h !== h) { el._h = h; el.innerHTML = h; } }
+  function rows() {
+    return [
+      { n: '샘플 설교 영상', src: d.src, pr: d.pr, vis: d.vis, rt: d.rt, op: d.op },
+      { n: '샘플 찬양 영상', src: 'upload', pr: 'run', vis: 'private', rt: 'need', op: 'none' },
+      { n: '샘플 예배 녹화', src: 'auto', pr: 'ready', vis: 'public', rt: 'done', op: 'none' },
+      { n: '샘플 강해 영상', src: 'upload', pr: 'failed', vis: 'private', rt: 'need', op: 'none' }
+    ];
+  }
+  function pass(x) { return (!F.pr || (GRP[x.pr] || 'failed') === F.pr) && (!F.vis || x.vis === F.vis) && (!F.src || x.src === F.src) && (!F.need || x.rt === 'need'); }
+  function lab(x) { return x.op === 'blocked' ? '차단됨 · 공개 불가' : PL[x.pr]; }
+  function chips(g, label, opts) {
+    return '<fieldset class="fgroup"><legend class="label">' + label + '</legend><span class="chips">' + opts.map(function (o) {
+      return '<button class="chip" type="button" data-f="' + g + ':' + o[0] + '" aria-pressed="' + (F[g] === o[0]) + '">' + o[1] + '</button>'; }).join('') + '</span></fieldset>';
+  }
+  function sel(g, label, opts) {
+    return '<label class="field"><span class="label">' + label + '</span><select class="input" data-fs="' + g + '">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (F[g] === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>';
+  }
+  var OPT = [['pr', '처리 상태', [['', '전체'], ['run', '처리 중'], ['ready', '준비 완료'], ['failed', '실패']]], ['vis', '공개 범위', [['', '전체'], ['public', '전체 공개'], ['link', '링크 공개'], ['private', '비공개']]], ['src', '출처', [['', '전체'], ['auto', '자동 녹화'], ['upload', '업로드']]]];
+  function filters() {
+    var hasSel = document.activeElement && document.activeElement.dataset && document.activeElement.dataset.fs;
+    if (hasSel) return; // 선택 중인 select는 다시 그리지 않는다
+    put($('chipbox'), OPT.map(function (o) { return chips(o[0], o[1], o[2]); }).join('') + '<p><button class="chip" type="button" data-fneed aria-pressed="' + F.need + '">권리 확인 필요만</button></p>');
+    put($('selbox'), OPT.map(function (o) { return sel(o[0], o[1], o[2]); }).join('') + '<label class="check"><input type="checkbox" data-fneedc' + (F.need ? ' checked' : '') + '><span>권리 확인 필요만</span></label>');
+  }
+  function btn(x, i) { return '<button class="btn" type="button" data-open="v-dlg" aria-label="' + x.n + ' 관리">관리</button>'; }
+  function list() {
+    var all = rows(), r = all.filter(pass), norm = d.s === 'normal' || d.s === 'partial';
+    if (d.s === 'partial') r = r.slice(0, 3);
+    put($('tb'), r.map(function (x) {
+      return '<tr><th scope="row"><span class="vtitle"><span class="preview vthumb">썸네일</span><span>' + x.n + '</span></span></th><td>' + SL[x.src] + '</td><td><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : '') + '">' + lab(x) + '</span></td><td>' + VL[x.vis] + '</td><td>' + (x.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '필요') + '</td><td>' + btn(x) + '</td></tr>'; }).join(''));
+    put($('cards'), r.map(function (x) {
+      return '<div class="mc"><p class="vtitle"><span class="preview vthumb">썸네일</span><strong>' + x.n + '</strong></p><p class="small"><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : '') + '">' + lab(x) + '</span>' + VL[x.vis] + ' · ' + SL[x.src] + '</p><p class="small muted">권리 확인 ' + (x.rt === 'done' ? '완료' : '필요') + '</p><div class="mem-acts">' + btn(x) + '</div></div>'; }).join(''));
+    $('f0').hidden = !(norm && !r.length);
+    $('listbox').hidden = !norm || !r.length;
+    var run = all.filter(function (x) { return GRP[x.pr] === 'run'; }).length, bad = all.filter(function (x) { return !GRP[x.pr]; }).length, n = $('proc-note');
+    n.hidden = !(norm && (run || bad));
+    n.innerHTML = (run ? '<strong>처리 중인 영상이 있어요</strong>끝나면 알림으로 알려 드려요.' : '') + (bad ? (run ? '<p></p>' : '') + '<strong>처리에 실패한 영상이 있어요</strong>목록에서 [관리]를 눌러 다시 처리할 수 있어요.' : '');
+  }
+  function sheet() {
+    var owner = d.role === 'owner', blocked = d.op === 'blocked';
+    $('v-src').textContent = SL[d.src];
+    $('a-pr').textContent = PL[d.pr]; $('a-vis').textContent = VL[d.vis]; $('a-op').textContent = blocked ? '차단됨 · 공개 불가' : '없음';
+    $('a-rt').innerHTML = d.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '필요';
+    var noPub = blocked || /^(failed|retrying|failedagain|reqsent|opproc|opfail)$/.test(d.pr);
+    document.querySelectorAll('input[name=vis]').forEach(function (r) { r.checked = r.value === d.vis; r.disabled = noPub; });
+    var w = blocked ? '운영 조치로 공개 범위를 바꿀 수 없어요' : noPub ? '처리가 끝나야 공개 범위를 바꿀 수 있어요' : d.pr === 'run' ? '처리가 끝날 때까지 공개는 대기해요. 지금 선택해 두면 처리 뒤 적용돼요' : '';
+    $('vis-why').textContent = w; $('vis-why').hidden = !w;
+    $('rc').hidden = d.rt === 'done'; $('rcdone').hidden = d.rt !== 'done';
+    $('rcform').hidden = d.rt === 'done' || !(rcOpen || d.dlg === 'reject');
+    $('rcopen').disabled = !owner; $('rcown').hidden = owner;
+    var rw = !owner ? '권리 확인 저장은 소유자만 할 수 있어요' : !$('rcchk').checked ? '내용을 확인하고 체크해 주세요' : '';
+    $('rcsave').disabled = !!rw; $('rcsave').classList.toggle('primary', !rw); $('rcwhy').textContent = rw;
+    $('rcopen').classList.toggle('primary', owner);
+    $('sh-no').hidden = d.vis !== 'private'; $('sh-on').hidden = d.vis === 'private'; if (d.vis === 'private') $('shok').hidden = true;
+    $('rc-go').disabled = !owner; $('rc-own').hidden = owner;
+    $('pub-to').textContent = VL[pending] || VL.public;
+  }
+  function openD(dlg, op) { if (!dlg.open) { dlg._opener = dlg._opener || op; dlg.showModal(); } }
+  window.mockAfter = function () {
+    if (d.role === 'mgr') return;
+    filters(); list(); sheet();
+    var s = d.dlg, v = $('v-dlg');
+    var need = { detail: 1, rc: 1, pub: 1, reject: 1, saveerr: 1, conflict: 1, ok: 1 }[s];
+    if (need && !v.open) { v._opener = document.querySelector('[data-open="v-dlg"]'); v.showModal(); v.querySelector('h2').tabIndex = -1; v.querySelector('h2').focus(); }
+    if (s === 'closed' && v.open) v.close();
+    if (s === 'rc') openD($('rc-dlg'), $('visf').querySelector('input')); else if ($('rc-dlg').open) $('rc-dlg').close();
+    if (s === 'pub') openD($('pub-dlg'), $('visf').querySelector('input')); else if ($('pub-dlg').open && !pubBusy) $('pub-dlg').close();
+  };
+  ['rc-dlg', 'pub-dlg', 'v-dlg'].forEach(function (id) {
+    var e = $(id);
+    e.addEventListener('close', function () {
+      if (id === 'v-dlg') { if (d.dlg !== 'closed') { d.dlg = 'closed'; } rcOpen = false; }
+      else if (d.dlg === 'rc' || d.dlg === 'pub') d.dlg = 'detail';
+      var o = e._opener; if (!o || !document.contains(o) || o.offsetParent === null) o = id === 'v-dlg' ? Array.prototype.filter.call(document.querySelectorAll('[data-open="v-dlg"]'), function (x) { return x.offsetParent !== null; })[0] : $('visf').querySelector('input');
+      if (o && !skipF) o.focus(); skipF = false;
+      window.mockRender();
+    });
+  });
+  // 공개 범위 선택
+  $('visf').addEventListener('change', function (e) {
+    var v = e.target.value; e.target.checked = false;
+    if (v === 'private') { d.vis = 'private'; d.dlg = d.dlg === 'ok' ? 'detail' : d.dlg; window.mockRender(); return; }
+    if (v === d.vis) return;
+    sim = /^(reject|saveerr|conflict)$/.test(d.dlg) ? d.dlg : '';
+    pending = v; var dl = d.rt === 'need' ? $('rc-dlg') : $('pub-dlg');
+    d.dlg = d.rt === 'need' ? 'rc' : 'pub';
+    dl._opener = document.querySelector('#visf input[value="' + v + '"]'); window.mockRender();
+    if (!dl.open) dl.showModal();
+  });
+  $('pub-ok').addEventListener('click', function () {
+    var s = d.dlg; pubBusy = true; $('pub-dlg').close(); pubBusy = false;
+    if (sim) { d.dlg = sim; } else { d.vis = pending; d.dlg = 'ok'; }
+    window.mockRender();
+  });
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-open="v-dlg"]')) d.dlg = 'detail'; });
+  // 게이트 [권리 확인하기]: 시트 안 폼을 연다
+  $('rc-go').addEventListener('click', function () { rcOpen = true; d.dlg = 'detail'; skipF = true; $('rc-dlg').close(); window.mockRender(); $('rcform').hidden = false; $('rcchk').focus(); });
+  $('rcopen').onclick = function () { rcOpen = true; window.mockRender(); $('rcchk').focus(); };
+  $('rcchk').addEventListener('change', function () { window.mockRender(); });
+  $('rcsave').onclick = function () { d.rt = 'done'; rcOpen = false; window.mockRender(); $('rcdone').tabIndex = -1; $('rcdone').focus(); };
+  $('reproc').onclick = function () { d.pr = 'retrying'; window.mockRender(); var h = $('proc').querySelector('h3'); h.tabIndex = -1; h.focus(); clearTimeout(tm); tm = setTimeout(function () { if (d.pr === 'retrying') { d.pr = 'failedagain'; window.mockRender(); } }, 1500); }; // 목업: 1.5초 뒤 다시 실패
+  $('opreq').onclick = function () { d.pr = 'reqsent'; window.mockRender(); var h = $('proc').querySelector('h3'); h.tabIndex = -1; h.focus(); };
+  $('shcopy').onclick = function () { $('shok').hidden = false; };
+  // 필터
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('[data-f]'), n = e.target.closest('[data-fneed]');
+    if (c) { var p = c.dataset.f.split(':'); F[p[0]] = F[p[0]] === p[1] ? '' : p[1]; window.mockRender(); var k = document.querySelector('[data-f="' + c.dataset.f + '"]'); if (k) k.focus(); }
+    if (n) { F.need = !F.need; window.mockRender(); document.querySelector('[data-fneed]').focus(); }
+    if (e.target.id === 'freset') { F.pr = F.vis = F.src = ''; F.need = false; window.mockRender(); }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target.dataset.fs !== undefined) { F[e.target.dataset.fs] = e.target.value; document.activeElement.blur(); window.mockRender(); }
+    if (e.target.dataset.fneedc !== undefined) { F.need = e.target.checked; window.mockRender(); }
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

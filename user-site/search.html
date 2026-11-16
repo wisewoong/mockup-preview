@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>검색 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 880px; margin: 0 auto; padding: 24px 0 64px; }
+  .sbar .r { display: flex; gap: 8px; }
+  .sbar .r .input { flex: 1; }
+  .rec { list-style: none; margin: 8px 0 0; padding: 0; }
+  .rec li { display: flex; gap: 8px; align-items: center; }
+  .rec .term { flex: 1; justify-content: flex-start; text-decoration: underline; }
+  .rec li + li { margin-top: 8px; }
+</style>
+</head>
+<body data-notabs data-default="s:before t:live">
+<!-- mock: 결과 개수, 방송 제목, 방송국, 목회자 이름은 샘플 값이다. 썸네일은 Unsplash 무료 사진(img/). -->
+<header id="site-header" data-active=""></header>
+<style>.hsearch { display: none; }</style>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:before">입력 전(최근 검색어 있음)</button><button data-set="s:beforeempty">입력 전(최근 검색어 없음)</button><button data-set="s:emptysubmit">빈 검색어 제출</button><button data-set="s:loading">로딩</button><button data-set="s:results">결과 있음</button><button data-set="s:partial">라이브만 0건</button><button data-set="s:zero">전체 0건</button><button data-set="s:error">오류</button></div>
+  <p class="muted">최근 검색어: 이 기기에만 저장돼요(서버 저장 없음, 브라우저 localStorage). 저장 최대 개수는 <span class="slot">최근 검색어 최대 개수</span>. [제안] 검색 화면 안의 카테고리 칩, 0건 화면의 칩과 라이브 보러 가기 버튼. 자동완성과 인기 검색어는 없어요. 데스크톱에서도 이 화면은 본문의 검색창을 써요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <p style="margin-bottom:8px"><a href="main.html">뒤로</a></p>
+  <form class="sbar" id="f" onsubmit="return false">
+    <label class="field"><span class="label">방송국·방송 검색</span>
+      <span class="r"><input class="input" id="q" type="search" enterkeyhint="search" autocomplete="off" aria-describedby="qerr"><button class="btn" type="button" id="clr" data-icon="x" data-label="검색어 지우기">지우기</button><button class="btn" id="go" data-icon="search" data-label="검색">검색</button></span></label>
+    <p class="err" id="qerr" role="alert" data-show="s=emptysubmit">검색어를 입력해 주세요</p>
+  </form>
+  <p class="sr" id="live" role="status"></p>
+
+  <!-- 입력 전 -->
+  <section data-show="s=before|beforeempty" style="margin-top:24px">
+    <p>방송국이나 방송을 검색해 보세요</p>
+    <div id="recent" style="margin-top:24px">
+      <div class="row between"><h2>최근 검색어</h2><button class="btn" id="delall">전체 삭제</button></div>
+      <p class="small muted">이 기기에만 저장돼요. 계정이나 서버에는 저장되지 않아요.</p>
+      <ul class="rec" id="reclist"></ul>
+    </div>
+    <div style="margin-top:24px">
+      <h2 style="margin-bottom:12px">카테고리</h2>
+      <div class="chips"><a class="chip" href="main.html">예배</a><a class="chip" href="main.html">심방</a><a class="chip" href="main.html">성경공부</a><a class="chip" href="main.html">말씀</a><a class="chip" href="main.html">찬양</a><a class="chip" href="main.html">기도</a><a class="chip" href="main.html">간증</a><a class="chip" href="main.html">특별집회</a><a class="chip" href="main.html">선교</a><a class="chip" href="main.html">강해</a><a class="chip" href="main.html">기타</a></div>
+    </div>
+  </section>
+
+  <section data-show="s=emptysubmit" style="margin-top:24px"><p class="muted">방송국이나 방송을 검색해 보세요</p></section>
+
+  <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:24px"><p class="muted">검색하는 중</p><div class="grid" style="margin-top:12px"><div class="skeleton thumb"></div><div class="skeleton thumb"></div><div class="skeleton thumb"></div></div></div>
+  <div class="notice danger" role="alert" data-show="s=error" style="margin-top:24px"><strong>검색하지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>
+
+  <!-- 전체 0건 -->
+  <section data-show="s=zero" style="margin-top:24px">
+    <h2>'<span class="qt">로마서</span>' 검색 결과가 없어요</h2>
+    <p class="muted">철자를 확인하거나 다른 단어로 검색해 보세요</p>
+    <div style="margin-top:24px"><h2 style="margin-bottom:12px">카테고리</h2>
+      <div class="chips"><a class="chip" href="main.html">예배</a><a class="chip" href="main.html">심방</a><a class="chip" href="main.html">성경공부</a><a class="chip" href="main.html">말씀</a><a class="chip" href="main.html">찬양</a><a class="chip" href="main.html">기도</a><a class="chip" href="main.html">간증</a><a class="chip" href="main.html">특별집회</a><a class="chip" href="main.html">선교</a><a class="chip" href="main.html">강해</a><a class="chip" href="main.html">기타</a></div></div>
+    <p style="margin-top:24px"><a class="btn" href="main.html">라이브 보러 가기</a></p>
+  </section>
+
+  <!-- 결과 -->
+  <section data-show="s=results|partial" style="margin-top:24px">
+    <h2>'<span class="qt">로마서</span>' 검색 결과</h2>
+    <div class="tabs" role="tablist" aria-label="결과 종류" style="margin-top:12px">
+      <button role="tab" data-set="t:live">라이브 <span data-show="s=results">2</span><span data-show="s=partial">0</span></button>
+      <button role="tab" data-set="t:chan">방송국 2</button>
+      <button role="tab" data-set="t:vod">다시보기 3</button>
+    </div>
+    <div style="margin-top:24px">
+      <div class="grid" data-show="t=live s=results">
+        <a class="card" href="live.html?variant=general"><div class="thumb"><img src="img/bible.jpg" alt="" loading="lazy"><div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 312명</span></div><h3>로마서 8장 강해 12회</h3><p class="meta"><img class="pa" src="../portraits/men/65.jpg" alt="" loading="lazy">샘물교회 이정훈 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span> · 강해</p></a>
+        <a class="card" href="live.html?variant=general"><div class="thumb"><img src="img/prayer-hands.jpg" alt="" loading="lazy"><div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 74명</span></div><h3>로마서 읽기 모임</h3><p class="meta"><img class="pa" src="../portraits/men/52.jpg" alt="" loading="lazy">푸른숲교회 오민재 목사 · 성경공부</p></a>
+      </div>
+      <div class="empty" data-show="t=live s=partial"><p><strong>지금 방송 중인 라이브가 없어요</strong></p><p class="muted">다른 탭의 결과를 확인해 보세요.</p></div>
+      <div data-show="t=chan">
+        <a class="item" href="channel.html" style="text-decoration:none;grid-template-columns:72px 1fr"><img class="av" src="../portraits/men/65.jpg" alt=""><span><strong>샘물교회 이정훈 목사</strong><br><span class="muted small">이정훈 목사 · 성경공부</span></span></a>
+        <a class="item" href="channel.html" style="text-decoration:none;grid-template-columns:72px 1fr"><img class="av" src="img/chapel.jpg" alt=""><span><strong>로마서 연구회</strong><br><span class="muted small">김도현 목사 · 강해</span></span></a>
+      </div>
+      <div class="grid" data-show="t=vod">
+        <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/bible.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">55:02</span></div><h3>로마서 8장 강해 11회</h3><p class="meta">샘물교회 · <strong>조회 2,914회</strong></p></a>
+        <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/sanctuary.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">42:10</span></div><h3>로마서 5장 설교</h3><p class="meta">은혜교회 · <strong>조회 1,120회</strong></p></a>
+        <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/praise.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">38:27</span></div><h3>로마서 1장 성경공부</h3><p class="meta">푸른숲교회 · <strong>조회 408회</strong></p></a>
+      </div>
+      <div style="margin-top:24px" data-show="s=results"><button class="btn">더 보기</button></div>
+    </div>
+  </section>
+</div></main>
+
+<script>
+  var KEY = 'mock-recent', SEED = ['로마서 강해', '새벽 기도', '찬양', '수요 예배', '간증'];
+  var recent; try { recent = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  if (!Array.isArray(recent)) recent = SEED.slice();
+  var q = document.getElementById('q'), list = document.getElementById('reclist'), live = document.getElementById('live');
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(recent)); } catch (e) {} }
+  function draw() {
+    list.innerHTML = '';
+    recent.forEach(function (t, i) {
+      var li = document.createElement('li');
+      li.innerHTML = '<button class="btn term" type="button"></button><button class="btn" type="button" data-icon="x">삭제</button>';
+      li.firstChild.textContent = t; li.lastChild.dataset.label = "최근 검색어 '" + t + "' 삭제"; window.mockIcons(li);
+      li.firstChild.onclick = function () { q.value = t; run(); };
+      li.lastChild.onclick = function () {
+        recent.splice(i, 1); save(); draw(); live.textContent = t + '를 지웠어요';
+        var n = list.querySelectorAll('.term'); (n[i] || n[i - 1] || document.getElementById('delall')).focus();
+      };
+      list.appendChild(li);
+    });
+    document.getElementById('recent').hidden = !recent.length;
+  }
+  function run() {
+    var t = q.value.trim();
+    if (!t) { document.body.dataset.s = 'emptysubmit'; window.mockRender(); q.focus(); return; }
+    recent = [t].concat(recent.filter(function (x) { return x !== t; })).slice(0, 5); save(); draw();
+    document.querySelectorAll('.qt').forEach(function (e) { e.textContent = t; });
+    document.body.dataset.s = 'results'; document.body.dataset.t = 'live'; window.mockRender();
+  }
+  document.getElementById('go').onclick = run;
+  q.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); run(); } });
+  document.getElementById('clr').onclick = function () { q.value = ''; q.focus(); };
+  document.getElementById('delall').onclick = function () { recent = []; save(); draw(); live.textContent = '최근 검색어를 모두 지웠어요'; q.focus(); };
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-set="s:before"]'); if (b && !recent.length) { recent = SEED.slice(); save(); draw(); }
+    if (e.target.closest('[data-set="s:beforeempty"]')) { recent = []; save(); draw(); }
+  });
+  window.mockDerive = function (b) { if (b.dataset.s === 'results' || b.dataset.s === 'partial') q.value = '로마서'; document.getElementById('recent').hidden = !recent.length || b.dataset.s === 'beforeempty'; };
+  draw();
+  var p = new URLSearchParams(location.search).get('q'); if (p) { q.value = p; }
+if (new URLSearchParams(location.search).get('s') === 'results' || new URLSearchParams(location.search).get('s') === 'partial') q.value = '로마서';
+</script>
+<script src="mock.js"></script>
+</body>
+</html>

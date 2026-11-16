@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MY - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
+  .prof { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+  .prof .pa { width: 56px; height: 56px; margin: 0; vertical-align: 0; }
+  .prof { flex-wrap: wrap; }
+  .prof .grow { flex: 1 1 160px; min-width: 0; }
+  @media (max-width: 767px) { .prof .acct { flex: 0 0 100%; } }
+  .bal { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 16px; }
+  .bal strong { font-size: 1.5rem; }
+  ul.menu { list-style: none; margin: 8px 0 0; padding: 0; }
+  ul.menu li > a, ul.menu li > .rowst { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: var(--tap); border-top: 1px solid var(--line); text-decoration: none; color: var(--text); }
+  ul.menu li > a:hover { background: var(--bg-sub); }
+  ul.menu .val { color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body data-default="s:normal">
+<!-- MY: 개인정보·설정·로그아웃·탈퇴. 활동 기록(본 영상·방문·후원)은 헤더 내 활동에만 둔다. 즐겨찾기·내 신고·문의는 햄버거 드로어. 잔액은 샘플 값. 닉네임·계정 관리, 알림 설정은 화면이 없어 링크를 걸지 않는다. -->
+<header id="site-header" data-active="my"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:zero">잔액 0</button><button data-set="s:loading">로딩</button><button data-set="s:proffail">프로필 실패</button><button data-set="s:balfail">잔액 실패</button><button data-set="s:under19">만 19세 미만</button><button data-set="s:logoutfail">로그아웃 실패</button><button data-set="s:guest">비로그인</button>
+  </div>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-my" tabindex="-1">MY</h1>
+
+  <div data-show="s=normal|zero|loading|proffail|balfail|under19|logoutfail">
+    <div class="prof" data-show="s=normal|zero|balfail|under19|logoutfail">
+      <img class="pa" src="../portraits/women/32.jpg" alt="">
+      <div class="grow"><strong>샘플닉네임</strong><p class="muted small"><span class="slot">로그인 계정 표기</span></p></div>
+      <span class="muted small acct">닉네임·계정 관리 <span class="slot">화면 미작성</span></span>
+    </div>
+    <div class="prof" role="status" aria-busy="true" data-show="s=loading"><div class="skeleton" style="width:56px;height:56px;border-radius:50%"></div><div class="skeleton" style="height:40px;flex:1"></div></div>
+    <div class="notice danger" role="alert" data-show="s=proffail" style="margin-top:16px"><strong>내 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+
+    <div class="bal">
+      <div data-show="s=normal|logoutfail|proffail|under19"><span>현재 잔액</span> <strong>3,500 <span class="slot">S1 명칭</span></strong> <span class="muted small">(샘플)</span></div>
+      <div data-show="s=zero"><span>현재 잔액</span> <strong>0 <span class="slot">S1 명칭</span></strong> <span class="muted small">(샘플)</span></div>
+      <div data-show="s=loading" role="status" aria-busy="true"><div class="skeleton" style="height:32px;width:180px"></div></div>
+      <div data-show="s=balfail" role="alert"><strong style="font-size:1rem">잔액을 불러오지 못했어요</strong> <button class="btn" type="button" data-icon="retry" data-keep>다시 시도</button></div>
+      <a class="btn primary" href="charge.html" data-show="s=normal|zero|proffail|balfail|logoutfail"><span class="slot" style="margin-right:8px">S1 명칭</span>충전하기</a>
+      <p class="muted small" data-show="s=under19">충전과 후원은 만 19세부터 할 수 있어요. <span class="slot">법무 7-2 확인 전</span></p>
+    </div>
+    <p style="margin-top:8px"><a href="history.html">충전·후원 내역</a></p>
+
+    <h2 style="margin-top:24px">설정</h2>
+    <ul class="menu">
+      <li><div class="rowst"><span>알림 설정</span><span class="val"><span class="slot">화면 미작성</span></span></div></li>
+      <li><a href="reco-settings.html"><span>추천·기록 설정</span><span class="val">추천 켜짐</span></a></li>
+    </ul>
+
+    <h2 style="margin-top:24px">계정</h2>
+    <p style="margin-top:8px"><a class="btn" href="main.html?auth=guest">로그아웃</a></p>
+    <p class="err" role="alert" data-show="s=logoutfail">로그아웃하지 못했어요 <button class="btn" type="button" data-icon="retry" data-keep>다시 시도</button></p>
+    <p class="small muted" style="margin-top:32px"><a href="withdraw.html">탈퇴</a></p>
+  </div>
+
+  <div class="notice" data-show="s=guest" style="margin-top:16px"><strong>로그인하면 내 정보와 설정을 볼 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=my.html">로그인</a></p></div>
+</div></main>
+<script src="mock.js"></script>
+</body>
+</html>

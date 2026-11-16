@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방송 관리 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal sig:ok mode:normal send:browser chat:open tts:on don:some end:none dlg:closed">
+<!-- 송출 중·채팅 관리(DESIGN-REMAINING). 후원 금액은 어느 역할에도 표시하지 않는다. 예배 중 후원 메시지 표시 방식은 슬롯(S3). 시간·간격 숫자는 슬롯 -->
+<header id="site-header" data-active="live"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:unsupported">미지원 기기</button></div>
+  <div class="group"><b>송출</b><button data-set="sig:ok">정상</button><button data-set="sig:unstable">불안정</button><button data-set="sig:cut">끊김</button><button data-set="sig:recon">재연결 중</button><button data-set="sig:reconfail">재연결 실패</button><b>방식</b><button data-set="send:browser">브라우저</button><button data-set="send:obs">OBS</button></div>
+  <div class="group"><b>방송 모드</b><button data-set="mode:normal">일반</button><button data-set="mode:worship">예배</button><b>채팅</b><button data-set="chat:open">열림</button><button data-set="chat:slow">느린 모드</button><button data-set="chat:closed">닫힘</button></div>
+  <div class="group"><b>TTS</b><button data-set="tts:on">정상</button><button data-set="tts:muted">긴급 음소거</button><button data-set="tts:fail">공급자 장애</button><b>후원 메시지</b><button data-set="don:some">있음</button><button data-set="don:none">0건</button></div>
+  <div class="group"><b>종료</b><button data-set="end:none">방송 중</button><button data-set="end:confirm">종료 확인</button><button data-set="end:wait">서버 확인 대기</button><button data-set="end:fail">종료 실패</button><button data-set="end:done">종료 후 요약</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:msg">메시지 관리</button><button data-set="dlg:ban">전체 차단 확인</button><button data-set="dlg:mode">예배 전환 확인</button></div>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 채팅·후원 메시지·닉네임은 모두 샘플이에요. 사용자 결정 전: 예배 중 후원 메시지 표시 방식, 재연결 실패 시간, 관리자 부분 부여.</p>
+</div></div>
+
+<main class="wrap">
+<section class="stack" style="padding-top:24px" role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:200px"></div></section>
+<section style="padding-top:24px" data-show="s=loaderr"><div class="notice danger" role="alert"><strong>방송 정보를 불러오지 못했어요</strong><p class="small">방송에는 영향이 없어요. 다시 시도해 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div></section>
+<section style="padding-top:24px" data-show="s=unsupported"><div class="notice"><strong>이 기기에서는 방송 관리 화면을 쓸 수 없어요</strong><p class="small">컴퓨터 같은 다른 기기에서 열어 확인해 주세요.</p><p style="margin-top:8px"><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<!-- 종료 후 요약 -->
+<section class="col stack" data-show="s=normal end=done" aria-label="방송 요약">
+  <h1>방송이 끝났어요</h1>
+  <div class="panel stack"><h2>요약</h2>
+    <p>방송 시간 <strong><span class="slot">시간</span></strong></p>
+    <p data-show="role=owner">후원 메시지 <strong><span class="slot">건수</span></strong>건 <span class="muted small">금액과 정산은 정산 내역에서만 볼 수 있어요</span></p>
+    <p><span class="tag">다시보기 준비 중</span>자동 녹화 영상은 처리가 끝나면 영상 관리에 나타나요.</p>
+    <p class="small">공개하려면 영상 관리에서 권리 확인을 마쳐야 해요.</p>
+  </div>
+  <p class="row"><a class="btn primary" href="videos.html?rt=need">영상 관리로</a><a class="btn" href="dashboard.html">대시보드로</a></p>
+</section>
+
+<div data-show="s=normal end=none|confirm|wait|fail" id="main">
+<div class="notice statusline" role="status" id="sl">
+  <div class="sl-row">
+    <div class="sl-info"><strong id="sl-t"></strong><span class="small muted">경과 <span class="slot">시간</span></span><span class="small muted">시청자 <strong>12</strong>명 (샘플)</span><span class="small" id="sl-x"></span></div>
+    <button class="btn bad" type="button" id="end" aria-describedby="end-why">방송 종료</button>
+  </div>
+  <p class="help" id="end-why" hidden></p>
+</div>
+<div class="notice danger" role="alert" data-show="end=fail" style="margin-top:16px"><strong>방송을 종료하지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" id="end-retry" data-icon="retry" data-keep>다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="sig=reconfail" style="margin-top:16px"><strong>서버가 방송을 종료했어요</strong><p class="small">연결이 <span class="slot">재연결 대기 시간</span> 안에 돌아오지 않았어요. 다시 방송하려면 라이브 시작에서 새로 시작해 주세요.</p><p class="row" style="margin-top:8px"><button class="btn" type="button" data-set="end:done">요약 보기</button><a class="btn" href="live-start.html">라이브 시작</a></p></div>
+
+<div class="tabs mtabs" role="tablist" aria-label="화면 선택" style="margin-top:16px">
+  <button class="" role="tab" type="button" id="mt-mine" aria-selected="true" aria-controls="p-mine" data-mt="mine">내 방송</button>
+  <button role="tab" type="button" id="mt-view" aria-selected="false" aria-controls="p-view" data-mt="view" tabindex="-1">시청자 화면</button>
+</div>
+<div class="two" style="margin-top:24px">
+  <section class="panel stack" id="p-mine" role="tabpanel" aria-labelledby="mt-mine" aria-label="내 방송">
+    <h2>내 방송</h2>
+    <div class="preview" id="pv"><p><strong style="color:inherit" id="pv-t"></strong><br><span class="small" id="pv-s"></span></p></div>
+    <fieldset class="row" id="fs-ctl" style="border:0;padding:0;margin:16px 0 0" data-show="send=browser"><legend class="sr">송출 제어</legend>
+      <button class="btn toggle" type="button" id="mic" aria-pressed="false">마이크 켜짐</button><button class="btn toggle" type="button" id="cam" aria-pressed="false">카메라 켜짐</button></fieldset>
+    <div class="row between"><p>방송 모드 <span class="tag" id="md-t"></span></p><button class="btn" type="button" id="md-btn" aria-describedby="ctl-why">예배 방송으로 전환</button></div>
+    <p class="help" id="md-help" hidden>방송 중에는 일반에서 예배로만 바꿀 수 있어요.</p>
+    <p class="help" id="ctl-why" hidden></p>
+  </section>
+  <section class="panel stack" id="p-view" role="tabpanel" aria-labelledby="mt-view" aria-label="시청자 화면">
+    <h2>시청자가 보는 화면</h2>
+    <div class="preview"><p>시청자 화면<br><span class="small">몇 초 늦게 보일 수 있어요.</span></p></div>
+    <p class="row"><span class="tag" id="mute-t">음소거 중</span><button class="btn" type="button" id="mute">소리 켜기</button><button class="btn ik" type="button" id="lcopy" data-icon="copy" data-keep>링크 복사</button></p>
+    <p class="help" id="lok" role="status" hidden>복사했어요.</p>
+  </section>
+</div>
+
+<div class="tabs stabs" role="tablist" aria-label="관리 영역" style="margin-top:16px">
+  <button role="tab" type="button" id="st-don" aria-selected="false" aria-controls="p-don" data-st="don" tabindex="-1">후원 메시지</button>
+  <button role="tab" type="button" id="st-chat" aria-selected="true" aria-controls="p-chat" data-st="chat">채팅 관리</button>
+  <button role="tab" type="button" id="st-tts" aria-selected="false" aria-controls="p-tts" data-st="tts" tabindex="-1">TTS 제어</button>
+</div>
+<div class="lc-grid">
+  <section class="panel stack" id="p-don" role="tabpanel" aria-labelledby="st-don" aria-label="후원 메시지">
+    <h2>후원 메시지</h2>
+    <p class="help" data-show="role=adm0">후원 메시지 확인은 소유자가 권한을 주면 쓸 수 있어요</p>
+    <p class="help" data-show="role=mgr">후원 메시지는 관리자 이상만 볼 수 있어요</p>
+    <p class="help" data-show="mode=worship">예배 중 후원 메시지 표시: <span class="slot">방송 설정에서 확정 예정</span></p>
+    <fieldset id="fs-don" style="border:0;padding:0;margin:0"><legend class="sr">후원 메시지 목록</legend>
+      <div class="empty" data-show="don=none"><p>아직 후원 메시지가 없어요</p></div>
+      <ul class="msg-list" data-show="don=some"><li><span><strong>샘플닉네임3</strong><br>샘플 후원 메시지예요</span></li><li><span><strong>샘플닉네임4</strong><br>샘플 응원 메시지예요</span></li></ul>
+    </fieldset>
+    <p class="help" id="don-no" hidden>후원 메시지는 권한이 있는 관리자 이상만 볼 수 있어요.</p>
+    <p class="help">후원 금액은 여기에 보이지 않아요.</p>
+  </section>
+
+  <section class="panel stack" id="p-chat" role="tabpanel" aria-labelledby="st-chat" aria-label="채팅 관리">
+    <h2>채팅 관리</h2>
+    <div class="row"><span class="tag" id="chat-t"></span><button class="btn" type="button" id="chat-tg"></button><button class="btn toggle" type="button" id="slow" aria-pressed="false">느린 모드 <span class="slot">간격</span></button></div>
+    <div class="empty" data-show="chat=closed"><p>채팅이 닫혀 있어요</p></div>
+    <ul class="msg-list" data-show="chat=open|slow" id="chat-list">
+      <li><span><strong>샘플닉네임1</strong> <span class="tag" id="s-m1" hidden></span><br>안녕하세요, 샘플 채팅이에요</span><button class="btn" type="button" data-m="m1" aria-label="샘플닉네임1 메시지 관리">관리</button></li>
+      <li><span><strong>샘플닉네임2</strong> <span class="tag" id="s-m2" hidden></span><br>샘플 채팅 메시지예요</span><button class="btn" type="button" data-m="m2" aria-label="샘플닉네임2 메시지 관리">관리</button></li>
+      <li><span><strong>샘플매니저1</strong> <span class="tag">매니저</span><br>샘플 매니저 메시지예요</span></li>
+    </ul>
+  </section>
+
+  <section class="panel stack" id="p-tts" role="tabpanel" aria-labelledby="st-tts" aria-label="TTS 제어">
+    <h2>TTS 제어</h2>
+    <div class="notice" data-show="mode=worship"><p>예배 중에는 TTS를 사용하지 않아요</p></div>
+    <div class="notice danger" role="alert" data-show="mode=normal tts=fail"><strong>TTS를 쓸 수 없어요</strong><p class="small">후원 메시지는 텍스트로 보여 드려요.</p></div>
+    <p class="help" data-show="role=adm0 mode=normal">TTS 제어는 소유자가 권한을 주면 쓸 수 있어요</p>
+    <p class="help" data-show="role=mgr mode=normal">TTS 제어는 관리자 이상만 쓸 수 있어요</p>
+    <p data-show="mode=normal tts=muted"><span class="tag bad">긴급 음소거 중</span></p>
+    <fieldset id="fs-tts" style="border:0;padding:0;margin:0"><legend class="sr">TTS 제어</legend>
+      <p class="row"><button class="btn" type="button">읽기 중지</button><button class="btn" type="button">건너뛰기</button><button class="btn toggle bad" type="button" id="tts-mute" aria-pressed="false">긴급 음소거</button></p>
+      <p class="small muted" style="margin-top:12px">대기열 <strong>2</strong>건 (샘플)</p>
+    </fieldset>
+  </section>
+</div>
+</div>
+
+<div style="height:96px"></div>
+</main>
+
+<dialog class="sheet" id="msg-dlg" aria-labelledby="msg-t"><h2 id="msg-t">메시지 관리</h2>
+  <p style="margin-top:8px"><strong id="msg-nick">샘플닉네임1</strong></p>
+  <p class="small muted" id="msg-body">안녕하세요, 샘플 채팅이에요</p>
+  <fieldset class="pick" style="border:0;padding:0;margin:16px 0 0;grid-template-columns:1fr"><legend class="label" style="font-weight:700;margin-bottom:6px">처리 방법</legend>
+    <label><input type="radio" name="act" value="hide" checked><span><span class="t">숨기기</span><span class="small muted">이 메시지만 시청자 화면에서 가려요</span></span></label>
+    <label><input type="radio" name="act" value="show"><span><span class="t">이번 방송만 차단</span><span class="small muted">이번 방송에서 이 사용자의 채팅을 막아요</span></span></label>
+    <label><input type="radio" name="act" value="all" id="act-all" aria-describedby="all-why"><span><span class="t">방송국 전체 차단</span><span class="small muted">이 방송국의 모든 방송에서 막아요</span></span></label>
+  </fieldset>
+  <p class="help" id="all-why" hidden>방송국 전체 차단은 소유자·관리자만 할 수 있어요</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="msg-ok">적용</button></div>
+</dialog>
+<dialog id="ban-dlg" aria-labelledby="ban-t"><h2 id="ban-t">방송국 전체에서 차단할까요?</h2>
+  <p style="margin-top:8px">이 사용자는 이 방송국의 모든 방송 채팅에서 차단돼요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn bad" type="button" id="ban-ok">전체 차단</button></div>
+</dialog>
+<dialog id="end-dlg" aria-labelledby="end-t"><h2 id="end-t">방송을 종료할까요?</h2>
+  <p style="margin-top:8px">종료하면 시청자 화면에서 방송이 끝나요. 자동 녹화 영상은 처리 뒤 권리 확인을 마쳐야 공개할 수 있어요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>계속 방송</button><button class="btn" type="button" id="end-ok">방송 종료</button></div>
+</dialog>
+<dialog id="mode-dlg" aria-labelledby="mode-t"><h2 id="mode-t">예배 방송으로 바꿀까요?</h2>
+  <p style="margin-top:8px">예배 방송에서는 음성(TTS)을 쓸 수 없어요. 방송 중에는 일반으로 되돌릴 수 없어요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="mode-ok">예배로 전환</button></div>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); }, cur = 'm1', tm, done = false, mt = 'mine', st = 'chat', busy = false;
+  var MSG = { m1: ['샘플닉네임1', '안녕하세요, 샘플 채팅이에요'], m2: ['샘플닉네임2', '샘플 채팅 메시지예요'] };
+  var SIG = { ok: ['방송 중 · 송출 정상', ''], unstable: ['방송 중 · 송출이 불안정해요', '네트워크를 확인해 주세요'], cut: ['끊겼어요', '연결을 확인하고 다시 송출해 주세요'], recon: ['다시 연결하는 중', '연결되면 방송 중으로 돌아가요'], reconfail: ['재연결에 실패했어요', ''] };
+  var DLG = { 'msg-dlg': ['dlg', ['msg', 'ban'], 'closed'], 'ban-dlg': ['dlg', ['ban'], 'closed'], 'mode-dlg': ['dlg', ['mode'], 'closed'], 'end-dlg': ['end', ['confirm'], 'none'] };
+  function can() { return d.role === 'owner' || d.role === 'admall'; }
+  window.mockAfter = function () {
+    var c = can(), w = d.mode === 'worship', mgr = d.role === 'mgr', ending = d.end === 'wait';
+    var sg = SIG[d.sig];
+    $('sl-t').textContent = ending ? '종료를 서버가 확인하는 중이에요' : sg[0]; $('sl-x').textContent = ending ? '확인되면 요약이 보여요' : sg[1];
+    $('pv-t').textContent = d.send === 'obs' ? '신호 수신 상태' : '내 화면(송출 중)'; $('pv-s').textContent = ending ? '종료 확인 중' : sg[0];
+    var why = !c ? (d.role === 'mgr' ? '방송 제어는 관리자 이상만 쓸 수 있어요' : '방송 종료와 제어는 소유자가 권한을 주면 쓸 수 있어요') : '';
+    $('end').disabled = !c || ending; $('end-why').textContent = why; $('end-why').hidden = !why;
+    $('ctl-why').textContent = why; $('ctl-why').hidden = !why;
+    $('md-btn').disabled = !c || w; $('md-btn').hidden = w; $('md-help').hidden = w; $('md-t').textContent = w ? '예배 방송' : '일반 방송';
+    var fc = $('fs-ctl'); if (fc) fc.disabled = !c;
+    $('fs-don').disabled = !c; $('fs-don').hidden = !c; $('don-no').hidden = c; $('fs-tts').disabled = !c || w || d.tts === 'fail';
+    $('tts-mute').setAttribute('aria-pressed', String(d.tts === 'muted'));
+    // 채팅
+    var cl = d.chat === 'closed';
+    $('chat-t').textContent = cl ? '채팅 닫힘' : d.chat === 'slow' ? '채팅 열림 · 느린 모드' : '채팅 열림';
+    $('chat-tg').textContent = cl ? '채팅 열기' : '채팅 닫기'; $('slow').disabled = cl; $('slow').setAttribute('aria-pressed', String(d.chat === 'slow'));
+    // 전체 차단은 소유자·관리자만
+    $('act-all').disabled = mgr; $('all-why').hidden = !mgr;
+    // 모바일 탭
+    ['mine', 'view'].forEach(function (k) { $('p-' + k).classList.toggle('off-m', mt !== k); $('mt-' + k).setAttribute('aria-selected', String(mt === k)); $('mt-' + k).tabIndex = mt === k ? 0 : -1; });
+    ['don', 'chat', 'tts'].forEach(function (k) { $('p-' + k).classList.toggle('off-m', st !== k); $('st-' + k).setAttribute('aria-selected', String(st === k)); $('st-' + k).tabIndex = st === k ? 0 : -1; });
+    if (d.end === 'done' && !done) { done = true; var h = document.querySelector('[aria-label="방송 요약"] h1'); h.tabIndex = -1; h.focus(); }
+    // 대화상자
+    Object.keys(DLG).forEach(function (id) {
+      var m = DLG[id], el = $(id), want = m[1].indexOf(d[m[0]]) > -1;
+      if (want && !el.open) { if (id === 'ban-dlg' && !$('msg-dlg').open) { $('msg-dlg').showModal(); } el.showModal(); }
+      if (!want && el.open && !busy) el.close();
+    });
+  };
+  Object.keys(DLG).forEach(function (id) {
+    var m = DLG[id], el = $(id);
+    el.addEventListener('close', function () {
+      if (id === 'ban-dlg') { if (d.dlg === 'ban') d.dlg = 'msg'; }
+      else if (m[1].indexOf(d[m[0]]) > -1 && !busy) { d[m[0]] = m[2]; if (id === 'msg-dlg' && $('ban-dlg').open) $('ban-dlg').close(); }
+      if (el._opener && document.contains(el._opener)) el._opener.focus();
+      window.mockRender();
+    });
+  });
+  function open(id, key, val, op) { $(id)._opener = op; d[key] = val; window.mockRender(); }
+  $('end').onclick = function () { open('end-dlg', 'end', 'confirm', this); };
+  $('md-btn').onclick = function () { open('mode-dlg', 'dlg', 'mode', this); };
+  document.querySelectorAll('[data-m]').forEach(function (x) { x.onclick = function () { cur = x.dataset.m; $('msg-nick').textContent = MSG[cur][0]; $('msg-body').textContent = MSG[cur][1]; $('ban-dlg')._opener = null; open('msg-dlg', 'dlg', 'msg', x); }; });
+  $('msg-ok').onclick = function () {
+    var a = document.querySelector('input[name=act]:checked').value;
+    if (a === 'all') { $('ban-dlg')._opener = this; d.dlg = 'ban'; window.mockRender(); return; }
+    tag(a); d.dlg = 'closed'; $('msg-dlg').close(); window.mockRender();
+  };
+  function tag(a) { var t = $('s-' + cur); t.textContent = { hide: '숨김', show: '이번 방송 차단', all: '방송국 전체 차단' }[a]; t.hidden = false; }
+  $('ban-ok').onclick = function () { tag('all'); busy = true; d.dlg = 'closed'; $('ban-dlg').close(); $('msg-dlg').close(); busy = false; window.mockRender(); };
+  $('end-ok').onclick = function () {
+    d.end = 'wait'; busy = true; $('end-dlg').close(); busy = false; window.mockRender();
+    clearTimeout(tm); tm = setTimeout(function () { if (d.end === 'wait') { d.end = 'done'; window.mockRender(); } }, 1500); // 목업: 1.5초 뒤 서버가 확인한 것으로 가정
+  };
+  $('end-retry').onclick = function () { $('end-ok').click(); };
+  $('mode-ok').onclick = function () { d.mode = 'worship'; d.dlg = 'closed'; busy = true; $('mode-dlg').close(); busy = false; window.mockRender(); $('md-t').tabIndex = -1; $('md-t').focus(); };
+  // 채팅·TTS·시청자 화면
+  $('chat-tg').onclick = function () { d.chat = d.chat === 'closed' ? 'open' : 'closed'; window.mockRender(); };
+  $('slow').onclick = function () { d.chat = d.chat === 'slow' ? 'open' : 'slow'; window.mockRender(); };
+  $('tts-mute').onclick = function () { d.tts = d.tts === 'muted' ? 'on' : 'muted'; window.mockRender(); };
+  ['mic', 'cam'].forEach(function (i) { $(i).onclick = function () { var p = this.getAttribute('aria-pressed') === 'true'; this.setAttribute('aria-pressed', String(!p)); this.textContent = (i === 'mic' ? '마이크 ' : '카메라 ') + (p ? '켜짐' : '꺼짐'); }; });
+  $('mute').onclick = function () { var m = $('mute-t').textContent === '음소거 중'; $('mute-t').textContent = m ? '소리 켜짐' : '음소거 중'; this.textContent = m ? '음소거' : '소리 켜기'; };
+  $('lcopy').onclick = function () { $('lok').hidden = false; };
+  // 모바일 탭(좌우 화살표 포함)
+  function tabs(sel, set) {
+    document.querySelectorAll(sel).forEach(function (t, i, all) {
+      t.addEventListener('click', function () { set(t); window.mockRender(); });
+      t.addEventListener('keydown', function (e) { var k = { ArrowRight: 1, ArrowLeft: -1 }[e.key]; if (!k) return; var n = all[(i + k + all.length) % all.length]; set(n); window.mockRender(); n.focus(); e.preventDefault(); });
+    });
+  }
+  tabs('[data-mt]', function (t) { mt = t.dataset.mt; }); tabs('[data-st]', function (t) { st = t.dataset.st; });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

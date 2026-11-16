@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>열매 충전과 후원 확인 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 680px; margin: 0 auto; padding: 32px 0 64px; }
+  .bal { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .bal > span:first-child { font-size: .9rem; color: var(--muted); }
+  .bal strong { font-size: 1.5rem; font-weight: 700; color: var(--strong); font-variant-numeric: tabular-nums; }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
+  .prods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .prod { position: relative; display: block; border: 1px solid var(--muted); border-radius: var(--radius); padding: 14px 16px 14px 48px; min-height: 96px; cursor: pointer; }
+  .prod:hover { background: var(--bg-sub); }
+  .prod input { position: absolute; left: 14px; top: 16px; width: 24px; height: 24px; accent-color: var(--strong); }
+  .prod:has(input:checked) { border: 2px solid var(--strong); background: var(--bg-sub); padding: 13px 15px 13px 47px; }
+  .prod .sel { display: none; font-size: .85rem; font-weight: 700; color: var(--strong); }
+  .prod .qty { font-size: 1rem; font-weight: 600; color: var(--text); }
+  .prod:has(input:checked) .sel { display: inline; }
+  .prod .nm { font-size: .9rem; font-weight: 400; color: var(--muted); display: block; }
+  .dl { display: grid; grid-template-columns: 96px 1fr; gap: 6px 12px; margin: 0; }
+  .dl dt { font-size: .9rem; font-weight: 400; color: var(--muted); } .dl dd { margin: 0; }
+  .terms { list-style: none; margin: 0; padding: 0; } .terms li { padding: 6px 0; border-top: 1px solid var(--line); }
+  .terms li:first-child { border-top: 0; }
+  @media (max-width: 767px) { .prods { grid-template-columns: 1fr; } .col { padding-top: 20px; } .dl { grid-template-columns: 80px 1fr; } }
+</style>
+</head>
+<body data-default="view:charge cs:normal ds:normal tts:below limit:once">
+<!-- mock: 잔액, 방송 제목, 목회자 이름은 목업 값이다. 가격, 열매 수량, 환산 비율, 유효기간, 최소 금액은 확정 전이라 슬롯으로 표시한다. -->
+
+<header id="site-header" data-active=""></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>화면</b>
+    <button data-set="view:charge">충전</button><button data-set="view:donate">후원 확인</button></div>
+  <div class="group" data-show="view=charge"><b>충전 상태</b>
+    <button data-set="cs:normal">상품 선택됨</button>
+    <button data-set="cs:none">미선택</button>
+    <button data-set="cs:empty">상품 0건</button>
+    <button data-set="cs:loading">로딩</button>
+    <button data-set="cs:error">목록 오류</button>
+    <button data-set="cs:soldout">판매 중지</button>
+    <button data-set="cs:pricechg">가격 변경</button>
+    <button data-set="cs:paying">결제 진행 중</button>
+    <button data-set="cs:payfail">결제 실패</button>
+    <button data-set="cs:paycancel">결제 취소</button>
+    <button data-set="cs:checking">결과 확인 중</button>
+    <button data-set="cs:under19">충전 불가(만 19세 미만)</button>
+    <button data-set="cs:limit">한도 초과</button></div>
+  <div class="group" data-show="view=charge cs=limit"><b>한도 종류</b>
+    <button data-set="limit:once">1회</button><button data-set="limit:day">일</button><button data-set="limit:month">월</button></div>
+  <div class="group" data-show="view=donate"><b>후원 상태</b>
+    <button data-set="ds:normal">정상</button>
+    <button data-set="ds:belowmin">최소 금액 미달</button>
+    <button data-set="ds:nobalance">잔액 부족</button>
+    <button data-set="ds:filtered">메시지 거절</button>
+    <button data-set="ds:processing">처리 중</button>
+    <button data-set="ds:checking">결과 확인 중</button>
+    <button data-set="ds:ended">방송 종료·차단</button>
+    <button data-set="ds:dup">중복 요청</button>
+    <button data-set="ds:error">오류</button>
+    <button data-set="ds:success">완료</button>
+    <button data-set="ds:under19">후원 불가(만 19세 미만)</button>
+    <button data-set="ds:limit">한도 초과</button></div>
+  <div class="group" data-show="view=donate ds=limit"><b>한도 종류</b>
+    <button data-set="limit:once">1회</button><button data-set="limit:day">일</button><button data-set="limit:month">월</button></div>
+  <div class="group" data-show="view=donate"><b>TTS 안내</b>
+    <button data-set="tts:below">최소액 미만</button>
+    <button data-set="tts:above">최소액 이상</button>
+    <button data-set="tts:off">TTS 꺼짐(문구 없음)</button>
+    <button data-set="tts:worship">예배 방송(완료 때만 안내)</button>
+    <button data-set="tts:fault">공급자 장애</button></div>
+</div></div>
+
+<main class="wrap"><div class="col">
+
+<!-- ================= 열매 충전 ================= -->
+<section data-show="view=charge" aria-labelledby="h-charge" class="stack">
+  <h1 id="h-charge"><span class="slot">S1 명칭</span> 충전</h1>
+  <div class="bal"><span>현재 잔액</span><strong>3,500 <span class="slot">S1 명칭</span></strong> <span class="muted small">(샘플)</span></div>
+
+  <div class="notice" role="status" data-show="cs=under19"><strong><span class="slot">S1 명칭</span> 충전은 만 19세부터 할 수 있어요</strong><p>시청, 구독, 채팅, 댓글은 그대로 쓸 수 있어요. <span class="slot">법무 7-2 안내 문구</span></p><p style="margin-top:8px"><a class="btn" href="main.html">방송 보러 가기</a></p></div>
+  <div class="notice danger" role="alert" data-show="cs=limit"><strong>충전 한도를 넘었어요</strong>
+    <p data-show="cs=limit limit=once">한 번에 충전할 수 있는 한도는 <span class="slot">1회 한도 값</span>이에요. 더 적은 금액권을 골라 주세요.</p>
+    <p data-show="cs=limit limit=day">오늘 충전할 수 있는 한도는 <span class="slot">일 한도 값</span>이에요. <span class="slot">다시 가능한 시점</span></p>
+    <p data-show="cs=limit limit=month">이번 달 충전할 수 있는 한도는 <span class="slot">월 한도 값</span>이에요. <span class="slot">다시 가능한 시점</span></p>
+  </div>
+
+  <div data-show="cs=loading" role="status" aria-busy="true">
+    <p class="muted">금액권 목록을 불러오고 있어요.</p>
+    <div class="prods" style="margin-top:12px"><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div></div>
+  </div>
+
+  <div class="empty" data-show="cs=empty">
+    <p><strong>지금은 <span class="slot">S1 명칭</span>를 충전할 수 없어요</strong></p>
+    <p class="muted">판매 중인 금액권이 없어요. 나중에 다시 확인해 주세요.</p>
+    <a class="btn" href="#" data-set="view:donate">후원 화면으로 돌아가기</a>
+  </div>
+
+  <div class="notice danger" role="alert" data-show="cs=error">
+    <strong>금액권 목록을 불러오지 못했어요</strong><p>잠시 후 다시 시도해 주세요.</p>
+    <p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p>
+  </div>
+
+  <!-- 결제 직전 알림류 -->
+  <div class="notice danger" role="alert" data-show="cs=soldout"><strong>이 상품은 더 이상 판매하지 않아요</strong><p>선택을 해제했어요. 판매 중인 금액권에서 다시 골라 주세요.</p><p style="margin-top:8px"><button class="btn">목록 새로고침</button></p></div>
+  <div class="notice danger" role="alert" data-show="cs=pricechg"><strong>가격이 바뀌었어요</strong><p>새 가격을 확인한 뒤 다시 결제해 주세요.</p></div>
+  <div class="notice danger" role="alert" data-show="cs=payfail"><strong>결제에 실패했어요</strong><p>결제 수단을 확인하고 다시 시도해 주세요. 결제된 금액이 있으면 문의해 주세요.</p></div>
+  <div class="notice" role="status" data-show="cs=paycancel"><strong>결제를 취소했어요</strong><p><span class="slot">S1 명칭</span>는 충전되지 않았어요.</p></div>
+  <div class="notice" role="status" data-show="cs=checking"><strong>결제 결과를 확인하고 있어요</strong><p>잠시만 기다려 주세요. 이 화면을 닫아도 결과는 MY의 충전·후원 내역에서 확인할 수 있어요.</p></div>
+
+  <form id="f-charge" data-show="cs=normal|none|soldout|pricechg|paying|payfail|paycancel|checking|limit" onsubmit="return false" class="stack">
+    <fieldset>
+      <legend>금액권 선택</legend>
+      <div class="prods">
+        <label class="prod"><input type="radio" name="prod" value="1"><span class="nm slot">[V1 상품명]</span><span class="price"><span class="muted small">가격</span> <strong><span class="slot">[V1 가격]</span> 원</strong></span><br><span class="qty"><span class="slot">S1 명칭</span> <span class="slot">[V1 열매 수량]</span> 개</span> <span class="sel">선택됨</span></label>
+        <label class="prod"><input type="radio" name="prod" value="2" checked><span class="nm slot">[V1 상품명]</span><span class="price"><span class="muted small">가격</span> <strong><span class="slot">[V1 가격]</span> 원</strong></span><br><span class="qty"><span class="slot">S1 명칭</span> <span class="slot">[V1 열매 수량]</span> 개</span> <span class="sel">선택됨</span></label>
+        <label class="prod"><input type="radio" name="prod" value="3"><span class="nm slot">[V1 상품명]</span><span class="price"><span class="muted small">가격</span> <strong><span class="slot">[V1 가격]</span> 원</strong></span><br><span class="qty"><span class="slot">S1 명칭</span> <span class="slot">[V1 열매 수량]</span> 개</span> <span class="sel">선택됨</span></label>
+        <label class="prod"><input type="radio" name="prod" value="4"><span class="nm slot">[V1 상품명]</span><span class="price"><span class="muted small">가격</span> <strong><span class="slot">[V1 가격]</span> 원</strong></span><br><span class="qty"><span class="slot">S1 명칭</span> <span class="slot">[V1 열매 수량]</span> 개</span> <span class="sel">선택됨</span></label>
+      </div>
+    </fieldset>
+
+    <p data-show="sel=yes" role="status" style="color:var(--text)"><span class="slot">[V1 가격]</span> 원을 결제하면 <span class="slot">S1 명칭</span> <span class="slot">[V1 열매 수량]</span> 개가 충전돼요.</p>
+
+    <section aria-labelledby="h-terms" style="border:1px solid var(--muted);border-radius:var(--radius);padding:16px">
+      <h2 id="h-terms" style="font-size:1rem;font-weight:700;color:var(--strong)">충전 전에 확인해 주세요</h2>
+      <ul class="terms" style="margin-top:8px">
+        <li><span class="muted small">환산 비율</span> <span class="slot">[S2 환산 비율]</span></li>
+        <li><span class="muted small">환불</span> <span class="slot">[S2 환불 안내 문구]</span></li>
+      </ul>
+    </section>
+
+    <div>
+      <button class="btn primary block" id="pay" data-show="cs=normal|soldout|pricechg|payfail|paycancel|checking"><span class="slot">V1 가격</span>&nbsp;원 결제하기</button>
+      <button class="btn block" disabled data-show="cs=none" aria-describedby="nopick">결제하기</button>
+      <p class="help" id="nopick" data-show="cs=none">금액권을 선택해 주세요.</p>
+      <button class="btn block" disabled data-show="cs=limit" aria-describedby="lim-c">결제하기</button>
+      <p class="help" id="lim-c" data-show="cs=limit">충전 한도를 넘었어요.</p>
+      <button class="btn block" disabled data-show="cs=paying">결제 진행 중</button>
+      <p class="help" data-show="cs=paying" role="status">결제 창에서 결제를 마쳐 주세요. 이 화면을 닫지 마세요.</p>
+    </div>
+  </form>
+</section>
+
+<!-- ================= 후원 확인 ================= -->
+<section data-show="view=donate" aria-labelledby="h-don" class="stack">
+  <h1 id="h-don">후원 확인</h1>
+  <div class="notice" role="status" data-show="ds=under19"><strong>후원은 만 19세부터 할 수 있어요</strong><p>시청, 구독, 채팅, 댓글은 그대로 쓸 수 있어요. <span class="slot">법무 7-2 안내 문구</span></p><p style="margin-top:8px"><a class="btn" href="live.html">방송으로 돌아가기</a></p></div>
+  <div class="notice danger" role="alert" data-show="ds=limit"><strong>후원 한도를 넘었어요</strong>
+    <p data-show="ds=limit limit=once">한 번에 후원할 수 있는 한도는 <span class="slot">1회 한도 값</span>이에요. 더 적은 금액을 입력해 주세요.</p>
+    <p data-show="ds=limit limit=day">오늘 후원할 수 있는 한도는 <span class="slot">일 한도 값</span>이에요. <span class="slot">다시 가능한 시점</span></p>
+    <p data-show="ds=limit limit=month">이번 달 후원할 수 있는 한도는 <span class="slot">월 한도 값</span>이에요. <span class="slot">다시 가능한 시점</span></p>
+  </div>
+
+  <div class="notice" role="status" data-show="ds=success"><strong>후원이 완료됐어요</strong><p>후원을 보냈어요.</p><p data-show="tts=worship">예배 중에는 음성으로 읽지 않아요.</p><p style="margin-top:8px"><a class="btn" href="live.html">방송으로 돌아가기</a></p></div>
+
+  <dl class="dl">
+    <dt>후원 대상</dt><dd><strong>샘물교회 이정훈 목사</strong> (라이브 방송 후원)</dd>
+    <dt>방송</dt><dd><strong>로마서 8장 강해 12회</strong></dd>
+    <dt>내 잔액</dt><dd><strong>3,500 <span class="slot">S1 명칭</span></strong> <span class="muted small">(샘플)</span></dd>
+  </dl>
+
+  <form id="f-don" data-show="ds=normal|belowmin|nobalance|filtered|processing|checking|ended|dup|error|success|limit" onsubmit="return false" class="stack" style="border-top:1px solid var(--line);padding-top:20px">
+    <div class="field">
+      <label class="label" for="amt">후원 금액 (<span class="slot">S1 명칭</span>)</label>
+      <input class="input" id="amt" name="amt" inputmode="numeric" autocomplete="off" aria-describedby="amt-help amt-err">
+      <p class="help" id="amt-help">현재 최소 후원 금액은 <span class="slot">[V4 최소 금액]</span> <span class="slot">S1 명칭</span>예요.</p>
+      <p class="err" id="amt-err" data-show="ds=belowmin">최소 후원 금액보다 적어요. <span class="slot">[V4 최소 금액]</span> <span class="slot">S1 명칭</span> 이상 입력해 주세요.</p>
+    </div>
+
+    <!-- TTS 안내: 금액과 메시지 사이. 예배 방송과 TTS 꺼짐은 후원 입력 중 문구를 표시하지 않는다(planner-1 결정). 예배 방송은 후원 완료 notice에만 "예배 중에는 음성으로 읽지 않아요."를 보인다(사용자 결정 B안). 예배 방송의 메시지 노출 방식은 S3 -->
+    <div class="notice" role="status" aria-live="polite" data-show="tts=below|above|fault"><strong>음성 안내</strong>
+      <p data-show="tts=below"><span class="slot">[TTS 최소 후원액]</span> <span class="slot">S1 명칭</span> 이상 후원하면 메시지를 음성으로 읽어 드려요. 지금 금액은 글자로만 표시돼요.</p>
+      <p data-show="tts=above">메시지를 음성으로 읽어 드려요.</p>
+      <p data-show="tts=fault">음성 서비스에 문제가 있어 글자로만 표시돼요.</p>
+    </div>
+
+    <div class="field">
+      <label class="label" for="msg">후원 메시지 (선택)</label>
+      <textarea class="textarea" id="msg" name="msg" aria-describedby="msg-help msg-err"></textarea>
+      <p class="help" id="msg-help">계좌번호나 연락처 같은 개인 정보는 쓸 수 없어요.</p>
+      <p class="err" id="msg-err" data-show="ds=filtered">메시지에 쓸 수 없는 내용이 있어요. 고친 뒤 다시 보내 주세요.</p>
+    </div>
+
+    <label class="check"><input type="checkbox" name="anon"><span>익명으로 후원</span></label>
+    <p class="help">익명 범위: <span class="slot">익명 범위 미확정</span></p>
+    <p class="help">후원 메시지 표시 방식: <span class="slot">S3 후원 메시지 노출 방식</span></p>
+
+    <div class="notice danger" role="alert" data-show="ds=nobalance">
+      <strong><span class="slot">S1 명칭</span>가 부족해요</strong><p>부족한 만큼 충전한 뒤 다시 후원해 주세요.</p>
+      <p style="margin-top:8px"><button type="button" class="btn" data-set="view:charge"><span class="slot">S1 명칭</span> 충전</button></p>
+    </div>
+    <div class="notice danger" role="alert" data-show="ds=ended"><strong>지금은 이 방송을 후원할 수 없어요</strong></div>
+    <div class="notice" role="status" data-show="ds=checking"><strong>후원 결과를 확인하는 중이에요</strong><p>잠시만 기다려 주세요.</p></div>
+    <div class="notice" role="status" data-show="ds=dup"><strong>이미 처리된 후원이에요</strong><p>이전 결과를 다시 보여 드려요.</p></div>
+    <div class="notice danger" role="alert" data-show="ds=error">
+      <strong>후원을 보내지 못했어요</strong><p>잠시 후 다시 시도해 주세요. 같은 후원이 두 번 처리되지는 않아요.</p>
+    </div>
+
+    <!-- 환불 불가 고지: 문구는 S2 확정 전 임시 -->
+    <p class="small muted"><span class="slot">S2 환불 안내 문구</span></p>
+
+    <button class="btn primary block" data-show="ds=normal|nobalance|filtered|error"><span class="slot">V4 금액</span>&nbsp;<span class="slot">S1 명칭</span>&nbsp;후원하기</button>
+    <button class="btn block" disabled data-show="ds=belowmin" aria-describedby="why-amt">후원하기</button>
+    <p class="help" id="why-amt" data-show="ds=belowmin">후원 금액을 확인해 주세요.</p>
+    <button class="btn block" disabled data-show="ds=limit" aria-describedby="lim-d">후원하기</button>
+    <p class="help" id="lim-d" data-show="ds=limit">후원 한도를 넘었어요.</p>
+    <button class="btn block" disabled data-show="ds=processing">처리 중</button>
+    <p class="help" role="status" data-show="ds=processing">후원을 처리하고 있어요. 이 화면을 닫지 마세요.</p>
+  </form>
+</section>
+
+</div></main>
+
+<script>
+  window.mockDerive = function (b) {
+    var r = document.querySelectorAll('input[name=prod]');
+    if (b.dataset.cs === 'none') r.forEach(function (x) { x.checked = false; });
+    else if (!document.querySelector('input[name=prod]:checked')) r[1].checked = true;
+    b.dataset.sel = document.querySelector('input[name=prod]:checked') ? 'yes' : 'no';
+    var amt = document.getElementById('amt');
+    if (b.dataset.ds === 'belowmin') amt.setAttribute('aria-invalid', 'true'); else amt.removeAttribute('aria-invalid');
+  };
+  document.addEventListener('change', function (e) {
+    if (e.target.name === 'prod' && document.body.dataset.cs === 'none') { document.body.dataset.cs = 'normal'; window.mockRender(); }
+    if (e.target.name === 'prod') document.querySelectorAll('[data-set^="cs:"]').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.set === 'cs:' + document.body.dataset.cs)); });
+  });
+  // 천 단위 콤마: 입력 중에도 유지, 빈칸은 빈칸
+  document.getElementById('amt').addEventListener('input', function (e) {
+    var el = e.target, pos = el.selectionStart, before = el.value.slice(0, pos).replace(/\D/g, '').length;
+    var d = el.value.replace(/\D/g, ''); el.value = d ? Number(d).toLocaleString('ko-KR') : '';
+    var n = 0, i = 0; while (i < el.value.length && n < before) { if (/\d/.test(el.value[i])) n++; i++; }
+    el.setSelectionRange(i, i);
+  });
+</script>
+<script src="mock.js"></script>
+</body>
+</html>

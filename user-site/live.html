@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>라이브 시청 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .live-grid > * { min-width: 0; }
+  .live-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 0 32px; padding: 24px 0 48px; align-items: start; }
+  .stage { position: relative; aspect-ratio: 16 / 9; background: #1B2120; border-radius: var(--radius); overflow: hidden; }
+  .stage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .stage .over { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--bg) 72%, transparent); }
+  .stage .over > div { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 24px; max-width: 420px; text-align: center; }
+  .stage .over p + p, .stage .over p + .btn { margin-top: 8px; }
+  .stage .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 6px 12px; background: var(--bg); color: var(--muted); font-size: .85rem; }
+  .head { padding-top: 16px; }
+  .head h1 { margin-bottom: 8px; }
+  .chrow { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  .ctrl { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .ctrl .grow { flex: 1; min-width: 200px; }
+  .info { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .info dl { display: grid; grid-template-columns: 96px 1fr; gap: 6px 12px; margin: 12px 0; }
+  .info dt { color: var(--muted); } .info dd { margin: 0; }
+  .side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; max-height: calc(100dvh - 96px); grid-row: 1 / span 3; grid-column: 2; }
+  .panel { border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; min-height: 0; }
+  .panel > h2 { font-size: 1rem; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  .panel .body { padding: 12px 16px; overflow: auto; }
+  #p-don { flex: none; max-height: 220px; } #p-don .body { background: var(--bg-sub); }
+  #p-chat { flex: 1; } #p-chat .list { flex: 1; min-height: 160px; }
+  .bubble { background: var(--don-bg); border: 1px solid var(--don-line); border-left-width: 4px; border-radius: var(--radius); padding: 8px 12px; color: var(--strong); }
+  .bubble + .bubble { margin-top: 8px; }
+  .bubble .who { font-weight: 700; color: var(--don-name); } .bubble p + p { margin-top: 2px; }
+  .tag.don { color: var(--don-name); border-color: var(--don-name); background: transparent; }
+  .tag.don svg { width: 12px; height: 12px; margin-right: 3px; vertical-align: -1px; }
+  .msg { padding: 0; font-size: 1rem; line-height: 1.5; color: var(--strong); font-weight: 400; } .msg + .msg { margin-top: 12px; }
+  .msg .who { display: block; margin-bottom: 2px; color: var(--muted); font-size: .85rem; font-weight: 700; line-height: 1.4; }
+  /* 역할 색: me를 먼저 두어 host/admin/mgr이 함께 붙으면 역할 색이 이긴다 */
+  .msg.me .who { color: var(--role-me); } .msg.host .who { color: var(--accent); }
+  .msg.admin .who { color: var(--role-admin); } .msg.mgr .who { color: var(--role-mgr); }
+  .msg .tag { font-size: .75rem; margin: 0 0 0 6px; background: transparent; } .msg .who .muted { margin-left: 6px; font-weight: 400; }
+  .msg .tag.host { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .msg .tag.admin { color: var(--role-admin); border-color: var(--role-admin); }
+  .msg .tag.mgr { color: var(--role-mgr); border-color: var(--role-mgr); }
+  .msg .tag.me { color: var(--role-me); border-color: var(--role-me); }
+  .sys { margin: 8px 0; }
+  .composer { padding: 12px 16px; border-top: 1px solid var(--line); }
+  .composer .r { display: flex; gap: 8px; } .composer .r .input { flex: 1; }
+  .tabs-m { display: none; }
+  .donate { min-width: 160px; }
+  .head .donate-wrap { margin-top: 12px; }
+  body[data-state="noaccess"] .live-grid > :not(.stage) { display: none; }
+  .tabs-m button { flex: 1; }
+  @media (max-width: 767px) {
+    .live-grid { grid-template-columns: 1fr; padding: 0 0 96px; }
+    .wrap.live-wrap { padding: 0; }
+    .stage { border-radius: 0; }
+    .head, .info, .tabs-m, .panel { margin-left: 16px; margin-right: 16px; }
+    .tabs-m { display: flex; margin-top: 16px; }
+    .side { display: contents; }
+    .panel { margin-top: 16px; max-height: none; }
+    #p-don { max-height: none; }
+    body[data-tab="chat"] #p-don, body[data-tab="chat"] .info,
+    body[data-tab="don"] #p-chat, body[data-tab="don"] .info,
+    body[data-tab="info"] #p-chat, body[data-tab="info"] #p-don { display: none; }
+    .donate-wrap { position: fixed; left: 0; right: 0; bottom: 0; padding: 8px 16px; background: var(--bg); border-top: 1px solid var(--line); z-index: 6; }
+    .donate-wrap .donate { width: 100%; }
+    .ctrl { padding-top: 12px; }
+  }
+  .tabs-m button { min-height: var(--tap); padding: 0 12px; background: none; border: 0; font: inherit; color: var(--muted); cursor: pointer; }
+  .tabs-m button[aria-pressed="true"] { color: var(--text); font-weight: 700; box-shadow: inset 0 -3px 0 var(--accent); }
+  .tabs-m { border-bottom: 1px solid var(--line); }
+</style>
+</head>
+<body data-notabs data-default="variant:general state:normal tab:chat lp:yes me:viewer">
+<!-- 이 목업의 방송 썸네일은 Unsplash 무료 사진(img/)이며 실제 방송 화면이 아니다. -->
+<!-- mock: 방송 제목, 방송국, 목회자 이름, 채팅 내용, 후원 금액, 시청자 수는 모두 목업 값이다. -->
+
+<header id="site-header" data-active="live"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>방송 종류</b>
+    <button data-set="variant:general">일반 방송</button>
+    <button data-set="variant:worship">예배 방송</button>
+  </div>
+  <div class="group"><b>상태</b>
+    <button data-set="state:normal">정상</button>
+    <button data-set="state:chatopen">예배 채팅 열림</button>
+    <button data-set="state:pastorclosed">목회자가 채팅 닫음</button>
+    <button data-set="state:sending">내 메시지 전송 중</button>
+    <button data-set="state:sendfail">전송 실패</button>
+    <button data-set="state:guest">비회원</button>
+    <button data-set="state:chatlost">채팅 연결 끊김</button>
+    <button data-set="state:ttsfault">TTS 장애</button>
+    <button data-set="state:nodon">후원 메시지 0건</button>
+    <button data-set="state:interrupted">송출 끊김</button>
+    <button data-set="state:limited">방송국 제한</button>
+    <button data-set="state:ended">종료됨</button>
+    <button data-set="state:noaccess">권한 없음</button>
+  </div>
+  <div class="group"><b>내 역할</b>
+    <button data-set="me:viewer">시청자</button><button data-set="me:host">방송자</button><button data-set="me:admin">관리자</button><button data-set="me:mgr">매니저</button>
+    <p class="help">방송자는 자기 방송에 후원·구독하지 않는다(사용자 결정).</p>
+  </div>
+  <div class="group" data-show="state=limited"><b>LIMITED 후원</b><button data-set="lp:yes">후원 가능</button><button data-set="lp:no">후원 불가</button></div>
+  <p class="muted">방송국 제한 때 후원 가능 여부는 사용자 결정 전이에요. 비공개 콘텐츠의 공유 버튼 노출·링크 복사 허용도 사용자 결정 전이에요. 방송국 이름 링크색은 사용자 결정 전이에요. 신고 사유 목록과 자기 방송·자기 댓글 신고 처리는 사용자 결정 전이에요(명세 §16.1에 사유 목록 없음).</p>
+</div></div>
+
+<main class="wrap live-wrap">
+<div class="live-grid" data-fs-box>
+
+  <!-- 영상 영역. 실제 플레이어 대신 썸네일 이미지를 둔다 -->
+  <div class="stage" role="region" aria-label="방송 영상">
+    <img data-show="variant=general" src="img/bible.jpg" alt="방송 화면 예시"><img data-show="variant=worship" src="img/sanctuary.jpg" alt="방송 화면 예시"><div class="pbar" data-show="stage=ok"><button class="btn" data-toggle aria-pressed="false" data-icon="play" data-label="재생" data-loff="재생" data-lon="일시정지">재생</button><button class="btn" data-toggle aria-pressed="false" data-icon="mute" data-label="소리 끄기" data-loff="소리 끄기" data-lon="소리 켜기">소리 끄기</button></div><button type="button" class="fsbtn chatbtn" data-chat-toggle aria-pressed="true" aria-label="채팅 닫기" title="채팅 닫기"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg></button><button type="button" class="fsbtn" data-fs aria-label="전체화면으로 보기" title="전체화면"><svg class="i-enter" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="i-exit" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="over" data-show="stage=interrupted" role="status"><div><p><strong>송출이 잠시 끊겼어요</strong></p><p class="muted">방송이 이어지면 자동으로 다시 재생돼요.</p></div></div>
+    <div class="over" data-show="stage=ended"><div><p><strong>방송이 끝났어요</strong></p><p class="muted">다시보기가 공개되면 방송국에서 볼 수 있어요.</p><a class="btn" href="channel.html">방송국으로 이동</a></div></div>
+    <div class="over" data-show="stage=noaccess"><div><p><strong>볼 수 없는 방송이에요</strong></p><p class="muted">링크가 바뀌었거나 공개되지 않은 방송일 수 있어요.</p><a class="btn" href="main.html">메인으로 이동</a></div></div>
+    
+  </div>
+
+
+  <!-- 제목, 방송국, 구독 -->
+  <div class="head">
+    <div class="row" style="margin-bottom:8px">
+      <span class="badge pulse" data-show="variant=general"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span>
+      <span class="badge pulse" data-show="variant=worship"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span>
+      <span class="badge plain" data-show="variant=worship">예배 중</span>
+      <span class="muted small" data-show="variant=general">시청 312명</span>
+      <span class="muted small" data-show="variant=worship">시청 1,284명</span>
+    </div>
+    <h1 data-show="variant=general">로마서 8장 강해 12회</h1>
+    <h1 data-show="variant=worship">주일 낮 예배 실시간 방송</h1>
+    <div class="chrow" style="margin-top:8px">
+      <p><a class="nm-link" href="channel.html"><img class="pa lg" data-show="variant=general" src="../portraits/men/65.jpg" alt=""><img class="pa lg" data-show="variant=worship" src="../portraits/men/75.jpg" alt=""><strong data-show="variant=general">샘물교회 이정훈 목사</strong><strong data-show="variant=worship">은혜교회 박성민 목사</strong></a> <span data-show="variant=general"><span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span></span><span data-show="variant=worship"><span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span></span> <span class="muted small" style="white-space:nowrap"> <strong>구독자 2,418명</strong></span></p>
+      <button class="btn toggle" data-toggle aria-pressed="false" data-on="구독 중" data-off="구독" data-show="me=viewer|admin|mgr">구독</button>
+    </div>
+
+    <div class="ctrl">
+      <!-- TTS: 일반 방송에서만 표시. 예배 방송은 표시 자체를 숨긴다 -->
+      <div class="grow" data-show="tts=on">
+        <p><strong>음성 읽기</strong> <span class="muted">후원 메시지를 음성으로 읽어 드려요.</span></p>
+      </div>
+      <div class="grow" data-show="tts=fault">
+        <p><strong>음성 읽기</strong> <span style="color:var(--danger);font-weight:600">음성 서비스에 문제가 있어 글자로만 표시돼요.</span></p>
+      </div>
+      <button class="btn toggle" data-toggle aria-pressed="false" data-icon="ttsmute" data-label="후원 음성 음소거" data-loff="후원 음성 음소거" data-lon="후원 음성 음소거 해제" data-show="tts=on|fault">음소거</button>
+      <p class="muted small grow" data-show="variant=worship tts=off">후원 메시지 표시 방식: <span class="slot">S3 후원 메시지 노출 방식</span></p>
+    </div>
+
+    <!-- 후원 버튼: 모바일은 하단 고정 -->
+    <div class="donate-wrap" data-show="don=on|off me=viewer|admin|mgr">
+      <div data-show="don=on"><div class="row"><a class="btn primary donate" href="charge.html?view=donate">후원하기</a></div>
+        <p class="help" data-show="state=limited">이 방송국은 일부 기능이 제한돼요. 후원 가능 여부: <span class="slot">LIMITED 후원 가능 여부</span></p></div>
+      <div data-show="don=off"><button class="btn donate" disabled aria-describedby="why">후원하기</button>
+        <p class="help" id="why" data-show="state=limited">이 방송국은 일부 기능이 제한돼요. 후원 가능 여부: <span class="slot">LIMITED 후원 가능 여부</span></p>
+        <p class="help" data-show="state=ended">방송이 끝나 후원할 수 없어요.</p></div>
+    </div>
+  </div>
+
+  <div class="info">
+    <h2>방송 정보</h2>
+    <dl>
+      <dt>카테고리</dt><dd data-show="variant=general">강해</dd><dd data-show="variant=worship">예배</dd>
+      <dt>방송 시작</dt><dd>오늘 오전 11시</dd>
+    </dl>
+    <p>이번 주는 로마서 8장 후반부를 함께 읽고 말씀을 나눕니다.</p>
+    <div class="row icons" style="margin-top:12px"><button class="btn" data-icon="share" data-keep data-share="로마서 8장 강해 12회 · 샘물교회 이정훈 목사">공유</button><button class="btn" data-icon="flag" data-keep data-report="로마서 8장 강해 12회">신고</button></div>
+  </div>
+
+  <!-- 모바일 전용 탭 -->
+  <div class="tabs-m" role="group" aria-label="보기 전환">
+    <button data-set="tab:chat">채팅</button><button data-set="tab:don">후원 메시지</button><button data-set="tab:info">정보</button>
+  </div>
+
+  <div class="side">
+    <!-- 후원 메시지 말풍선: 채팅과 분리된 고정 영역 -->
+    <section class="panel" id="p-don" aria-labelledby="h-don">
+      <h2 id="h-don">후원 메시지</h2>
+      <div class="body" aria-live="polite">
+        <div data-show="variant=general state=nodon"><p class="muted">아직 후원 메시지가 없어요.</p></div>
+        <div data-show="variant=worship"><div class="notice"><span class="slot">S3 후원 메시지 노출 방식</span></div></div>
+        <div data-show="variant=general state=normal|chatopen|pastorclosed|sending|sendfail|guest|chatlost|ttsfault|interrupted|limited|ended|noaccess">
+          <div class="bubble"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">아침이슬</span></p><p>목사님 말씀 덕분에 힘이 났습니다.</p></div>
+          <div class="bubble"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">익명</span></p><p>오늘도 감사합니다.</p></div>
+          <div class="bubble"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">든든한반석</span></p><p>수요 모임 기도 부탁드립니다.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="p-chat" aria-labelledby="h-chat">
+      <h2 id="h-chat">채팅</h2>
+      <div class="body list" data-show="chat=open|slow|guest|lost|closedpastor">
+        <!-- 표시 이름은 닉네임 가정. 실명 노출 없음 -->
+        <p class="msg host"><b class="who">샘물지기<span class="tag host">방송자</span><span class="tag me" data-show="me=host chat=open|slow|lost|closedpastor">나</span></b>안녕하세요. 오늘은 로마서 8장입니다.</p>
+        <p class="msg"><b class="who">푸른언덕</b>안녕하세요. 잘 들립니다.</p>
+        <p class="msg mgr"><b class="who">은빛나무<span class="tag mgr">매니저</span></b>채팅은 천천히 입력해 주세요.</p>
+        <p class="msg admin"><b class="who">말씀지기<span class="tag admin">관리자</span></b>오늘도 함께해 주셔서 감사합니다.</p>
+        <p class="msg"><b class="who">하늘바람</b>본문 몇 절인가요?</p>
+        <p class="msg me" data-show="chat=open|slow own=sent me=viewer"><b class="who">새벽별<span class="tag me">나</span></b>8장 28절입니다.</p>
+        <p class="msg me" data-show="chat=open|slow own=sending me=viewer"><b class="who">새벽별<span class="tag me">나</span><span class="muted">전송 중</span></b>8장 28절입니다.</p>
+        <!-- 내가 방송자·관리자·매니저일 때(CHAT-COLOR-DESIGN.md 8절 3항): 역할 색 닉네임 + 역할 라벨 + 나. 방송자는 한 명이라 위 샘물지기와 같은 닉네임이다 -->
+        <div class="msg me host" data-show="chat=open|slow me=host"><p><b class="who">샘물지기<span class="tag host">방송자</span><span class="tag me">나</span><span class="muted" data-show="own=sending">전송 중</span></b>8장 28절입니다.</p><p class="err" data-show="own=sendfail">전송하지 못했어요. <button class="btn" style="min-height:44px;margin-left:8px" data-icon="retry" data-keep>다시 보내기</button></p></div>
+        <div class="msg me admin" data-show="chat=open|slow me=admin"><p><b class="who">새벽별<span class="tag admin">관리자</span><span class="tag me">나</span><span class="muted" data-show="own=sending">전송 중</span></b>8장 28절입니다.</p><p class="err" data-show="own=sendfail">전송하지 못했어요. <button class="btn" style="min-height:44px;margin-left:8px" data-icon="retry" data-keep>다시 보내기</button></p></div>
+        <div class="msg me mgr" data-show="chat=open|slow me=mgr"><p><b class="who">새벽별<span class="tag mgr">매니저</span><span class="tag me">나</span><span class="muted" data-show="own=sending">전송 중</span></b>8장 28절입니다.</p><p class="err" data-show="own=sendfail">전송하지 못했어요. <button class="btn" style="min-height:44px;margin-left:8px" data-icon="retry" data-keep>다시 보내기</button></p></div>
+        <div class="msg me" data-show="chat=open|slow own=sendfail me=viewer"><p><b class="who">새벽별<span class="tag me">나</span></b>8장 28절입니다.</p><p class="err">전송하지 못했어요. <button class="btn" style="min-height:44px;margin-left:8px" data-icon="retry" data-keep>다시 보내기</button></p></div>
+        <p class="msg" data-show="chat=open|slow|guest|closedpastor"><b class="who">한도윤</b>감사합니다.</p>
+      </div>
+      <div class="body list" data-show="chat=closedworship" role="status">
+        <div class="notice"><strong>예배 중에는 채팅이 닫혀 있어요.</strong></div>
+      </div>
+      <div class="body list" data-show="chat=ended"><div class="notice"><strong>방송이 끝나 채팅이 닫혔어요.</strong></div></div>
+      <div class="body list" data-show="chat=noaccess"><div class="notice"><strong>볼 수 있는 방송에서만 채팅할 수 있어요.</strong></div></div>
+
+      <div class="composer" data-show="chat=slow" role="status">
+        <p class="small" style="margin-bottom:8px"><strong>채팅이 열렸어요.</strong> 천천히 입력할 수 있어요 (<span class="slot">N초</span>에 한 번).</p>
+      </div>
+      <div class="composer" data-show="chat=open|slow">
+        <label class="field"><span class="label">채팅 입력</span>
+          <span class="r"><input class="input" type="text" name="chat" autocomplete="off"><button class="btn" data-icon="send" data-label="채팅 보내기">보내기</button></span></label>
+        <p class="help">계좌번호나 연락처 같은 개인 정보는 입력할 수 없어요.</p>
+      </div>
+      <div class="composer" data-show="chat=guest">
+        <p style="margin-bottom:8px">채팅은 로그인하면 입력할 수 있어요.</p>
+        <a class="btn primary block" href="login.html?next=live.html">로그인</a>
+      </div>
+      <div class="composer" data-show="chat=closedpastor"><p class="notice"><strong>목회자가 채팅을 닫았어요.</strong></p></div>
+      <div class="composer" data-show="chat=lost" role="alert">
+        <div class="notice danger"><strong>채팅 연결이 끊겼어요</strong><p>인터넷 연결을 확인한 뒤 다시 연결해 주세요.</p></div>
+        <button class="btn block" style="margin-top:8px" data-icon="retry" data-keep>다시 연결</button>
+      </div>
+    </section>
+  </div>
+
+</div>
+</main>
+<script>
+  // 목업 전용: 상태에서 파생값 계산
+  window.mockDerive = function (b) {
+    var s = b.dataset.state, w = b.dataset.variant === 'worship', m;
+    if (s === 'noaccess') m = 'noaccess'; else if (s === 'ended') m = 'ended'; else if (s === 'chatlost') m = 'lost';
+    else if (w) m = s === 'chatopen' ? 'slow' : 'closedworship';
+    else if (s === 'pastorclosed') m = 'closedpastor'; else if (s === 'guest') m = 'guest'; else m = 'open';
+    b.dataset.chat = m;
+    b.dataset.own = (s === 'sending' || s === 'sendfail') ? s : 'sent';
+    b.dataset.tts = (w || s === 'ended' || s === 'noaccess') ? 'off' : (s === 'ttsfault' ? 'fault' : 'on');
+    b.dataset.stage = (s === 'interrupted' || s === 'ended' || s === 'noaccess') ? s : 'ok';
+    b.dataset.don = (s === 'ended' || (s === 'limited' && b.dataset.lp === 'no')) ? 'off' : (s === 'noaccess' ? 'none' : 'on');
+  };
+</script>
+<script src="mock.js"></script>
+</body>
+</html>

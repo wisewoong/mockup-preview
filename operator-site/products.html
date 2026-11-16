@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>열매 충전 상품 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+</head>
+<body data-default="role:super s:normal size:small">
+<!-- 정책 틀 복제(fees.html). 값·환산은 모두 슬롯. -->
+<header id="site-header" data-active="products"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:conflict">충돌</button></div>
+  <div class="group"><b>변경 폭</b><button data-set="size:small">보통</button><button data-set="size:big">큼 [V6]</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>열매 충전 상품</h1>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:120px;margin-top:12px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>열매 충전 상품 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+
+    <div class="stack" data-show="s=normal|empty|saveerr|conflict">
+      <div class="notice" data-show="role=op"><strong>최고 관리자만 변경할 수 있어요</strong><p class="small">값과 이력은 볼 수 있어요.</p></div>
+      <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 값은 그대로 두었어요. 잠시 뒤 다시 추가해 주세요.</p></div>
+      <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 운영자가 먼저 바꿨어요</strong><p>입력한 값은 그대로 두었어요. 새로 불러온 뒤 다시 확인해 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">새로 불러오기</button></p></div>
+
+      <div class="empty" data-show="s=empty"><p><strong>상품이 없어요</strong></p><p>상품이 없으면 사용자가 열매를 충전할 수 없어요. 아래에서 첫 상품을 추가해 주세요.</p></div>
+
+      <section aria-labelledby="h-cur" data-show="s=normal|saveerr|conflict"><h2 id="h-cur">현재 판매 상품</h2>
+        <p class="muted small" style="margin:4px 0 8px">적용 시작 날짜 <span class="slot">샘플 날짜</span> · 환산 비율은 열매 수량과 원화 가격으로 계산해 보여줘요</p>
+        <div class="tbl-wrap cards"><table><caption class="sr">현재 판매 상품</caption>
+          <thead><tr><th scope="col">상품명</th><th scope="col">열매 수량</th><th scope="col">원화 가격</th><th scope="col">환산 비율</th><th scope="col">판매</th><th scope="col">정렬</th><th scope="col"><span class="sr">작업</span></th></tr></thead>
+          <tbody>
+            <tr><th scope="row">샘플 상품 A</th><td data-label="열매 수량"><span class="slot">V1</span></td><td data-label="원화 가격"><span class="slot">V1</span></td><td data-label="환산 비율" class="muted"><span class="slot">계산값</span></td><td data-label="판매"><span class="tag">판매 중</span></td><td data-label="정렬">1</td><td><button class="linkbtn" type="button" data-open="edit-dlg" data-role="super">새 버전으로 변경</button></td></tr>
+            <tr><th scope="row">샘플 상품 B</th><td data-label="열매 수량"><span class="slot">V1</span></td><td data-label="원화 가격"><span class="slot">V1</span></td><td data-label="환산 비율" class="muted"><span class="slot">계산값</span></td><td data-label="판매"><span class="tag">판매 중</span></td><td data-label="정렬">2</td><td><button class="linkbtn" type="button" data-open="edit-dlg" data-role="super">새 버전으로 변경</button></td></tr>
+            <tr><th scope="row">샘플 상품 C</th><td data-label="열매 수량"><span class="slot">V1</span></td><td data-label="원화 가격"><span class="slot">V1</span></td><td data-label="환산 비율" class="muted"><span class="slot">계산값</span></td><td data-label="판매"><span class="tag">판매 중지</span></td><td data-label="정렬">3</td><td><button class="linkbtn" type="button" data-open="edit-dlg" data-role="super">새 버전으로 변경</button></td></tr>
+          </tbody></table></div></section>
+
+      <section aria-labelledby="h-res"><h2 id="h-res">예약된 버전</h2>
+        <div data-show="s=empty"><p class="muted" style="margin-top:8px">예약된 변경이 없어요</p></div>
+        <div data-show="s=normal|saveerr|conflict">
+          <div class="item" style="margin-top:8px"><p><strong>적용 시작일 <span class="slot">샘플 날짜</span></strong> · 상품 <span class="slot">샘플 상품</span> · 열매 <span class="slot">V1</span> / 가격 <span class="slot">V1</span> · <span class="muted">등록자 샘플 운영자</span></p>
+            <button class="linkbtn" type="button" data-open="cancel-dlg" data-role="super" aria-describedby="cx-why">예약 취소</button> <span class="help" id="cx-why" data-show="role=op">최고 관리자만 변경할 수 있어요</span></div>
+        </div></section>
+
+      <section aria-labelledby="h-add"><h2 id="h-add">새 버전 추가</h2>
+        <p class="muted small" style="margin:4px 0 8px">상품은 덮어쓰지 않고 적용 시작일이 있는 새 버전으로 추가해요. 이미 충전한 열매에는 영향이 없어요.</p>
+        <p data-show="role=op"><button class="btn" type="button" disabled aria-describedby="ro-why">새 버전 추가</button></p>
+        <p class="help" id="ro-why" data-show="role=op">최고 관리자만 변경할 수 있어요</p>
+        <details class="add" data-show="role=super"><summary>새 버전 추가</summary>
+          <form class="stack" id="frm" onsubmit="return false" aria-label="상품 새 버전">
+            <label class="field"><span class="label">상품명 <span class="muted">필수</span></span><input class="input" id="f-name" aria-describedby="f-name-e"><span class="err" id="f-name-e" hidden>상품명을 입력해 주세요.</span></label>
+            <label class="field"><span class="label">열매 수량 <span class="muted">필수</span></span><input class="input" id="f-qty" inputmode="numeric" placeholder="현재 값 V1" aria-describedby="f-qty-e"><span class="err" id="f-qty-e" hidden>1 이상 정수로 입력해 주세요.</span></label>
+            <label class="field"><span class="label">원화 가격 (원) <span class="muted">필수</span></span><input class="input" id="f-price" inputmode="numeric" placeholder="현재 값 V1" aria-describedby="f-price-e"><span class="err" id="f-price-e" hidden>1 이상 정수로 입력해 주세요.</span></label>
+            <label class="check"><input type="checkbox" id="f-sale" checked> 판매</label>
+            <label class="field"><span class="label">적용 시작일 <span class="muted">필수</span></span><span class="help">내일부터 고를 수 있어요 <span class="slot">사용자 결정 전</span></span><input class="input" id="f-date" type="date" aria-describedby="f-date-e"><span class="err" id="f-date-e" hidden>내일 이후 날짜를 골라 주세요.</span></label>
+            <label class="field"><span class="label">사유 <span class="muted">필수</span></span><textarea class="textarea" id="f-why" rows="3" aria-describedby="f-why-e"></textarea><span class="err" id="f-why-e" hidden>사유를 입력해 주세요.</span></label>
+            <h3>변경 전 → 후</h3>
+            <div class="tbl-wrap"><table><caption class="sr">변경 전후 비교</caption>
+              <thead><tr><th scope="col">항목</th><th scope="col">현재</th><th scope="col">새 값</th></tr></thead>
+              <tbody><tr><th scope="row">열매 수량</th><td><span class="slot">V1</span></td><td id="c-qty" class="muted">—</td></tr>
+              <tr><th scope="row">원화 가격</th><td><span class="slot">V1</span></td><td id="c-price" class="muted">—</td></tr>
+              <tr><th scope="row">환산 비율</th><td class="muted"><span class="slot">계산값</span></td><td id="c-rate" class="muted">—</td></tr></tbody></table></div>
+            <p class="small">이미 충전한 열매에는 영향이 없어요. 새 가격은 적용 시작일 이후 충전부터 쓰여요.</p>
+            <p class="row"><button class="btn primary" type="button" id="add">새 버전 추가</button></p>
+          </form></details></section>
+
+      <section aria-labelledby="h-his"><h2 id="h-his">이력</h2>
+        <div data-show="s=empty"><p class="muted" style="margin-top:8px">아직 이력이 없어요</p></div>
+        <div class="tbl-wrap cards" style="margin-top:8px" data-show="s=normal|saveerr|conflict"><table><caption class="sr">상품 이력</caption>
+          <thead><tr><th scope="col">적용 시작일</th><th scope="col">상품 / 값(열매 · 가격)</th><th scope="col">등록자</th><th scope="col">등록 시각</th><th scope="col">상태</th></tr></thead>
+          <tbody>
+            <tr><td data-label="적용 시작일"><span class="slot">샘플 날짜</span></td><td data-label="상품 / 값(열매 · 가격)">샘플 상품 A · <span class="slot">V1</span></td><td data-label="등록자">샘플 운영자</td><td data-label="등록 시각">샘플 시각</td><td data-label="상태"><span class="tag">예약</span></td></tr>
+            <tr><td data-label="적용 시작일"><span class="slot">샘플 날짜</span></td><td data-label="상품 / 값(열매 · 가격)">샘플 상품 A · <span class="slot">V1</span></td><td data-label="등록자">샘플 운영자</td><td data-label="등록 시각">샘플 시각</td><td data-label="상태"><span class="tag">적용 중</span></td></tr>
+            <tr><td data-label="적용 시작일"><span class="slot">샘플 날짜</span></td><td data-label="상품 / 값(열매 · 가격)">샘플 상품 A · <span class="slot">V1</span></td><td data-label="등록자">샘플 운영자</td><td data-label="등록 시각">샘플 시각</td><td data-label="상태"><span class="tag">종료</span></td></tr>
+          </tbody></table></div></section>
+    </div>
+  </main>
+</div>
+
+<dialog id="add-dlg" aria-labelledby="add-t"><h2 id="add-t">상품 새 버전을 추가할까요?</h2>
+  <div class="tbl-wrap" style="margin-top:12px"><table><caption class="sr">변경 전후 비교</caption>
+    <thead><tr><th scope="col">항목</th><th scope="col">현재</th><th scope="col">새 값</th></tr></thead>
+    <tbody><tr><th scope="row">열매 수량</th><td><span class="slot">V1</span></td><td id="d-qty">—</td></tr>
+    <tr><th scope="row">원화 가격</th><td><span class="slot">V1</span></td><td id="d-price">—</td></tr></tbody></table></div>
+  <p style="margin-top:12px">적용 시작일 <span id="d-date">—</span>부터 쓰여요. 이미 충전한 열매에는 영향이 없어요.</p>
+  <div class="notice danger" style="margin-top:12px" data-show="size=big"><strong>변경 폭이 커요 <span class="slot">V6</span></strong>
+    <label class="check" style="margin-top:8px"><input type="checkbox" id="d-ok"> 내용을 확인했어요</label>
+</div>
+  <p class="muted small" style="margin-top:12px">변경자와 시각이 기록돼요.</p>
+  <p class="help" id="d-why" hidden>내용을 확인하면 눌러 볼 수 있어요</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" id="d-go">추가</button></div>
+</dialog>
+<dialog id="edit-dlg" aria-labelledby="ed-t"><h2 id="ed-t">상품을 수정할까요?</h2><p class="muted small" style="margin-top:8px">상품은 덮어쓰지 않아요. 수정하면 위 「새 버전 추가」 폼으로 이동해 새 버전으로 남겨요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>돌아가기</button><button class="btn" type="button" data-close>새 버전 추가로 이동</button></div></dialog>
+<dialog id="cancel-dlg" aria-labelledby="cx-t"><h2 id="cx-t">예약을 취소할까요?</h2><p class="muted small" style="margin-top:8px">취소하면 이 버전은 적용되지 않아요. 기록은 이력에 남아요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>돌아가기</button><button class="btn danger" type="button" data-close>예약 취소</button></div></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var int = function (v) { return /^[1-9]\d*$/.test(v.trim()); };
+  function cmp() {
+    var q = $('f-qty').value.trim(), p = $('f-price').value.trim();
+    $('c-qty').className = q ? 'chg' : 'muted'; $('c-qty').textContent = q ? q + ' 변경' : '—';
+    $('c-price').className = p ? 'chg' : 'muted'; $('c-price').textContent = p ? p + '원 변경' : '—';
+    $('c-rate').textContent = q && p ? '저장 시 계산돼요' : '—';
+  }
+  window.mockAfter = function () {
+    document.querySelectorAll('[data-role="super"]').forEach(function (x) { x.disabled = b.dataset.role !== 'super'; });
+    var off = b.dataset.size === 'big' && !$('d-ok').checked; $('d-go').disabled = off; $('d-why').hidden = !off;
+  };
+  document.addEventListener('input', function (e) { if (e.target.closest('#frm')) cmp(); if (e.target.id === 'd-ok') window.mockRender(); });
+  $('d-go').addEventListener('click', function () {
+    var g = this; g.disabled = true; g.textContent = '저장 중…'; $('add').disabled = true;
+    setTimeout(function () { $('add-dlg').close(); g.textContent = '추가'; $('add').disabled = false; b.dataset.s = 'normal'; window.mockRender(); }, 600);
+  });
+  function validate(ids) {
+    var first = null;
+    ids.forEach(function (k) {
+      var bad = k[1]; $(k[0] + '-e').hidden = !bad; $(k[0]).setAttribute('aria-invalid', String(bad));
+      if (bad && !first) first = $(k[0]);
+    });
+    if (first) first.focus();
+    return !first;
+  }
+  function openDlg() { $('d-ok').checked = false; $('d-go').textContent = '추가'; window.mockRender(); var d = $('add-dlg'); d._opener = $('add'); d.showModal(); }
+  $('add').addEventListener('click', function () {
+    if (!validate([['f-name', !$('f-name').value.trim()], ['f-qty', !int($('f-qty').value)], ['f-price', !int($('f-price').value)], ['f-date', !$('f-date').value], ['f-why', !$('f-why').value.trim()]])) return;
+    $('d-qty').textContent = $('f-qty').value; $('d-price').textContent = $('f-price').value + '원'; $('d-date').textContent = $('f-date').value; openDlg();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

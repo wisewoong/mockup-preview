@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후원 설정 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal live:off adj:off hist:some">
+<!-- 후원 설정. 금액·한도·단위는 모두 슬롯. 후원 금액 합계·정산은 두지 않는다. -->
+<header id="site-header" data-active="donation"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:unset">한도 미설정</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:reject">서버 거절</button><button data-set="s:saved">저장 완료</button><button data-set="s:err">입력 오류</button>
+  </div>
+  <div class="group"><b>방송</b><button data-set="live:off">방송 안 함</button><button data-set="live:on">방송 중</button><b>자동 조정 배너</b><button data-set="adj:on">있음</button><button data-set="adj:off">없음</button><b>변경 이력</b><button data-set="hist:some">있음</button><button data-set="hist:none">0건</button></div>
+  <p class="muted">사용자 결정 전: 최소액 변경 적용 시점(즉시/다음 방송부터), 관리자 부분 부여. 확정(2026-11-15 추천 반영): TTS 최소액 규칙. 금액·한도 값은 정책 데이터라 슬롯으로 표기해요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>후원과 정산은 방송국 소유자만 볼 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<section class="notice" role="alert" data-show="role=adm0"><strong>권한이 없어요</strong><p class="small">후원 설정은 소유자가 권한을 주면 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn" href="dashboard.html">대시보드로 가기</a></p></section>
+<section data-show="role=owner|admall s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:120px"></div><div class="skeleton" style="height:160px"></div></section>
+
+<div class="notice danger" role="alert" data-show="role=owner|admall s=loaderr"><strong>후원 설정을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+
+<div class="stack" data-show="role=owner|admall s=normal|unset|saveerr|reject|saved|err">
+<h1>후원 설정</h1>
+<div class="notice" data-show="adj=on"><strong>후원 설정이 조정되었어요</strong>
+  <p>후원 최소 금액이 <span class="slot">이전 값</span>에서 <span class="slot">새 값</span>으로 바뀌었어요.</p>
+  <p>새 한도는 <span class="slot">최소</span>부터 <span class="slot">최대</span>까지예요. 한도 안에서 다시 설정할 수 있어요.</p>
+  <p style="margin-top:8px"><button class="btn" type="button" data-set="adj:off">확인</button></p></div>
+<div class="notice" role="status" data-show="s=saved"><strong>저장했어요</strong><p class="small muted">변경자와 시각이 이력에 남았어요.</p></div>
+<div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 값은 그대로 두었어요. 잠시 뒤 다시 저장해 주세요.</p></div>
+<div class="notice danger" role="alert" data-show="s=reject"><strong>운영사 한도가 바뀌었어요</strong><p>새 범위는 <span class="slot">새 한도</span>입니다. 입력한 값은 그대로 두었어요. 한도 안으로 고쳐 주세요.</p></div>
+<div class="notice" data-show="live=on"><p>방송 중에도 저장할 수 있어요. 변경은 <span class="slot">즉시 / 다음 방송부터</span> 적용돼요.</p></div>
+
+<section class="panel" aria-labelledby="h-lim"><h2 id="h-lim">운영사 한도</h2>
+  <div data-show="s=unset"><p class="muted">운영사 한도가 아직 설정되지 않았어요.</p></div>
+  <ul class="plain" data-show="s=normal|saveerr|reject|saved|err">
+    <li><span class="muted">후원 금액</span> <strong><span class="slot">V4-최소</span> ~ <span class="slot">V4-최대</span></strong></li>
+    <li><span class="muted">TTS 최소 후원액</span> <strong><span class="slot">V5-최소</span> ~ <span class="slot">V5-최대</span></strong></li>
+  </ul></section>
+
+<form class="stack" id="frm" onsubmit="return false" aria-label="후원 설정 입력">
+  <label class="field"><span class="label">후원 최소 금액</span><span class="help">단위 <span class="slot">S1</span></span>
+    <input class="input" id="min" inputmode="numeric" placeholder="현재 값(샘플)" aria-describedby="min-h min-e"><span class="help" id="min-h">현재 값 <span class="slot">현재 값</span></span>
+    <span class="err" id="min-e" data-show="s=err">한도 미만이에요. <span class="slot">V4-최소</span> 이상으로 입력해 주세요.</span></label>
+  <label class="field"><span class="label">TTS 최소 후원액</span><span class="help">단위 <span class="slot">S1</span></span>
+    <input class="input" id="tts" inputmode="numeric" placeholder="현재 값(샘플)" aria-describedby="tts-h tts-e"><span class="help" id="tts-h">현재 값 <span class="slot">현재 값</span></span>
+    <span class="err" id="tts-e" data-show="s=err">TTS 최소 후원액은 후원 최소 금액 이상이어야 해요.</span></label>
+  <p class="help" data-show="s=err">TTS 최소액과 후원 최소액의 관계: <span class="slot">안내 문구 확정 필요</span> (강제하지 않아요)</p>
+  <p class="err" id="num-e" hidden>숫자만 입력해 주세요.</p>
+  <p class="err" data-show="s=err">후원 최소 금액이 한도(<span class="slot">V4-최대</span>)보다 커요.</p>
+  <p class="muted small" data-show="s=unset">운영사 한도가 설정되면 입력할 수 있어요.</p>
+  <p class="row"><button class="btn primary" type="button" id="save" data-open="sv-dlg" aria-describedby="why">저장</button></p>
+  <p class="help" id="why"></p>
+</form>
+
+<section class="panel" aria-labelledby="h-his"><h2 id="h-his">변경 이력</h2>
+  <div class="empty" data-show="hist=none"><p><strong>아직 변경 이력이 없어요</strong></p></div>
+  <div data-show="hist=some">
+    <table class="hide-m" style="width:100%;border-collapse:collapse"><caption class="sr">변경 이력</caption>
+      <thead><tr><th scope="col" style="text-align:left">시각</th><th scope="col" style="text-align:left">변경자</th><th scope="col" style="text-align:left">항목</th><th scope="col" style="text-align:left">이전 → 새</th></tr></thead>
+      <tbody id="hrows">
+        <tr><td>샘플 시각</td><td>운영사 한도 변경으로 자동 조정</td><td>후원 최소 금액</td><td><span class="slot">이전</span> → <span class="slot">새</span></td></tr>
+        <tr><td>샘플 시각</td><td>샘플닉네임</td><td>TTS 최소 후원액</td><td><span class="slot">이전</span> → <span class="slot">새</span></td></tr>
+      </tbody></table>
+    <div class="hide-d">
+      <div class="item"><p><strong>후원 최소 금액</strong> <span class="slot">이전</span> → <span class="slot">새</span><br><span class="muted small">샘플 시각 · 운영사 한도 변경으로 자동 조정</span></p></div>
+      <div class="item"><p><strong>TTS 최소 후원액</strong> <span class="slot">이전</span> → <span class="slot">새</span><br><span class="muted small">샘플 시각 · 샘플닉네임</span></p></div>
+    </div></div></section>
+</div>
+</div></main>
+
+<dialog id="sv-dlg" aria-labelledby="sv-t"><h2 id="sv-t">이렇게 저장할까요?</h2>
+  <ul class="plain" style="margin-top:8px"><li>후원 최소 금액 <span class="slot">전</span> → <span class="slot">후</span></li><li>TTS 최소 후원액 <span class="slot">전</span> → <span class="slot">후</span></li></ul>
+  <p style="margin-top:8px">시청자 화면에는 <span class="slot">"[후] 이상 후원할 수 있어요"</span>처럼 표시돼요.</p>
+  <p class="muted small">변경자와 시각이 기록돼요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="ok" data-close>저장</button></div>
+</dialog>
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); }, base = { min: $('min').value, tts: $('tts').value };
+  window.mockAfter = function () {
+    var d = b.dataset, can = d.role === 'owner' || d.role === 'admall', off = !can || d.s === 'unset';
+    var m = $('min').value.trim(), t = $('tts').value.trim(), bad = !/^\d*$/.test(m) || !/^\d*$/.test(t);
+    $('min').disabled = $('tts').disabled = off;
+    $('min').style.fontWeight = m !== base.min ? 700 : ''; $('tts').style.fontWeight = t !== base.tts ? 700 : '';
+    $('num-e').hidden = !bad;
+    var why = !can ? '소유자만 사용할 수 있어요' : d.s === 'unset' ? '운영사 한도가 설정되면 입력할 수 있어요' : bad ? '숫자만 입력해 주세요' : (m === base.min && t === base.tts) ? '바뀐 값이 없어요' : '';
+    $('save').disabled = !!why; $('why').textContent = why; $('why').hidden = !why;
+  };
+  document.addEventListener('input', window.mockRender);
+  $('ok').addEventListener('click', function () { b.dataset.s = 'saved'; b.dataset.hist = 'some'; base = { min: $('min').value, tts: $('tts').value }; window.mockRender(); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

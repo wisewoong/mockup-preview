@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방송국 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .ch-head { display: grid; grid-template-columns: 96px 1fr auto; gap: 20px; align-items: center; padding: 32px 0 24px; }
+  .ch-head img { width: 96px; height: 96px; border-radius: var(--radius); object-fit: cover; background: var(--bg-sub); }
+  .ch-head h1 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  .ch-head .vbadge.lg { margin-left: 0; }
+  .ch-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+  .ch-actions .btn { min-width: 120px; }
+  .pane { padding: 24px 0 64px; }
+  .upcoming { list-style: none; padding: 0; margin: 0; }
+  .upcoming li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .live-now { display: grid; grid-template-columns: minmax(0, 1.4fr) 1fr; gap: 24px; align-items: center; }
+  @media (max-width: 767px) {
+    .ch-head { grid-template-columns: 72px 1fr; padding: 20px 0 16px; }
+    .ch-head img { width: 72px; height: 72px; }
+    .ch-actions { grid-column: 1 / -1; justify-content: stretch; }
+    .ch-actions .btn { flex: 1; }
+    .live-now { grid-template-columns: 1fr; }
+    .upcoming li { flex-wrap: wrap; }
+    .tabs [role="tab"] { flex: 1; padding: 0 8px; }
+  }
+</style>
+</head>
+<body data-default="status:active data:normal tab:live subs:public lp:yes">
+<!-- 프로필과 썸네일은 Unsplash 무료 사진(img/)다. 실제 방송국 이미지가 아니다. -->
+<!-- mock: 방송국 이름, 목회자 이름, 구독자 수, 조회 수는 목업 값이다. -->
+
+<header id="site-header" data-active=""></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>방송국 상태</b>
+    <button data-set="subs:public">구독자 수 공개</button><button data-set="subs:hidden">구독자 수 비공개</button>
+    <button data-set="status:active">정상</button><button data-set="status:limited">일부 기능 제한</button>
+    <button data-set="status:suspended">운영 제재</button><button data-set="status:closed">폐쇄</button></div>
+  <div class="group"><b>콘텐츠</b>
+    <button data-set="data:normal">있음</button><button data-set="data:empty">0건</button>
+    <button data-set="data:loading">로딩</button><button data-set="data:error">오류</button></div>
+  <div class="group" data-show="status=limited"><b>LIMITED 후원</b><button data-set="lp:yes">후원 가능</button><button data-set="lp:no">후원 불가</button></div>
+  <p class="muted">LIMITED 후원 가능 여부는 사용자 결정 전이에요. SUSPENDED에서 방송·다시보기 노출 여부도 확정 전이에요. 비공개 콘텐츠의 공유 버튼 노출·링크 복사 허용은 사용자 결정 전이에요. 신고 사유 목록과 자기 방송·자기 댓글 신고 처리는 사용자 결정 전이에요(명세 §16.1에 사유 목록 없음).</p>
+</div></div>
+
+<main class="wrap">
+  <header class="ch-head">
+    <img src="../portraits/men/65.jpg" alt="">
+    <div>
+      <h1>샘물교회 이정훈 목사 <span class="vbadge lg" aria-label="인증 목회자, 운영사 확인" title="[B1 인증 안내 문구] [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span></h1>
+      <p class="muted">말씀을 차분히 읽고 나누는 방송국이에요.</p>
+      <p class="muted small">소속 교단: 한마음교단(가상) · <strong>구독자 2,418명</strong></p>
+    </div>
+    <div class="ch-actions" data-show="status=active|limited">
+      <!-- 구독이 첫 번째, 후원은 그다음 -->
+      <button class="btn primary toggle" data-toggle aria-pressed="false" data-on="구독 중" data-off="구독">구독</button>
+      <button class="btn" data-icon="share" data-keep data-share="샘물교회 이정훈 목사 방송국">공유</button>
+      <button class="btn" data-report="샘물교회 이정훈 목사 방송국">신고</button>
+      <a class="btn" href="charge.html?view=donate" data-show="status=active">후원하기</a>
+      <a class="btn" href="charge.html?view=donate" data-show="status=limited lp=yes" aria-describedby="lim-d">후원하기</a>
+      <button class="btn" disabled aria-disabled="true" aria-describedby="lim-why lim-d" data-show="status=limited lp=no">후원하기</button>
+      <p class="help" id="lim-d" data-show="status=limited" style="flex-basis:100%">일부 기능이 제한돼요. 후원 가능 여부: <span class="slot">LIMITED 후원 가능 여부</span></p>
+    </div>
+  </header>
+
+  <div class="notice" data-show="status=limited" id="lim-why">
+    <strong>이 방송국은 일부 기능이 제한돼요</strong>
+    <p>제한된 기능: <span class="slot">LIMITED 제한 범위</span></p>
+  </div>
+  <div class="notice danger" data-show="status=suspended" role="alert">
+    <strong>이 방송국은 운영자 조치를 받고 있어요</strong>
+    <p><span class="slot">SUSPENDED 시청자 안내: 볼 수 있는 것·없는 것</span></p>
+  </div>
+  <div class="notice danger" data-show="status=closed" role="alert">
+    <strong>폐쇄된 방송국이에요</strong>
+    <p><span class="slot">CLOSED 시청자 안내</span></p>
+  </div>
+
+  <div data-show="status=active|limited" style="margin-top:16px">
+    <div class="tabs" role="tablist" aria-label="방송국 메뉴">
+      <button role="tab" data-set="tab:live">라이브</button>
+      <button role="tab" data-set="tab:vod">다시보기</button>
+      <button role="tab" data-set="tab:about">소개</button>
+    </div>
+
+    <!-- 공통 상태: 로딩, 오류 -->
+    <div class="pane" data-show="data=loading" role="status" aria-busy="true">
+      <p class="muted">불러오고 있어요.</p>
+      <div class="grid" style="margin-top:16px"><div><div class="skeleton thumb"></div><div class="skeleton line"></div></div><div><div class="skeleton thumb"></div><div class="skeleton line"></div></div><div><div class="skeleton thumb"></div><div class="skeleton line"></div></div></div>
+    </div>
+    <div class="pane" data-show="data=error"><div class="notice danger" role="alert"><strong>방송국 정보를 불러오지 못했어요</strong><p>잠시 후 다시 시도해 주세요.</p><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div></div>
+
+    <!-- 라이브 탭 -->
+    <div class="pane" data-show="tab=live data=normal">
+      <div class="live-now">
+        <a class="card" href="live.html?variant=general">
+          <div class="thumb"><img src="img/bible.jpg" alt="" loading="lazy"><div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 312명</span></div>
+        </a>
+        <div><h2>로마서 8장 강해 12회</h2><p class="muted">강해 · 오늘 오전 11시 시작</p><p style="margin-top:12px"><a class="btn" href="live.html?variant=general">방송 보기</a></p></div>
+      </div>
+      <h2 style="margin-top:32px">예정 방송</h2>
+      <ul class="upcoming" style="margin-top:8px">
+        <li><div><strong>저녁 성경공부 요한복음 3장</strong><p class="muted small">오늘 저녁 8시</p></div><button class="btn toggle" data-toggle aria-pressed="false" data-icon="bookmark" data-label="저녁 성경공부 요한복음 3장 즐겨찾기" data-loff="저녁 성경공부 요한복음 3장 즐겨찾기" data-lon="저녁 성경공부 요한복음 3장 즐겨찾기 해제">즐겨찾기</button></li>
+        <li><div><strong>수요 기도회</strong><p class="muted small">수요일 저녁 7시 30분</p></div><button class="btn toggle" data-toggle aria-pressed="false" data-icon="bookmark" data-label="수요 기도회 즐겨찾기" data-loff="수요 기도회 즐겨찾기" data-lon="수요 기도회 즐겨찾기 해제">즐겨찾기</button></li>
+      </ul>
+    </div>
+    <div class="pane" data-show="tab=live data=empty"><div class="empty"><p><strong>지금 방송 중이 아니에요</strong></p><p class="muted">예정된 방송도 없어요. 구독하면 방송이 시작될 때 알려 드려요.</p></div></div>
+
+    <!-- 다시보기 탭 -->
+    <div class="pane" data-show="tab=vod data=normal">
+      <div class="grid">
+        <a class="card" href="#"><div class="thumb"><img src="img/bible.jpg" alt="" loading="lazy"><span class="viewers">55:02</span></div><h3>로마서 8장 강해 11회</h3><p class="meta">지난주 · <strong>조회 2,914회</strong></p></a>
+        <a class="card" href="#"><div class="thumb"><img src="img/sanctuary.jpg" alt="" loading="lazy"><span class="viewers">42:10</span></div><h3>주일 낮 예배 설교</h3><p class="meta">지난주 · <strong>조회 1,730회</strong></p></a>
+        <a class="card" href="#"><div class="thumb"><img src="img/prayer-hands.jpg" alt="" loading="lazy"><span class="viewers">38:27</span></div><h3>요한복음 2장 성경공부</h3><p class="meta">2주 전 · <strong>조회 904회</strong></p></a>
+      </div>
+    </div>
+    <div class="pane" data-show="tab=vod data=empty"><div class="empty"><p><strong>아직 다시보기가 없어요</strong></p><p class="muted">방송이 끝나고 공개된 영상이 여기에 모여요.</p></div></div>
+
+    <!-- 소개 탭: 데이터 0건과 무관하게 소개 글만 표시 -->
+    <div class="pane" data-show="tab=about data=normal|empty">
+      <h2>소개</h2>
+      <p style="margin-top:8px;max-width:60ch">샘물교회에서 매주 주일 예배와 성경공부를 방송합니다. 본문을 천천히 읽고 함께 나누는 시간을 만들고 있어요.</p>
+      <dl class="dl" style="display:grid;grid-template-columns:96px 1fr;gap:6px 12px;margin-top:16px"><dt class="muted">주요 카테고리</dt><dd style="margin:0">예배, 성경공부, 강해</dd><dt class="muted">개설일</dt><dd style="margin:0">2026년 3월</dd></dl>
+    </div>
+  </div>
+</main>
+
+<script src="mock.js"></script>
+<script>
+// 방문한 목회자: 방송국 화면에 들어오면 이 기기(localStorage)에만 기록한다. 서버로 보내지 않는다. 저장소를 못 쓰면 건너뛴다.
+try {
+  var k = 'mw.visited', v = JSON.parse(localStorage.getItem(k)); if (!Array.isArray(v)) v = [];
+  var d = new Date(); v = v.filter(function (x) { return x.id !== 'saemul'; });
+  v.unshift({ id: 'saemul', n: '샘물교회', p: '이정훈 목사', a: 'men/65', c: 1, live: 1, sub: 1, d: (d.getMonth() + 1) + '월 ' + d.getDate() + '일' });
+  localStorage.setItem(k, JSON.stringify(v));
+} catch (e) {}
+</script>
+</body>
+</html>

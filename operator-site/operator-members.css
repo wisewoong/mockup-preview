@@ -1,0 +1,30 @@
+/* 회원 관리(목록·상세) 전용 (신규 색 토큰 없음) */
+/* 증거 첨부: 숨긴 file input을 감싼 label.btn, 포커스 링은 label에 */
+.pick-file { position: relative; }
+.pick-file:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+.files .f-acts { display: flex; gap: 8px; }
+.files .err { margin-top: 0; }
+/* 비활성 이유·조건 줄은 해당 라디오 바로 아래, 글자 시작선에 맞춤 */
+.radios .help { margin: 0 0 4px 34px; }
+.rd-form .check { min-width: 0; overflow-wrap: anywhere; }
+.rel li { border-top: 1px solid var(--line); padding: 10px 0; }
+@media (min-width: 1024px) {
+  /* 조치 폼이 화면보다 길어도 [조치 저장]에 닿게: 고정 헤더(64px) 아래에서 안쪽 스크롤 */
+  .rd-form { top: 80px; max-height: calc(100dvh - 96px); overflow-y: auto; }
+}
+@media (max-width: 1023px) {
+  /* 회원 목록 카드: 1행 닉네임(+회원 번호) + 계정 상태 / 2행 muted "역할 · 소속" / [상세] 전체 폭 */
+  /* 행 배치(흐름 방향 row): 닉네임+상태는 1행, 메타는 2행, 상세는 전체 폭. 열 방향 flex 의 flex-basis:0 이 폭을 0으로 만들었던 원인 */
+  .tbl-wrap.cards.v > table > tbody > tr { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+  .tbl-wrap.cards.v > table > tbody > tr > td { width: auto; }
+  .tbl-wrap.cards.v > table > tbody > tr::after { content: ""; order: 3; flex: 1 0 100%; height: 0; } /* 1행(닉네임·상태)과 2행(메타) 사이 줄바꿈 */
+  .tbl-wrap.cards.v > table > tbody > tr > td.c-tag { order: 2; }
+  .tbl-wrap.cards.v > table > tbody > tr > td.c-meta { order: 4; font-size: .9rem; color: var(--muted); }
+  .tbl-wrap.cards.v > table > tbody > tr > td.c-none { display: none; } /* 빈 값 "—" 는 카드에서 숨겨 구분점이 홀로 남지 않게 */
+  .tbl-wrap.cards.v > table > tbody > tr > td.c-act { order: 5; width: 100%; margin-top: 8px; }
+  .tbl-wrap.cards.v > table > tbody > tr > th.c-title { order: 1; width: auto; flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; }
+  .tbl-wrap.cards.v > table > tbody > tr > th.c-title .small { display: block; font-weight: 400; }
+  .tbl-wrap.cards.v td.c-meta:not(.c-none) + td.c-meta:not(.c-none)::before { display: inline; content: "· "; }
+  .files li .btn, .rel li .btn { min-height: var(--tap); }
+  .pick-file { width: 100%; }
+}

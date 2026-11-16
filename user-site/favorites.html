@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>즐겨찾기 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 880px; margin: 0 auto; padding: 24px 0 64px; }
+  .item { grid-template-columns: 120px 1fr auto; }
+  .item .act { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .item .thumbs { width: 120px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius); background: var(--bg-sub); display: block; }
+  .item.gone { background: var(--bg-sub); }
+  .item .act .check { min-height: 44px; padding: 10px 12px 10px 0; cursor: pointer; }
+  .nw { white-space: nowrap; }
+  @media (max-width: 767px) {
+    .item { grid-template-columns: 96px 1fr; }
+    .item .thumbs { width: 96px; }
+  }
+</style>
+</head>
+<body data-default="s:normal f:all">
+<!-- 방송 예정·다시보기를 즐겨찾기한 목록. 구독과 별개다. 해제는 목록에서 항목을 바로 빼고 되돌리기를 준다. 볼 수 없는 콘텐츠 행의 처리(남김/자동 숨김)는 사용자 결정 D1. -->
+<header id="site-header" data-active=""></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:empty">즐겨찾기 없음</button><button data-set="s:guest">비로그인</button><button data-set="s:loading">로딩</button><button data-set="s:error">오류</button><button data-set="s:alarmfail">알림 저장 실패</button><button data-set="s:morefail">더 보기 실패</button>
+  </div>
+  <p class="muted">맨 아래 항목은 삭제되었거나 볼 수 없게 된 콘텐츠 예시예요. 즐겨찾기 해제 버튼은 실제로 항목을 빼고, 되돌리기도 동작해요. 시작 전 알림 기본값은 사용자 결정 전이에요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-fav" tabindex="-1">즐겨찾기</h1>
+  <p class="muted small" style="margin-top:4px">방송 예정과 다시보기를 모아 볼 수 있어요. 방송국 구독과는 따로 관리돼요.</p>
+
+  <div data-show="s=normal|alarmfail|morefail">
+    <div class="chips" role="group" aria-label="종류" style="margin-top:16px">
+      <button class="chip" data-set="f:all" aria-pressed="true">전체</button><button class="chip" data-set="f:soon" aria-pressed="false">방송 예정</button><button class="chip" data-set="f:vod" aria-pressed="false">다시보기</button>
+    </div>
+    <p class="muted" id="cnt" role="status" style="margin-top:12px"></p>
+    <p class="notice" id="undo" role="status" hidden style="margin-top:8px"><span>즐겨찾기를 해제했어요</span> <button class="btn" type="button" id="undobtn" style="margin-left:8px">되돌리기</button></p>
+    <div id="list" style="margin-top:8px">
+      <div class="item" data-kind="soon" data-show="f=all|soon">
+        <img class="thumbs" src="img/praise.jpg" alt="">
+        <a class="name" href="upcoming.html"><strong>수요 찬양의 밤</strong><br><span class="muted small">새벽빛교회 한지은 전도사 · <span class="badge plain">방송 예정</span> <strong>오늘 저녁 8시</strong></span></a>
+        <div class="act"><label class="check small"><input type="checkbox"><span>시작 전 알림</span></label><button class="btn unfav" data-icon="bookmark" data-keep>즐겨찾기 해제</button></div>
+        <p class="err alert" role="alert" data-show="s=alarmfail">알림 설정을 저장하지 못했어요 <button class="btn" type="button" style="min-height:44px;margin-left:8px">다시 시도</button></p>
+      </div>
+      <div class="item" data-kind="soon" data-show="f=all|soon">
+        <img class="thumbs" src="img/chapel.jpg" alt="">
+        <a class="name" href="live.html?variant=worship"><strong>주일 낮 예배</strong><br><span class="muted small">은혜교회 박성민 목사 · <span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브 중</span></span>&nbsp;지금&nbsp;방송&nbsp;중</span></a>
+        <div class="act"><button class="btn unfav" data-icon="bookmark" data-keep>즐겨찾기 해제</button></div>
+      </div>
+      <div class="item" data-kind="soon" data-show="f=all|soon">
+        <img class="thumbs" src="img/fellowship.jpg" alt="">
+        <a class="name" href="live.html?variant=general"><strong>청년부 모임 나눔</strong><br><span class="muted small">샘물교회 이정훈 목사 · <span class="badge plain">시작이 늦어져요</span> 시작 시각 미정</span></a>
+        <div class="act"><label class="check small"><input type="checkbox"><span>시작 전 알림</span></label><button class="btn unfav" data-icon="bookmark" data-keep>즐겨찾기 해제</button></div>
+      </div>
+      <div class="item" data-kind="soon" data-show="f=all|soon">
+        <img class="thumbs" src="img/mission.jpg" alt="">
+        <a class="name" href="channel.html"><strong>선교 보고 라이브</strong><br><span class="muted small">새벽빛교회 한지은 전도사 · <span class="badge plain">방송이 취소됐어요</span></span></a>
+        <div class="act"><button class="btn unfav" data-icon="bookmark" data-keep>즐겨찾기 해제</button></div>
+      </div>
+      <div class="item" data-kind="vod" data-show="f=all|vod">
+        <img class="thumbs" src="img/bible.jpg" alt="">
+        <a class="name" href="videos.html?v=detail"><strong>로마서 8장 강해 11회</strong><br><span class="muted small">샘물교회 이정훈 목사 · <span class="badge plain">다시보기</span> 55:02</span></a>
+        <div class="act"><button class="btn unfav" data-icon="bookmark" data-keep>즐겨찾기 해제</button></div>
+      </div>
+      <div class="item" data-kind="vod" data-show="f=all|vod">
+        <img class="thumbs" src="img/sanctuary.jpg" alt="">
+        <a class="name" href="videos.html?v=detail"><strong>지난 주일 설교 다시보기</strong><br><span class="muted small">은혜교회 박성민 목사 · <span class="badge plain">준비 중</span> 영상을 처리하고 있어요</span></a>
+        <div class="act"><button class="btn unfav" data-icon="bookmark" data-keep>즐겨찾기 해제</button></div>
+      </div>
+      <div class="item gone" data-kind="gone" data-show="f=all">
+        <span class="thumbs" aria-hidden="true"></span>
+        <div class="name"><strong>볼 수 없는 콘텐츠예요</strong><br><span class="muted small">삭제됐거나 지금은 볼 수 없어요. <span class="slot">표시 방식 [사용자 결정 D1]</span></span></div>
+        <div class="act"><button class="btn unfav" data-icon="bookmark" data-keep>즐겨찾기 해제</button></div>
+      </div>
+    </div>
+    <div class="empty" id="fempty" hidden style="margin-top:8px"><p><strong id="fmsg"></strong></p><p><button class="btn" data-set="f:all">전체 보기</button></p></div>
+    <p class="notice danger" role="alert" data-show="s=morefail" style="margin-top:8px"><strong>더 불러오지 못했어요</strong><button class="btn" type="button" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p>
+    <p style="margin-top:16px;text-align:center"><button class="btn" type="button">더 보기</button></p>
+  </div>
+
+  <div class="empty" data-show="s=empty" style="margin-top:16px"><p><strong>즐겨찾기한 방송이 없어요</strong></p><p class="muted">방송 화면의 북마크 버튼을 누르면 여기에 모여요.</p><p><a class="btn primary" href="main.html">지금 라이브 보러 가기</a></p></div>
+  <div class="notice" data-show="s=guest" style="margin-top:16px"><strong>로그인하면 즐겨찾기를 볼 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=favorites.html">로그인</a></p></div>
+  <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:16px"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></div>
+  <div class="notice danger" role="alert" data-show="s=error" style="margin-top:16px"><strong>즐겨찾기를 불러오지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>
+</div></main>
+<script src="mock.js"></script>
+<script>
+// 목업: 해제(항목 제거)·되돌리기, 개수와 필터 0건 문구
+var last = null, msg = { soon: '방송 예정으로 즐겨찾기한 게 없어요', vod: '다시보기로 즐겨찾기한 게 없어요' };
+function upd() {
+  var n = document.querySelectorAll('#list .item:not([hidden])').length, f = document.body.dataset.f;
+  document.getElementById('cnt').textContent = n + '개';
+  var e = document.getElementById('fempty'); e.hidden = !(n === 0 && f !== 'all'); document.getElementById('fmsg').textContent = msg[f] || '';
+  if (n === 0 && f === 'all') { e.hidden = false; document.getElementById('fmsg').textContent = '즐겨찾기한 방송이 없어요'; }
+}
+document.addEventListener('click', function (e) {
+  var u = e.target.closest('.unfav');
+  if (u) { var it = u.closest('.item'); last = { el: it, next: it.nextElementSibling }; it.remove(); document.getElementById('undo').hidden = false; }
+  if (e.target.id === 'undobtn' && last) { last.next ? last.next.before(last.el) : document.getElementById('list').append(last.el); last = null; document.getElementById('undo').hidden = true; if (window.mockRender) window.mockRender(); }
+  if (e.target.closest('a')) document.getElementById('undo').hidden = true;
+  setTimeout(upd, 0);
+});
+upd();
+</script>
+</body>
+</html>

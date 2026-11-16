@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>다시보기 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 880px; margin: 0 auto; padding: 24px 0 64px; }
+  .pc { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .cm { padding: 16px 0; border-top: 1px solid var(--line); }
+  .cm .who { font-weight: 700; } .cm .when { color: var(--muted); font-size: .9rem; margin-left: 8px; }
+  .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  @media (max-width: 767px) { .acts .btn { flex: 1 1 calc(50% - 8px); } }
+  .card .thumb .badges { left: 8px; top: 8px; }
+</style>
+</head>
+<body data-default="v:list s:normal cat:all d:ok c:normal">
+<!-- 썸네일은 Unsplash 무료 사진(img/), 실제 방송 화면 아님. mock: 제목, 방송국, 조회 수, 방송일, 댓글 작성자와 내용은 샘플 값이다. -->
+<header id="site-header" data-active="videos"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>화면</b><button data-set="v:list">목록</button><button data-set="v:detail">상세</button></div>
+  <div class="group" data-show="v=list"><b>목록 상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:empty">전체 0건</button><button data-set="s:loading">로딩</button><button data-set="s:error">오류</button><button data-set="s:moreerr">더 보기 실패</button>
+    <button data-set="cat:예배">카테고리 선택(0건)</button><button data-set="cat:all">필터 해제</button></div>
+  <div class="group" data-show="v=detail"><b>영상 상태</b>
+    <button data-set="d:ok">재생 가능</button><button data-set="d:processing">처리 중</button><button data-set="d:login">로그인 필요(공유 링크 진입)</button><button data-set="d:locked">비공개·BLOCKED</button><button data-set="d:playerr">재생 오류</button><button data-set="d:loading">로딩</button><button data-set="d:nodonate">후원 불가(방송국 제한)</button></div>
+  <div class="group" data-show="v=detail"><b>댓글 상태</b>
+    <button data-set="c:normal">정상</button><button data-set="c:empty">0건</button><button data-set="c:guest">비로그인</button><button data-set="c:hidden">숨김</button><button data-set="c:filtered">금칙어 걸림</button><button data-set="c:failed">등록 실패</button><button data-set="c:restricted">작성 제한</button><button data-set="c:loading">로딩</button><button data-set="c:loadfail">불러오기 실패</button></div>
+  <p class="muted" data-show="v=detail">링크 공개 VOD는 링크로 들어온 사용자도 재생할 수 있고 목록과 검색에는 나오지 않아요. 헤더 메뉴 구성은 제안이에요.</p>
+  <p class="muted">비공개 콘텐츠의 공유 버튼 노출·링크 복사 허용, 방송국 이름 링크색은 사용자 결정 전이에요. 신고 사유 목록과 자기 방송·자기 댓글 신고 처리는 사용자 결정 전이에요(명세 §16.1에 사유 목록 없음).</p>
+</div></div>
+
+<main class="wrap">
+
+<!-- ============ 목록 ============ -->
+<section class="section" data-show="v=list" style="border-top:0">
+  <h1>다시보기</h1>
+  <p class="muted"><span class="slot">인기 집계 기간</span> 동안 많이 본 순</p>
+  <div class="chips one" role="group" aria-label="카테고리 선택" style="margin-top:16px">
+    <button class="chip" data-set="cat:all">전체</button><button class="chip" data-set="cat:예배">예배</button><button class="chip" data-set="cat:심방">심방</button><button class="chip" data-set="cat:성경공부">성경공부</button><button class="chip" data-set="cat:말씀">말씀</button><button class="chip" data-set="cat:찬양">찬양</button><button class="chip" data-set="cat:기도">기도</button><button class="chip" data-set="cat:간증">간증</button><button class="chip" data-set="cat:특별집회">특별집회</button><button class="chip" data-set="cat:선교">선교</button><button class="chip" data-set="cat:강해">강해</button><button class="chip" data-set="cat:기타">기타</button>
+  </div>
+  <div style="margin-top:24px">
+    <div class="grid" data-show="lv=grid">
+      <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/sanctuary.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">42:10</span></div><h3>지난 주일 설교 다시보기</h3><p class="meta"><img class="pa" src="../portraits/men/75.jpg" alt="" loading="lazy">은혜교회 박성민 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span></p><p class="meta"><strong>조회 5,230회</strong> · 예배 · 지난주</p></a>
+      <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/bible.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">55:02</span></div><h3>로마서 8장 강해 11회</h3><p class="meta"><img class="pa" src="../portraits/men/65.jpg" alt="" loading="lazy">샘물교회 이정훈 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span></p><p class="meta"><strong>조회 2,914회</strong> · 강해 · 지난주</p></a>
+      <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/praise.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">18:45</span></div><h3>부활절 특별 찬양</h3><p class="meta"><img class="pa" src="../portraits/women/65.jpg" alt="" loading="lazy">새벽빛교회 한지은 전도사</p><p class="meta"><strong>조회 1,806회</strong> · 찬양 · 3주 전</p></a>
+      <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/prayer-hands.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">38:27</span></div><h3>요한복음 2장 성경공부</h3><p class="meta"><img class="pa" src="../portraits/men/65.jpg" alt="" loading="lazy">샘물교회 이정훈 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span></p><p class="meta"><strong>조회 904회</strong> · 성경공부 · 2주 전</p></a>
+      <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/fellowship.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">24:50</span></div><h3>간증 나눔 시간</h3><p class="meta"><img class="pa" src="../portraits/men/52.jpg" alt="" loading="lazy">푸른숲교회 오민재 목사</p><p class="meta"><strong>조회 733회</strong> · 간증 · 지난달</p></a>
+      <a class="card" href="videos.html?v=detail"><div class="thumb"><img src="img/mission.jpg" alt="" loading="lazy"><div class="badges"><span class="badge plain">다시보기</span></div><span class="viewers">31:09</span></div><h3>선교지 소식 전하기</h3><p class="meta">열방교회 최은서 선교사</p><p class="meta"><strong>조회 512회</strong> · 선교 · 지난달</p></a>
+    </div>
+    <div style="text-align:center;margin-top:32px" data-show="lv=grid"><button class="btn" style="min-height:48px">더 보기</button></div>
+    <div class="notice danger" role="alert" data-show="lv=grid s=moreerr" style="margin-top:12px"><strong>더 불러오지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <div class="empty" data-show="lv=empty"><p><strong>아직 다시보기가 없어요</strong></p><p><a class="btn" href="main.html">지금 라이브 보러 가기</a></p></div>
+    <div class="empty" data-show="lv=catempty"><p><strong>이 카테고리의 다시보기가 없어요</strong></p><p><button class="btn" data-set="cat:all">전체 보기</button></p></div>
+    <div data-show="lv=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="grid" style="margin-top:12px"><div class="skeleton thumb"></div><div class="skeleton thumb"></div><div class="skeleton thumb"></div></div></div>
+    <div class="notice danger" role="alert" data-show="lv=error"><strong>다시보기를 불러오지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>
+  </div>
+</section>
+
+<!-- ============ 상세 ============ -->
+<section class="col" data-show="v=detail">
+  <!-- 영상 영역은 사진이 아니라 평평한 면 -->
+  <div class="pstage" data-show="d=ok|nodonate" role="region" aria-label="다시보기 영상"><img src="img/bible.jpg" alt="다시보기 화면 예시"><div class="pbar"><button class="btn" data-toggle aria-pressed="false" data-icon="play" data-label="재생" data-loff="재생" data-lon="일시정지">재생</button><button class="btn" data-toggle aria-pressed="false" data-icon="mute" data-label="소리 끄기" data-loff="소리 끄기" data-lon="소리 켜기">소리 끄기</button></div><button type="button" class="fsbtn" data-fs aria-label="전체화면으로 보기" title="전체화면"><svg class="i-enter" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="i-exit" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  <div class="vstage" data-show="d=processing" role="status"><div><p><strong>다시보기를 준비하는 중이에요</strong></p><p>잠시 후 다시 확인해 주세요.</p><button class="btn" data-icon="retry" data-keep>다시 확인하기</button></div></div>
+  <div class="vstage" data-show="d=login"><div><p><strong>로그인하면 볼 수 있어요</strong></p><p>로그인 후 이 다시보기로 돌아와요.</p><a class="btn" href="login.html?next=videos.html">로그인</a></div></div>
+  <div class="vstage" data-show="d=locked" role="status"><div><p><strong>볼 수 없는 다시보기예요.</strong></p><a class="btn" href="videos.html">다시보기 목록으로</a></div></div>
+  <div class="vstage" data-show="d=playerr" role="alert"><div><p><strong>영상을 불러오지 못했어요</strong></p><button class="btn" data-icon="retry" data-keep>다시 시도</button></div></div>
+  <div class="vstage" data-show="d=loading" role="status"><p>불러오는 중</p></div>
+
+  <div data-show="d=ok|nodonate|processing|login|playerr|loading" style="margin-top:16px">
+    <div class="row"><span class="badge plain">다시보기</span><span class="muted small">강해</span><span class="muted small">11월 6일 (샘플)</span><span class="muted small">55:02 (샘플)</span><span class="muted small" data-show="d=ok|nodonate|playerr"><strong>조회 2,914회</strong></span></div>
+    <h1 style="margin-top:8px">로마서 8장 강해 11회</h1>
+    <div class="chrow row between" style="margin-top:12px">
+      <p><a class="nm-link" href="channel.html"><strong>샘물교회 이정훈 목사</strong></a></p>
+      <button class="btn primary toggle" data-toggle aria-pressed="false" data-on="구독 중" data-off="구독">구독</button>
+    </div>
+  </div>
+
+  <div data-show="d=ok|nodonate|playerr">
+    <div class="acts">
+      <button class="btn toggle" data-toggle aria-pressed="false" data-icon="bookmark" data-label="즐겨찾기" data-loff="즐겨찾기" data-lon="즐겨찾기 해제">즐겨찾기</button>
+      <button class="btn" data-icon="share" data-keep data-share="로마서 8장 강해 12회 · 샘물교회 이정훈 목사">공유</button><button class="btn" data-icon="flag" data-keep data-report="로마서 8장 강해 12회">신고</button>
+      <a class="btn" href="charge.html?view=donate" data-show="d=ok|playerr">후원하기</a>
+      <button class="btn" disabled data-show="d=nodonate" aria-describedby="nd">후원하기</button>
+    </div>
+    <p class="help" id="nd" data-show="d=nodonate">지금은 후원할 수 없어요.</p>
+    <div style="margin-top:20px">
+      <p class="small muted">태그: 로마서, 강해 · 성경 구절: 로마서 8:28-30</p>
+      <p class="clamp" id="desc" style="margin-top:8px">로마서 8장 후반부를 함께 읽고 말씀을 나눕니다. 이번 회차에서는 28절부터 30절까지의 본문을 천천히 살펴봅니다.</p>
+      <button class="btn" style="margin-top:8px" data-toggle aria-pressed="false" data-on="접기" data-off="더 보기" data-icon="down" data-keep onclick="document.getElementById('desc').classList.toggle('clamp')">더 보기</button>
+    </div>
+  </div>
+
+  <!-- 댓글: 접근 불가·처리 중에서는 영역 자체를 그리지 않는다 -->
+  <section class="section" data-show="d=ok|nodonate" aria-labelledby="h-cm" style="margin-top:24px">
+    <div class="section-head"><h2 id="h-cm">댓글 3</h2><span class="muted small">최신순</span></div>
+
+    <div data-show="c=normal|empty|hidden|filtered|failed|loading|loadfail">
+      <label class="field"><span class="label">댓글</span><textarea class="textarea" name="cm"></textarea></label>
+      <p class="help">글자 수: <span class="slot">최대 글자 수</span></p>
+      <p class="err" role="alert" data-show="c=filtered">이 표현은 사용할 수 없어요.</p>
+      <p class="err" role="alert" data-show="c=failed">댓글을 등록하지 못했어요. 다시 시도해 주세요.</p>
+      <p style="margin-top:8px"><button class="btn">등록</button></p>
+    </div>
+    <div class="notice" data-show="c=guest"><p>댓글은 로그인하면 남길 수 있어요.</p><p style="margin-top:8px"><a class="btn" href="login.html?next=videos.html">로그인하고 댓글 남기기</a></p></div>
+    <div class="notice" data-show="c=restricted"><strong>댓글이 제한되었어요</strong><p><a href="#">이의제기</a></p></div>
+
+    <div data-show="c=normal|guest|filtered|failed|restricted" style="margin-top:16px">
+      <div class="cm"><p><span class="who">푸른언덕</span><span class="when">2시간 전</span></p><p>좋은 말씀 감사합니다.</p><p style="margin-top:4px"><button class="btn" data-icon="flag" data-label="이 댓글 신고">신고</button></p></div>
+      <div class="cm"><p><span class="who">하늘바람</span><span class="when">어제</span></p><p>28절 설명이 도움이 됐어요.</p><p style="margin-top:4px"><button class="btn" data-icon="flag" data-label="이 댓글 신고">신고</button></p></div>
+    </div>
+    <div class="cm" data-show="c=hidden"><p><span class="who">새벽별</span></p><p>숨겨진 댓글이에요.</p></div>
+    <div class="cm" data-show="c=hidden"><p><span class="who">나</span></p><p>숨김 처리됨 · <a href="#">이의제기</a></p></div>
+    <div class="empty" data-show="c=empty" style="margin-top:16px"><p>첫 댓글을 남겨보세요</p></div>
+    <p class="muted" data-show="c=loading" role="status" style="margin-top:16px">댓글을 불러오는 중</p>
+    <div class="notice danger" role="alert" data-show="c=loadfail" style="margin-top:16px"><strong>댓글을 불러오지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <div style="margin-top:16px" data-show="c=normal|guest|filtered|failed|restricted"><button class="btn">댓글 더 보기</button></div>
+  </section>
+</section>
+</main>
+<script>
+  window.mockDerive = function (b) {
+    var s = b.dataset.s, cat = b.dataset.cat;
+    b.dataset.lv = s === 'empty' ? 'empty' : s === 'loading' ? 'loading' : s === 'error' ? 'error' : (cat !== 'all' ? 'catempty' : 'grid');
+  };
+</script>
+<script src="mock.js"></script>
+</body>
+</html>

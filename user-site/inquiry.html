@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>환불·결제 오류 문의 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
+  fieldset { border: 0; padding: 0; margin: 0; }
+  legend { font-weight: 700; color: var(--strong); margin-bottom: 6px; padding: 0; }
+  .qrow { align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body data-default="s:normal">
+<!-- 환불·결제 오류 문의. 환불 요건·처리 결과 문구는 슬롯이고 환불 가능 여부를 단정하지 않는다. 문의 종류 3개·환불 요청을 이 폼에서 받을지는 사용자 결정 전. -->
+<header id="site-header"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:normal">기본</button><button data-set="s:prefill">결제 미리 채움</button><button data-set="s:nokind">종류 미선택</button><button data-set="s:sending">접수 중</button><button data-set="s:done">접수 완료</button><button data-set="s:dup">중복 접수</button><button data-set="s:fail">실패</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button><button data-set="s:guest">비로그인</button><button data-set="s:nolist">내 문의 0건</button>
+  </div>
+  <p class="muted">문의 종류 3개와 환불 요청을 이 폼에서 받을지는 사용자 결정 전이에요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-inq" tabindex="-1">환불·결제 오류 문의</h1>
+  <p class="muted" style="margin-top:4px"><span class="slot">S2 환불 요건: 미사용 열매 환불 가능 기간·조건</span></p>
+
+  <div data-show="s=normal|prefill|nokind|sending|fail|done|dup|nolist" class="stack" style="margin-top:16px">
+    <div class="notice" role="status" data-show="s=done"><strong>문의를 접수했어요</strong><p>접수번호 <span class="slot">번호</span>. 결과는 이 화면의 '내 문의'에서 볼 수 있어요.</p></div>
+    <div class="notice" role="status" data-show="s=dup"><strong>이미 접수된 문의가 있어요</strong><p style="margin-top:8px"><a class="btn" href="#mine">처리 상태 보기</a></p></div>
+    <div class="notice danger" role="alert" data-show="s=fail"><strong>문의를 접수하지 못했어요</strong><p class="muted small">입력한 내용은 그대로 있어요.</p><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <div class="notice danger" role="alert" data-show="s=nokind"><strong>입력을 확인해 주세요 (1곳)</strong></div>
+    <form onsubmit="return false" class="stack" id="f">
+      <fieldset aria-describedby="e-kind">
+        <legend>문의 종류 (필수)</legend>
+        <label class="check"><input type="radio" name="kind"><span>결제했는데 열매가 안 들어왔어요</span></label>
+        <label class="check"><input type="radio" name="kind"><span>같은 결제가 두 번 된 것 같아요</span></label>
+        <label class="check"><input type="radio" name="kind"><span>미사용 열매 환불을 요청해요</span></label>
+        <p class="err" id="e-kind" data-show="s=nokind">문의 종류를 선택해 주세요.</p>
+      </fieldset>
+      <fieldset>
+        <legend>관련 결제</legend>
+        <label class="check"><input type="radio" name="pay" id="pay1"><span>11월 9일 · <span class="slot">V1 상품명</span> · 결제 <span class="slot">V1 가격</span>원 (확인 중)</span></label>
+        <label class="check"><input type="radio" name="pay"><span>11월 8일 · <span class="slot">V1 상품명</span> · 결제 <span class="slot">V1 가격</span>원 (실패)</span></label>
+        <label class="check"><input type="radio" name="pay"><span>11월 12일 · <span class="slot">V1 상품명</span> · 결제 <span class="slot">V1 가격</span>원 (완료)</span></label>
+        <label class="check"><input type="radio" name="pay" id="paynone" checked><span>해당 없음</span></label>
+      </fieldset>
+      <div class="field"><label class="label" for="body">내용 (선택)</label><textarea class="textarea" id="body" aria-describedby="body-h"></textarea><p class="help" id="body-h">계좌번호나 카드번호는 쓰지 마세요.</p></div>
+      <button class="btn primary block" type="submit" data-show="s=normal|prefill|nokind|fail|done|dup|nolist">문의 접수</button>
+      <button class="btn primary block" type="submit" disabled aria-busy="true" data-show="s=sending">접수하는 중</button>
+    </form>
+  </div>
+  <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:16px"><p class="muted">불러오는 중</p><div class="skeleton" style="height:48px;margin-top:12px"></div><div class="skeleton" style="height:48px;margin-top:12px"></div></div>
+  <div class="notice danger" role="alert" data-show="s=loaderr" style="margin-top:16px"><strong>문의 화면을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+  <div class="notice" data-show="s=guest" style="margin-top:16px"><strong>로그인하면 문의할 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=inquiry.html">로그인</a></p></div>
+  <section class="section" id="mine" aria-labelledby="h-mine" data-show="s=normal|prefill|nokind|sending|fail|done|dup|nolist">
+    <h2 id="h-mine">내 문의</h2>
+    <div class="empty" data-show="s=nolist" style="margin-top:12px"><p><strong>접수한 문의가 없어요</strong></p></div>
+    <ul style="list-style:none;margin:8px 0 0;padding:0" data-show="s=normal|prefill|nokind|sending|fail|done|dup">
+      <li class="qrow"><span><strong>결제했는데 열매가 안 들어왔어요</strong><br><span class="muted small">11월 13일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain">확인 중</span></li>
+      <li class="qrow"><span><strong>미사용 열매 환불을 요청해요</strong><br><span class="muted small">11월 5일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain">처리 완료</span></li>
+      <li class="qrow"><span><strong>같은 결제가 두 번 된 것 같아요</strong><br><span class="muted small">11월 1일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain">처리하지 않음</span></li>
+    </ul>
+  </section>
+</div></main>
+<script src="mock.js"></script>
+<script>
+// 목업: 결제 미리 채움(?pay=행ID 진입 상태)
+function sync() { var b = document.body.dataset.s; document.getElementById(b === 'prefill' ? 'pay1' : 'paynone').checked = true; }
+document.addEventListener('click', function () { setTimeout(sync, 0); });
+sync();
+</script>
+</body>
+</html>

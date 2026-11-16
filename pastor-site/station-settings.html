@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방송국 설정 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.pre{display:flex;align-items:stretch;gap:0}
+.pre .px{display:flex;align-items:center;padding:0 10px;border:1px solid var(--line,#ccc);border-right:0;border-radius:8px 0 0 8px;background:var(--bg-sub,#f3f3f3);white-space:nowrap}
+.pre .input{border-radius:0 8px 8px 0;min-width:0;flex:1}
+.clamp2{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.cs-save{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+@media (max-width:700px){.pre .px{font-size:.85em}}
+</style>
+</head>
+<body data-default="role:owner s:normal f:none st:active cert:on img:ok dlg:closed">
+<!-- data-active="station"은 NAV 키에 없는 값이라 상단·하단 메뉴 강조 없음이 의도(진입점은 내 정보 메뉴). 방송국 설정(DESIGN-REMAINING 2묶음). 글자수·형식·용량·주소 규칙은 슬롯. 탐지 문구는 create-station과 통일. 제재 예고 표현 없음 -->
+<header id="site-header" data-active="station"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:dirty">수정됨</button><button data-set="s:saving">저장 중</button><button data-set="s:saved">저장 성공</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:conflict">충돌</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
+  <div class="group"><b>탐지·검증</b><button data-set="f:none">없음</button><button data-set="f:name">이름 탐지</button><button data-set="f:dup">이름 중복</button><button data-set="f:intro">소개 탐지</button><button data-set="f:img">이미지 탐지</button><b>이미지 형식</b><button data-set="img:ok">정상</button><button data-set="img:bad">거절</button></div>
+  <div class="group"><b>방송국 상태</b><button data-set="st:active">정상</button><button data-set="st:limited">제한</button><button data-set="st:suspended">정지</button><button data-set="st:closed">폐쇄</button><b>인증</b><button data-set="cert:on">인증됨</button><button data-set="cert:off">미인증</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:leave">나가기 확인</button><button data-set="dlg:vis">비공개 전환 확인</button></div>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 저장 성공·실패·충돌은 결과 화면만 보여 주는 상태예요(수정 후 저장하면 저장 중, 저장 성공 순서로 가요). "이름 중복"은 기획 목록에 더한 값이에요. 사용자 결정 전: 주소 변경, 탐지 이의 경로.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 관리자 이상만 쓸 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<div class="stack" data-show="role=owner|adm0|admall">
+<div class="mem-head"><h1>방송국 설정</h1></div>
+
+<section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:160px;margin-top:12px"></div></section>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>방송국 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+
+<div class="stack" data-show="s=normal|dirty|saving|saved|saveerr|conflict">
+  <div class="notice danger" role="alert" data-show="st=suspended|closed"><strong>이 방송국은 지금 수정할 수 없어요</strong><p class="small">방송국 상태 <span class="slot">정지·폐쇄</span> · 사유 <span class="slot">사유</span></p><p style="margin-top:8px"><a class="btn" href="sanctions.html">제재 안내</a></p></div>
+  <div class="notice" role="status" data-show="st=limited"><strong>방송국이 제한 중이에요</strong><p class="small">사유 <span class="slot">사유</span> · 제한 범위 <span class="slot">범위</span> · <a href="sanctions.html">제재 안내</a></p></div>
+  <div class="notice" role="status" id="n-saved" tabindex="-1" data-show="s=saved"><strong>저장했어요</strong></div>
+  <div class="notice danger" role="alert" data-show="s=saveerr"><strong>오류: 저장하지 못했어요. 입력한 내용은 그대로예요</strong></div>
+  <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 사람이 먼저 바꿨어요</strong><p class="small">화면을 새로 불러와 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">새로 불러오기</button></p></div>
+
+  <form class="stack" id="frm" novalidate aria-label="방송국 설정">
+    <fieldset class="stack panel" id="fs" style="margin:0"><legend class="sr">설정 입력</legend>
+    <section class="stack" aria-labelledby="h-pf">
+      <h2 id="h-pf">프로필</h2>
+      <div class="field"><label class="label" for="nm">방송국 이름 (필수)</label>
+        <input class="input" id="nm" autocomplete="off" value="샘플 방송국" aria-describedby="nm-h nm-e" required>
+        <span class="help" id="nm-h">시청자에게 보이는 이름이에요. <span class="slot">N~M자</span></span>
+        <span class="err" id="nm-e" role="alert" hidden></span></div>
+      <div class="field"><label class="label" for="it">소개</label>
+        <textarea class="textarea" id="it" aria-describedby="it-h it-e">샘플 소개 문장입니다.</textarea>
+        <span class="help" id="it-h">글자수 <span class="slot">N자 이내</span></span>
+        <span class="err" id="it-e" role="alert" hidden></span></div>
+      <div class="field"><label class="label" for="im">프로필 이미지</label>
+        <div class="fgrid"><span class="imgprev" id="pv-p">프로필 이미지 없음</span>
+          <div class="stack"><input class="input" id="im" type="file" accept="image/*" aria-describedby="im-h im-e">
+            <p><button class="btn" type="button" id="im-clr">이미지 지우기</button></p></div></div>
+        <span class="help" id="im-h">형식 <span class="slot">형식</span> · 용량 <span class="slot">용량</span></span>
+        <span class="err" id="im-e" role="alert" hidden></span></div>
+      <div class="field"><label class="label" for="bg">배경 이미지</label>
+        <div class="stack"><span class="imgprev wide" id="pv-b">배경 이미지 없음</span><input class="input" id="bg" type="file" accept="image/*" aria-describedby="bg-h">
+          <p><button class="btn" type="button" id="bg-clr">이미지 지우기</button></p></div>
+        <span class="help" id="bg-h">형식 <span class="slot">형식</span> · 용량 <span class="slot">용량</span></span></div>
+      <p class="help" id="f-help" hidden>운영자가 검토할 수 있어요. 잘못 걸렸다고 생각하면 <a href="sanctions.html">이의제기</a>해 주세요 <span class="slot">경로 결정 전</span></p>
+    </section>
+
+    <section class="stack" aria-labelledby="h-pub" style="margin-top:24px">
+      <h2 id="h-pub">공개 설정</h2>
+      <div class="field"><label class="label" for="ct">대표 카테고리</label>
+        <select class="input" id="ct"><option>예배</option><option>강해</option><option>찬양</option></select></div>
+      <fieldset class="pick" id="vis" style="border:0;padding:0;margin:0"><legend class="label" style="font-weight:700;margin-bottom:6px">공개 여부</legend>
+        <label><input type="radio" name="vis" value="public" checked><span><span class="t">공개</span><span class="small muted">누구나 방송국을 찾을 수 있어요</span></span></label>
+        <label><input type="radio" name="vis" value="private"><span><span class="t">비공개</span><span class="small muted">시청자에게 보이지 않아요</span></span></label>
+      </fieldset>
+      <div data-show="cert=on"><label class="check"><input type="checkbox" id="dn" checked aria-describedby="dn-h"><span>소속 교단을 시청자에게 보이기</span></label>
+        <p class="help" id="dn-h" hidden>소유자만 바꿀 수 있어요</p></div>
+    </section>
+
+    </fieldset>
+    <section class="stack" aria-labelledby="h-ad" style="margin-top:24px">
+      <h2 id="h-ad">공개 주소</h2>
+      <div class="field"><label class="label" for="ur">주소</label>
+        <div class="pre"><span class="px" aria-hidden="true"><span class="slot">주소 접두</span></span><input class="input" id="ur" readonly value="sample-church" aria-describedby="ur-h"></div>
+        <p class="help" id="ur-h">방송국을 만들 때 정한 주소는 바꿀 수 없어요. 바꾸려면 운영팀에 문의해 주세요 <span class="slot">사용자 결정 전</span></p></div>
+      <p class="row"><button class="btn ik" type="button" id="ur-cp" data-icon="copy" data-keep>주소 복사</button><span class="help" role="status" id="ur-ok" hidden>복사했어요.</span></p>
+    </section>
+
+    <section class="panel stack" aria-labelledby="h-pv">
+      <h2 id="h-pv">시청자에게 보이는 모습</h2>
+      <div class="fgrid"><span class="imgprev" aria-hidden="true">프로필</span><div style="min-width:0;flex:1"><p><strong id="pv-n"></strong></p><p class="small muted clamp2" id="pv-i"></p></div></div>
+    </section>
+
+    <div class="cs-save"><button class="btn primary" type="submit" id="go">저장</button><span class="help" role="status" id="dirty" hidden style="margin-top:0">저장하지 않은 변경이 있어요</span></div>
+  </form>
+</div>
+</div>
+</div></main>
+
+<dialog id="leave-dlg" aria-labelledby="lv-t"><h2 id="lv-t">저장하지 않고 나갈까요?</h2>
+  <p style="margin-top:8px">저장하지 않은 변경이 있어요. 나가면 바뀐 내용이 사라져요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>계속 수정</button><button class="btn" type="button" id="lv-go">나가기</button></div>
+</dialog>
+<dialog id="vis-dlg" aria-labelledby="vs-t"><h2 id="vs-t">방송국을 비공개로 바꿀까요?</h2>
+  <p style="margin-top:8px">비공개로 바꾸면 시청자가 방송국을 찾을 수 없어요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn bad" type="button" id="vs-ok">비공개로 바꾸기</button></div>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); }, timer, href = 'dashboard.html', initVis = 'public', needName = false, skipF = false, bypass = false;
+  var HIT = /(\d{2,4}[-\s]?\d{3,4}[-\s]?\d{4})|https?:\/\/|계좌|입금/;
+  var MSG = '외부 후원·결제를 안내하는 내용은 올릴 수 없어요. 해당 부분을 고쳐 주세요';
+  function err(id, msg) {
+    var e = $(id + '-e'), f = $(id === 'nm' ? 'nm' : id === 'it' ? 'it' : 'im');
+    e.hidden = !msg; e.textContent = msg ? '오류: ' + msg : ''; $(id + '-h').hidden = !!msg;
+    if (msg) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid');
+  }
+  function curVis() { return document.querySelector('input[name=vis]:checked').value; }
+  function vis(e) { return e && e.offsetParent !== null; }
+  window.mockAfter = function () {
+    if (d.role === 'mgr') return;
+    var owner = d.role === 'owner', frozen = /^(suspended|closed)$/.test(d.st), saving = d.s === 'saving';
+    err('nm', d.f === 'name' ? MSG : d.f === 'dup' ? '이미 쓰고 있는 이름이에요. 다른 이름을 입력해 주세요.' : needName && !$('nm').value.trim() ? '이름을 입력해 주세요' : '');
+    err('it', d.f === 'intro' ? MSG : '');
+    err('im', d.f === 'img' ? MSG : d.img === 'bad' ? '이 파일은 올릴 수 없어요. 형식과 용량을 확인해 주세요' : '');
+    $('f-help').hidden = !/^(name|intro|img)$/.test(d.f);
+    $('fs').disabled = frozen || saving;
+    $('dn').disabled = !owner || frozen || saving; $('dn-h').hidden = owner;
+    $('go').disabled = frozen || saving || d.s === 'normal' || d.s === 'saved' || d.s === 'conflict';
+    $('go').textContent = saving ? '저장 중…' : '저장';
+    $('dirty').hidden = d.s !== 'dirty';
+    $('pv-n').textContent = $('nm').value || '이름 없음'; $('pv-i').textContent = $('it').value;
+    var L = $('leave-dlg'), V = $('vis-dlg');
+    if (d.dlg === 'leave' && !L.open) L.showModal(); else if (d.dlg !== 'leave' && L.open) L.close();
+    if (d.dlg === 'vis' && !V.open) V.showModal(); else if (d.dlg !== 'vis' && V.open) V.close();
+  };
+  function dirty() { if (/^(normal|saved|saveerr)$/.test(d.s)) { d.s = 'dirty'; window.mockRender(); } }
+  $('frm').addEventListener('input', function (e) { if (e.target.id !== 'ur') { dirty(); $('pv-n').textContent = $('nm').value; $('pv-i').textContent = $('it').value; } });
+  $('frm').addEventListener('change', dirty);
+  function clr(inp, pv, t) { inp.value = ''; pv.textContent = t; dirty(); inp.focus(); }
+  $('im-clr').onclick = function () { clr($('im'), $('pv-p'), '프로필 이미지 없음'); };
+  $('bg-clr').onclick = function () { clr($('bg'), $('pv-b'), '배경 이미지 없음'); };
+  $('im').addEventListener('change', function () { $('pv-p').textContent = this.files[0] ? '선택한 파일' : '프로필 이미지 없음'; });
+  $('bg').addEventListener('change', function () { $('pv-b').textContent = this.files[0] ? '선택한 파일' : '배경 이미지 없음'; });
+  $('ur-cp').onclick = function () { $('ur-ok').hidden = false; };
+  function doSave() {
+    d.s = 'saving'; window.mockRender();
+    clearTimeout(timer); timer = setTimeout(function () { d.s = 'saved'; initVis = curVis(); window.mockRender(); var n = $('n-saved'); n.focus(); }, 1000);
+  }
+  $('frm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var hit = HIT.test($('nm').value) ? 'name' : HIT.test($('it').value) ? 'intro' : '';
+    needName = !$('nm').value.trim();
+    if (needName || hit) { d.f = hit || 'none'; window.mockRender(); (needName ? $('nm') : hit === 'name' ? $('nm') : $('it')).focus(); return; }
+    if (d.f !== 'none') d.f = 'none';
+    if (initVis === 'public' && curVis() === 'private') { d.dlg = 'vis'; window.mockRender(); return; }
+    doSave();
+  });
+  $('vs-ok').onclick = function () { skipF = true; $('vis-dlg').close(); doSave(); };
+  $('vis-dlg').addEventListener('close', function () { d.dlg = 'closed'; if (!skipF) $('go').focus(); skipF = false; window.mockRender(); });
+  // 수정 중에 다른 화면으로 나가는 링크
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href]');
+    if (!a || d.s !== 'dirty' || a.closest('#leave-dlg') || bypass || /^#/.test(a.getAttribute('href')) || a.closest('#frm')) return;
+    e.preventDefault(); href = a.getAttribute('href'); d.dlg = 'leave'; window.mockRender();
+  }, true);
+  $('lv-go').onclick = function () { bypass = true; location.href = href; };
+  $('leave-dlg').addEventListener('close', function () {
+    d.dlg = 'closed'; window.mockRender();
+    var o = Array.prototype.filter.call(document.querySelectorAll('a[href="' + href + '"]'), vis)[0] || $('nm'); o.focus();
+  });
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-set]')) clearTimeout(timer); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

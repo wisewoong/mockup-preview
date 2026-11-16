@@ -1,0 +1,51 @@
+/* 신고 목록·상세 전용 (신규 색 토큰 없음) */
+.filters { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+.filters .input { width: auto; min-width: 160px; }
+.lock-row td { color: var(--muted); }
+.lock-row .tag { color: var(--text); }
+.rd { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start; }
+.rd-form { position: sticky; top: 16px; }
+.quote { background: var(--bg-sub); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.shot { min-height: 160px; background: var(--bg-sub); border: 1px dashed var(--muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.tl { list-style: none; margin: 0; padding: 0; }
+.tl li { padding: 14px 0; border-top: 1px solid var(--line); }
+.radios { border: 0; padding: 0; margin: 0; }
+.radios legend { font-weight: 700; margin-bottom: 4px; }
+.radios label { display: flex; gap: 12px; align-items: center; min-height: var(--tap); }
+.radios input { width: 22px; height: 22px; accent-color: var(--strong); flex: none; }
+.radios label.off { color: var(--muted); }
+.ro { padding: 10px 14px; background: var(--bg-sub); border-radius: var(--radius); }
+@media (max-width: 1023px) { .rd { grid-template-columns: 1fr; } .rd-form { position: static; } }
+.only-m { display: none; }
+.why > summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; }
+.why > summary h2 { display: inline; margin: 0; }
+@media (max-width: 1023px) {
+  .only-m { display: block; }
+  .filters .input, .filters select { font-size: 1rem; min-height: var(--tap); }
+  .filters .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .filters label.row { width: 100%; }
+  .filters .input { flex: 1; }
+  .tbl-wrap.cards tr[hidden] { display: none; }
+  .tbl-wrap.cards:not(.v) tr { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .tbl-wrap.cards:not(.v) tr > td { width: auto; }
+  .tbl-wrap.cards:not(.v) tr > td::before { display: none !important; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(3) { order: 1; flex: 1 1 calc(100% - 104px); font-weight: 700; font-size: 1.05rem; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(5) { order: 2; flex: none; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(2) { order: 3; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(1) { order: 4; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(6) { order: 5; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(4) { order: 6; width: 100%; font-size: .85rem; color: var(--muted); }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(4)::before { display: inline !important; content: "신고 "; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(4)::after { content: "건 (참고)"; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(7) { order: 7; width: 100%; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(7) .btn { display: flex; align-items: center; justify-content: center; }
+  .tbl-wrap.cards:not(.v) tr > td:nth-child(3) .small { font-weight: 400; }
+  .lock-row td:nth-child(6) .small { display: block; }
+}
+
+/* 이의제기·심사 상세 공용: 읽기 전용 dl (신규 색 토큰 없음). 위 카드 nth-child 규칙은 신고 목록 전용이라 :not(.v)로 한정 */
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 8px 0 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.files li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; overflow-wrap: anywhere; }
+.rd-form select.input { width: 100%; }

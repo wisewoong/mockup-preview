@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>라이브 전체 보기 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .upcoming { display: grid; gap: 0; padding: 0; margin: 0; }
+  .upcoming li { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .upcoming a { text-decoration: none; }
+  .upcoming a:hover strong { text-decoration: underline; }
+  .fl { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+  .fl > b { min-width: 48px; color: var(--strong); }
+  @media (max-width: 767px) { .upcoming li { flex-wrap: wrap; } }
+</style>
+</head>
+<body data-default="s:normal c:전체 o:v">
+<!-- 방송 썸네일·시청자 수·이름은 목업 값. 정렬 "방금 시작한 순"은 제안(명세는 시청자 많은 순만 정의, 사용자 결정). 예정 방송을 이 화면 하단에 둘지 별도 화면으로 뺄지도 사용자 결정. -->
+<header id="site-header" data-active="live"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:empty">라이브 0건</button><button data-set="c:선교">카테고리 0건</button><button data-set="s:loading">로딩</button><button data-set="s:error">오류</button><button data-set="s:morefail">더 보기 실패</button>
+  </div>
+  <p class="muted">정렬 선택지와 예정 방송 위치는 사용자 결정 전이에요. 카테고리 칩과 정렬 칩은 실제로 동작해요.</p>
+</div></div>
+
+<main class="wrap">
+  <section class="section" aria-labelledby="h-all">
+    <h1 id="h-all" tabindex="-1">라이브 전체 보기</h1>
+    <p class="muted" id="cnt" role="status" data-show="s=normal|morefail|empty|error|loading"></p>
+
+    <div class="fl"><b id="l-cat">카테고리</b>
+      <div class="chips one" role="group" aria-label="카테고리 선택"><button class="chip" data-set="c:전체" aria-pressed="true">전체</button><button class="chip" data-set="c:예배" aria-pressed="false">예배</button><button class="chip" data-set="c:심방" aria-pressed="false">심방</button><button class="chip" data-set="c:성경공부" aria-pressed="false">성경공부</button><button class="chip" data-set="c:말씀" aria-pressed="false">말씀</button><button class="chip" data-set="c:찬양" aria-pressed="false">찬양</button><button class="chip" data-set="c:기도" aria-pressed="false">기도</button><button class="chip" data-set="c:간증" aria-pressed="false">간증</button><button class="chip" data-set="c:특별집회" aria-pressed="false">특별집회</button><button class="chip" data-set="c:선교" aria-pressed="false">선교</button><button class="chip" data-set="c:강해" aria-pressed="false">강해</button><button class="chip" data-set="c:기타" aria-pressed="false">기타</button></div></div>
+    <div class="fl"><b id="l-ord">정렬</b>
+      <div class="chips" role="group" aria-label="정렬">
+        <button class="chip" data-set="o:v" aria-pressed="true">시청자 많은 순</button><button class="chip" data-set="o:t" aria-pressed="false">방금 시작한 순</button></div></div>
+
+    <div class="grid" id="grid" style="margin-top:20px" data-show="s=normal|morefail">
+      <a class="card" data-cat="예배" data-v="1284" data-t="2" data-show="c=전체|예배" href="live.html">
+        <div class="thumb"><img src="img/sanctuary.jpg" alt="" loading="lazy">
+          <div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span><span class="badge plain">예배 중</span></div>
+          <span class="viewers">시청 1,284명</span></div>
+        <h3>주일 낮 예배 실시간 방송</h3>
+        <p class="meta"><img class="pa" src="../portraits/men/75.jpg" alt="" loading="lazy">은혜교회 박성민 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span> · 예배</p>
+      </a>
+      <a class="card" data-cat="강해" data-v="312" data-t="3" data-show="c=전체|강해" href="live.html?variant=general">
+        <div class="thumb"><img src="img/bible.jpg" alt="" loading="lazy">
+          <div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 312명</span></div>
+        <h3>로마서 8장 강해 12회</h3>
+        <p class="meta"><img class="pa" src="../portraits/men/65.jpg" alt="" loading="lazy">샘물교회 이정훈 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span> · 강해</p>
+      </a>
+      <a class="card" data-cat="찬양" data-v="187" data-t="1" data-show="c=전체|찬양" href="live.html?variant=general">
+        <div class="thumb"><img src="img/praise.jpg" alt="" loading="lazy">
+          <div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 187명</span></div>
+        <h3>수요 찬양의 밤</h3>
+        <p class="meta"><img class="pa" src="../portraits/women/65.jpg" alt="" loading="lazy">새벽빛교회 한지은 전도사 · 찬양</p>
+      </a>
+      <a class="card" data-cat="기도" data-v="96" data-t="6" data-show="c=전체|기도" href="live.html?variant=general">
+        <div class="thumb"><img src="img/prayer-hands.jpg" alt="" loading="lazy">
+          <div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 96명</span></div>
+        <h3>새벽 기도회 실시간</h3>
+        <p class="meta"><img class="pa" src="../portraits/men/65.jpg" alt="" loading="lazy">새벽빛교회 한지은 전도사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span> · 기도</p>
+      </a>
+      <a class="card" data-cat="성경공부" data-v="54" data-t="5" data-show="c=전체|성경공부" href="live.html?variant=general">
+        <div class="thumb"><img src="img/fellowship.jpg" alt="" loading="lazy">
+          <div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 54명</span></div>
+        <h3>요한복음 3장 함께 읽기</h3>
+        <p class="meta"><img class="pa" src="../portraits/men/65.jpg" alt="" loading="lazy">샘물교회 이정훈 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span> · 성경공부</p>
+      </a>
+      <a class="card" data-cat="간증" data-v="33" data-t="4" data-show="c=전체|간증" href="live.html?variant=general">
+        <div class="thumb"><img src="img/mission.jpg" alt="" loading="lazy">
+          <div class="badges"><span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span></div><span class="viewers">시청 33명</span></div>
+        <h3>간증 나눔의 밤</h3>
+        <p class="meta"><img class="pa" src="../portraits/men/65.jpg" alt="" loading="lazy">샘물교회 이정훈 목사 <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span> · 간증</p>
+      </a>
+    </div>
+    <div class="empty" id="cempty" hidden style="margin-top:20px"><p><strong id="cmsg"></strong></p><p><button class="btn" data-set="c:전체">전체 보기</button></p></div>
+
+    <div class="empty" data-show="s=empty" style="margin-top:20px"><p><strong>지금 방송 중인 라이브가 없어요</strong></p><p class="muted">아래 예정 방송을 확인하거나 다시보기를 둘러보세요.</p><p><a class="btn" href="videos.html">다시보기 보러 가기</a></p></div>
+    <div class="notice danger" role="alert" data-show="s=error" style="margin-top:20px"><strong>라이브 목록을 불러오지 못했어요</strong><p style="margin-top:12px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:20px"><p class="muted">방송 목록을 불러오고 있어요.</p><div class="grid" style="margin-top:16px"><div><div class="skeleton thumb"></div><div class="skeleton line"></div><div class="skeleton line" style="width:60%"></div></div><div><div class="skeleton thumb"></div><div class="skeleton line"></div><div class="skeleton line" style="width:60%"></div></div><div><div class="skeleton thumb"></div><div class="skeleton line"></div><div class="skeleton line" style="width:60%"></div></div><div><div class="skeleton thumb"></div><div class="skeleton line"></div><div class="skeleton line" style="width:60%"></div></div><div><div class="skeleton thumb"></div><div class="skeleton line"></div><div class="skeleton line" style="width:60%"></div></div><div><div class="skeleton thumb"></div><div class="skeleton line"></div><div class="skeleton line" style="width:60%"></div></div></div></div>
+
+    <div data-show="s=normal|morefail" id="more">
+      <p class="notice danger" role="alert" data-show="s=morefail" style="margin-top:20px"><strong>더 불러오지 못했어요</strong><button class="btn" type="button" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p>
+      <p style="margin-top:20px;text-align:center"><button class="btn" type="button">더 보기</button></p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="h-up">
+    <h2 id="h-up">예정 방송</h2>
+    <ul class="upcoming" style="margin-top:8px">
+      <li><div><a href="upcoming.html"><strong>저녁 성경공부 요한복음 3장</strong></a><p class="muted small">샘물교회 이정훈 목사 · 오늘 저녁 8시</p></div><button class="btn toggle" data-toggle aria-pressed="false" data-icon="bookmark" data-label="저녁 성경공부 요한복음 3장 즐겨찾기" data-loff="저녁 성경공부 요한복음 3장 즐겨찾기" data-lon="저녁 성경공부 요한복음 3장 즐겨찾기 해제">즐겨찾기</button></li>
+      <li><div><a href="upcoming.html"><strong>금요 철야 기도회</strong></a><p class="muted small">은혜교회 박성민 목사 · 금요일 밤 10시</p></div><button class="btn toggle" data-toggle aria-pressed="false" data-icon="bookmark" data-label="금요 철야 기도회 즐겨찾기" data-loff="금요 철야 기도회 즐겨찾기" data-lon="금요 철야 기도회 즐겨찾기 해제">즐겨찾기</button></li>
+    </ul>
+  </section>
+</main>
+<script src="mock.js"></script>
+<script>
+// 목업: 정렬(DOM 순서 변경)과 개수·카테고리 0건 문구. 카드 개수는 정상·더 보기 실패 상태에서만 센다.
+function upd() {
+  var b = document.body, g = document.getElementById('grid'), key = b.dataset.o === 't' ? 't' : 'v';
+  var cs = [].slice.call(g.children);
+  cs.sort(function (a, c) { return key === 'v' ? c.dataset.v - a.dataset.v : c.dataset.t - a.dataset.t; }).forEach(function (x) { g.appendChild(x); });
+  var n = cs.filter(function (x) { return !x.hidden; }).length, live = b.dataset.s === 'normal' || b.dataset.s === 'morefail';
+  document.getElementById('cnt').textContent = b.dataset.s === 'empty' ? '지금 방송 중 0개' : (live ? '지금 방송 중 ' + n + '개' : '');
+  var e = document.getElementById('cempty'); e.hidden = !(live && n === 0);
+  document.getElementById('cmsg').textContent = "'" + b.dataset.c + "' 카테고리에 방송 중인 라이브가 없어요";
+  document.getElementById('more').hidden = !(live && n > 0);
+}
+document.addEventListener('click', function () { setTimeout(upd, 0); });
+upd();
+</script>
+</body>
+</html>

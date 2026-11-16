@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>사용자 사이트 목업 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .sw { display: inline-block; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: var(--radius); vertical-align: middle; margin-right: 8px; }
+  table { border-collapse: collapse; width: 100%; } th, td { text-align: left; padding: 8px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+  .tw { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main class="wrap stack" style="padding-top:32px;padding-bottom:64px">
+  <h1>말씀ON 사용자 사이트 목업</h1>
+  <p class="muted">검토용 정적 목업이다. 실제 구현은 Vue 3로 따로 한다. 각 화면 위의 점선 막대로 상태를 바꿔 볼 수 있다. 주소 뒤에 <code>?theme=dark&amp;state=empty</code> 처럼 붙여도 된다.</p>
+
+  <section class="section">
+    <h2>화면</h2>
+    <ul>
+      <li><a href="main.html">메인 (라이브 중심)</a>: 정상, 시청 이력 없음, 라이브 0건, 로딩, 영역 오류</li>
+      <li><a href="live.html">라이브 시청</a>: 일반/예배 방송 변형 x 정상, 채팅 열림·닫힘, 비회원, 연결 끊김, TTS 장애, 송출 끊김, 방송국 제한, 종료, 권한 없음</li>
+      <li><a href="charge.html">열매 충전과 후원 확인</a>: 금액권 선택 상태 11종, 후원 확인 상태 7종, TTS 안내 5종</li>
+      <li><a href="videos.html">다시보기</a>: 목록(정상, 0건, 카테고리 0건, 로딩, 오류, 더 보기 실패), 상세(재생, 처리 중, 로그인 필요, 비공개 잠금, 재생 오류, 후원 불가), 댓글 상태 9종</li>
+      <li><a href="live-all.html">라이브 전체 보기</a>: 정상(카테고리·정렬 동작), 라이브 0건, 카테고리 0건, 로딩, 오류, 더 보기 실패, 예정 방송</li>
+      <li><a href="upcoming.html">예정 방송 상세</a>: 시작 전, 곧 시작, 시작됨, 지연 2종, 취소, 지난 방송, 로딩, 오류, 볼 수 없음, 비로그인, 알림 저장 실패 + 공유 시트(기본, 복사 실패, 링크 생성 실패, 권한 제한)</li>
+      <li><a href="reco-settings.html">추천 설정</a>: 켜짐·꺼짐(동작), 저장 중·실패, 삭제 확인 대화상자, 삭제 중·완료·실패, 로딩, 로드 실패, 비로그인</li>
+      <li><a href="withdraw.html">탈퇴</a>: 기본, 잔액 0, 처리 중 결제 있음, 탈퇴 진행 중, 완료, 실패, 로딩, 로드 실패, 비로그인, 확인 대화상자</li>
+      <li><a href="inquiry.html">환불·결제 오류 문의</a>: 기본, 결제 미리 채움, 종류 미선택, 접수 중·완료, 중복, 실패, 로딩, 로드 실패, 비로그인, 내 문의 0건</li>
+      <li><a href="reports.html">내 신고</a>: 정상(상태 4종), 0건, 로딩, 로드 실패, 더 보기 실패, 비로그인</li>
+      <li><a href="reports.html">내 신고</a>: 정상, 0건, 로딩, 로드 실패, 더 보기 실패, 비로그인 (신고 접수 대화상자는 live·videos·channel의 신고 버튼, 상태는 ?rp=ok|sending|done|dup|nokind|fail|gone|guest)</li>
+      <li><a href="subscriptions.html">구독</a>: 목록, 구독 없음, 비로그인, 로딩, 오류, 해제 중, 해제 실패, 해제 확인 대화상자</li>
+      <li><a href="search.html">검색</a>: 입력 전(최근 검색어 기기 저장), 빈 검색어, 로딩, 결과 탭 3종, 라이브만 0건, 전체 0건, 오류</li>
+      <li><a href="channel.html">방송국 페이지</a>: 정상, 일부 기능 제한, 운영 제재, 폐쇄 x 콘텐츠 있음, 0건, 로딩, 오류</li>
+      <li><a href="login.html">로그인·가입</a>: 로그인(정상, 처리 중, 실패, 정지, 연결 실패), 가입(필수 누락, 이메일·닉네임 중복, 비밀번호 짧음, 생년월일 오류, 만 14세 미만, 처리 중), 복귀 안내 유무</li>
+      <li><a href="favorites.html">즐겨찾기</a>: 정상(해제·되돌리기 동작), 없음, 비로그인, 로딩, 오류, 알림 저장 실패, 더 보기 실패</li>
+      <li><a href="notifications.html">알림</a>: 정상, 모두 읽음 후, 없음, 비로그인, 로딩, 오류, 읽음 처리 실패, 더 보기 실패, 새 알림 도착</li>
+      <li><a href="activity.html">내 활동</a>: 본 영상·방문한 목회자·후원 내역 탭, 0건, 기록 꺼짐, 로딩, 목록 실패, 만 19세 미만, 비로그인, 기록 지우기 대화상자</li>
+      <li><a href="my.html">MY</a>: 정상, 잔액 0, 로딩, 프로필 실패, 잔액 실패, 만 19세 미만, 로그아웃 실패, 비로그인</li>
+      <li><a href="history.html">내 후원·결제 내역</a>: 정상, 없음, 비로그인, 로딩, 잔액 실패, 목록 실패, 처리 중 결제, 만 19세 미만, 더 보기 실패</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>디자인 토큰</h2>
+    <div class="tw"><table>
+      <tr><th>토큰</th><th>라이트</th><th>다크</th><th>쓰임</th></tr>
+      <tr><td>--bg</td><td>#F5F6F5</td><td>#121615</td><td>바탕 (순백, 순흑 아님)</td></tr>
+      <tr><td>--bg-sub</td><td>#ECEEED</td><td>#1B2120</td><td>보조 면, 스켈레톤</td></tr>
+      <tr><td>--text</td><td>#1C2120</td><td>#E7EBE9</td><td>본문</td></tr>
+      <tr><td>--muted</td><td>#4B5553</td><td>#A7B1AE</td><td>보조 글</td></tr>
+      <tr><td>--line</td><td>#CDD3D1</td><td>#343C3A</td><td>얇은 구분선</td></tr>
+      <tr><td>--accent</td><td><span class="sw" style="background:#1B6652"></span>#1B6652</td><td><span class="sw" style="background:#6FC4AA"></span>#6FC4AA</td><td>포인트 1색 (딥 그린). 주 버튼, 선택 상태, 현재 위치</td></tr>
+      <tr><td>--on-accent</td><td>#F5F6F5</td><td>#0E1513</td><td>포인트 위 글자</td></tr>
+      <tr><td>--danger</td><td>#A12B2B</td><td>#F29B9B</td><td>오류 글자 전용 (포인트 아님)</td></tr>
+    </table></div>
+    <ul style="margin-top:16px">
+      <li>글꼴: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif. 외부 링크 없음. 본문 17px, 줄간격 1.65.</li>
+      <li>모서리 반경 8px 하나만 사용. 터치 타겟 최소 48px.</li>
+      <li>상태는 색만으로 구분하지 않고 텍스트를 함께 둔다. 점선 테두리와 "선택됨" 같은 글자를 병기.</li>
+      <li>다이얼: VARIANCE 3, MOTION 2(hover와 active의 1px 이동뿐), DENSITY 5.</li>
+      <li>목록의 방송 이미지는 Unsplash 무료 사진(img/)이며 실제 방송이 아니다.</li>
+      <li>목회자 프로필 사진은 randomuser.me 임의 인물 사진이며 실제 목회자가 아니다. 이름·교회명도 모두 가상이다.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

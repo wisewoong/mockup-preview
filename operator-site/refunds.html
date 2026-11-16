@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>환불·결제 오류 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-verify.css">
+</head>
+<body data-default="role:super s:normal">
+<header id="site-header" data-active="refunds"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:closed">마감 건</button><button data-set="s:saveerr">저장 실패</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>환불·결제 오류</h1>
+    <p class="muted small">환불 가능 여부·기간 <span class="slot">법무 확인 전</span></p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:160px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=empty"><p><strong>접수된 건이 없어요</strong></p></div>
+
+    <div class="stack" data-show="s=normal|closed|saveerr">
+      <div class="tbl-wrap cards v"><table><caption class="sr">접수 목록 (샘플)</caption>
+        <thead><tr><th scope="col">접수일</th><th scope="col">사용자</th><th scope="col">결제 건</th><th scope="col">상태</th><th scope="col">정산</th><th scope="col"><span class="sr">상세</span></th></tr></thead>
+        <tbody>
+          <tr><td data-label="접수일">샘플 날짜</td><td data-label="사용자">샘플닉네임A</td><td class="c-title">샘플 결제 #1</td><td class="c-tag"><span class="tag">접수</span></td><td data-label="정산"><span class="tag">진행 중</span></td><td class="c-act"><a class="btn" href="#detail">상세</a></td></tr>
+          <tr><td data-label="접수일">샘플 날짜</td><td data-label="사용자">샘플닉네임B</td><td class="c-title">샘플 결제 #2</td><td class="c-tag"><span class="tag">승인</span></td><td data-label="정산"><span class="tag">마감</span></td><td class="c-act"><a class="btn" href="#detail">상세</a></td></tr>
+          <tr><td data-label="접수일">샘플 날짜</td><td data-label="사용자">샘플닉네임C</td><td class="c-title">샘플 결제 #3</td><td class="c-tag"><span class="tag">거절</span></td><td data-label="정산"><span class="tag">진행 중</span></td><td class="c-act"><a class="btn" href="#detail">상세</a></td></tr>
+        </tbody></table></div>
+
+      <section class="detail stack" id="detail" aria-labelledby="h-d"><h2 id="h-d">상세: 샘플 결제 #<span data-show="s=closed">2</span><span data-show="s=normal|saveerr">1</span></h2>
+        <p>정산 <span class="tag" data-show="s=closed">마감</span><span class="tag" data-show="s=normal|saveerr">진행 중</span></p>
+        <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 사유는 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
+
+        <div class="stack" data-show="s=closed">
+          <div class="notice"><strong>마감된 정산이에요</strong><p>마감된 정산은 덮어쓰지 않고 조정 거래로 남겨요</p></div>
+          <p class="row" style="margin-top:8px"><button class="btn danger" type="button">조정 거래 생성</button></p>
+        </div>
+
+        <form class="stack" id="frm" onsubmit="return false" aria-label="처리 결정" data-show="s=normal|saveerr">
+          <fieldset class="radios"><legend>처리 <span class="muted">필수</span></legend>
+            <label class="check"><input type="radio" name="res" value="ok" checked> 승인</label>
+            <label class="check"><input type="radio" name="res" value="no"> 거절</label></fieldset>
+          <label class="field"><span class="label">사유 <span class="muted">필수</span></span><textarea class="textarea" id="why" rows="4" aria-describedby="why-e"></textarea><span class="err" id="why-e" hidden>사유를 입력해 주세요</span></label>
+          <p class="read-line">담당자 샘플 운영자 · 시각은 저장 시 자동 기록돼요</p>
+          <p class="row"><button class="btn primary" type="button" id="save">결정 저장</button></p>
+          <p role="status" id="saved" class="muted" hidden>저장했어요 (샘플)</p>
+        </form>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  $('save').addEventListener('click', function () {
+    var bad = !$('why').value.trim();
+    $('why-e').hidden = !bad; $('why').setAttribute('aria-invalid', String(bad)); $('saved').hidden = bad;
+    if (bad) $('why').focus();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

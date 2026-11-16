@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로그인·가입 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 440px; margin: 0 auto; padding: 32px 0 80px; }
+  .col form { display: grid; gap: 16px; margin-top: 16px; }
+  .tabs [role="tab"] { flex: 1; padding: 0 8px; }
+  .pw { display: flex; gap: 8px; }
+  .pw .input { flex: 1; min-width: 0; }
+  .check { align-items: flex-start; }
+  .check input { margin-top: 12px; }
+  .check span { padding-top: 10px; }
+</style>
+</head>
+<body data-default="m:login s:normal auth:guest nx:on">
+<!-- 로그인·가입. 소셜 로그인·본인확인 방식은 미결정이라 넣지 않았다. 생년월일·약관·미만 안내 문구는 법무(7-2, 7-3) 확인 전 슬롯이다. 가입 완료는 별도 화면 없이 복귀 화면이나 메인으로 이동한다(이동 후 상단에 "가입했어요" 안내). -->
+<header id="site-header"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>복귀</b>
+    <button data-set="nx:on">보던 화면 있음</button><button data-set="nx:off">직접 진입</button>
+  </div>
+  <div class="group" data-show="m=login"><b>로그인 상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:loading">처리 중</button><button data-set="s:fail">로그인 실패</button><button data-set="s:suspended">계정 정지</button><button data-set="s:net">연결 실패</button>
+  </div>
+  <div class="group" data-show="m=signup"><b>가입 상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:loading">처리 중</button><button data-set="s:missing">필수 누락</button><button data-set="s:dupemail">이메일 중복</button><button data-set="s:dupnick">닉네임 중복</button><button data-set="s:shortpw">비밀번호 짧음</button><button data-set="s:baddate">생년월일 오류</button><button data-set="s:under14">만 14세 미만</button>
+  </div>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-login" tabindex="-1">말씀ON에 오신 걸 환영해요</h1>
+  <p class="muted small" style="margin-top:8px">이 사이트는 말씀ON 시청자 사이트예요. 같은 계정으로 목회자·운영사 사이트에도 로그인하지만 사이트마다 따로 로그인해요.</p>
+
+  <div class="notice" data-show="nx=on" style="margin-top:16px"><strong>로그인하면 보던 화면으로 돌아가요</strong><p class="muted small">돌아갈 화면: <span id="nx-t">메인</span></p></div>
+
+  <div class="tabs" role="tablist" aria-label="로그인 또는 가입" style="margin-top:16px">
+    <button role="tab" data-set="m:login" aria-selected="true">로그인</button>
+    <button role="tab" data-set="m:signup" aria-selected="false">가입하기</button>
+  </div>
+
+  <!-- 로그인 -->
+  <div data-show="m=login">
+    <div class="notice danger" role="alert" data-show="s=fail" style="margin-top:16px"><strong>이메일이나 비밀번호가 맞지 않아요</strong><p class="muted small">다시 확인해 주세요. 계속 안 되면 비밀번호를 다시 설정할 수 있어요.</p></div>
+    <div class="notice danger" role="alert" data-show="s=net" style="margin-top:16px"><strong>연결이 불안정해요</strong><p class="muted small">잠시 후 다시 시도해 주세요. 입력한 내용은 그대로 있어요.</p></div>
+    <div class="notice danger" role="alert" data-show="s=suspended" style="margin-top:16px"><strong>이용이 제한된 계정이에요</strong><p class="muted small">사유와 이의제기 방법은 안내 화면에서 볼 수 있어요.</p><p><a class="btn" href="#" style="margin-top:8px">제한 안내와 이의제기</a></p></div>
+    <form onsubmit="return false" data-show="s=normal|loading|fail|net">
+      <label class="field"><span class="label">이메일</span><input class="input" type="email" autocomplete="email" inputmode="email" value="sample@example.com"></label>
+      <div class="field"><label class="label" for="pw1">비밀번호</label><div class="pw"><input class="input" id="pw1" type="password" autocomplete="current-password" value="password1"><button class="btn" type="button" data-toggle aria-pressed="false" data-on="숨기기" data-off="보기">보기</button></div></div>
+      <button class="btn primary" type="submit" data-show="s=normal|fail|net">로그인</button>
+      <button class="btn primary" type="submit" disabled aria-busy="true" data-show="s=loading">로그인하는 중</button>
+      <p class="small" style="text-align:center"><a href="#">비밀번호를 잊었어요</a></p>
+    </form>
+  </div>
+
+  <!-- 가입 -->
+  <div data-show="m=signup">
+    <div class="notice danger" role="alert" data-show="s=missing" style="margin-top:16px"><strong>입력을 확인해 주세요 (3곳)</strong></div>
+    <div class="notice danger" role="alert" data-show="s=under14" style="margin-top:16px"><strong>만 14세 미만은 가입할 수 없어요</strong><p class="muted small"><span class="slot">미만 안내 문구 [법무 7-2 확인 전]</span></p></div>
+    <form onsubmit="return false">
+      <div class="field"><label class="label" for="em">이메일</label><input class="input" id="em" type="email" autocomplete="email" inputmode="email" data-inv="dupemail" data-err="e-em">
+        <p class="err" id="e-em" role="alert" data-show="m=signup s=dupemail">이미 가입한 이메일이에요 <button class="btn" type="button" data-set="m:login" style="min-height:44px;margin-left:8px">로그인하기</button></p></div>
+      <div class="field"><label class="label" for="pw2">비밀번호</label><div class="pw"><input class="input" id="pw2" type="password" autocomplete="new-password" data-inv="shortpw" data-err="e-pw"><button class="btn" type="button" data-toggle aria-pressed="false" data-on="숨기기" data-off="보기">보기</button></div>
+        <p class="help">8자 이상</p><p class="err" id="e-pw" data-show="s=shortpw">비밀번호는 8자 이상이어야 해요.</p></div>
+      <div class="field"><label class="label" for="nk">닉네임</label><input class="input" id="nk" type="text" autocomplete="nickname" data-inv="missing dupnick" data-err="e-nk">
+        <p class="help">채팅과 댓글에 이 이름이 보여요. 실명을 쓰지 않아도 돼요.</p>
+        <p class="err" id="e-nk" data-show="s=missing">닉네임을 입력해 주세요.</p><p class="err" id="e-nk2" data-show="s=dupnick">이미 쓰고 있는 닉네임이에요.</p></div>
+      <div class="field"><label class="label" for="bd">생년월일</label><input class="input" id="bd" type="date" autocomplete="bday" data-inv="missing baddate under14" data-err="e-bd">
+        <p class="help"><span class="slot">생년월일 사용 목적 [법무 7-2 확인 전]</span></p>
+        <p class="help">만 19세 미만은 시청·구독·채팅·댓글은 되지만 충전·후원은 할 수 없어요. <span class="slot">법무 7-2 확인 전</span></p>
+        <p class="err" id="e-bd" data-show="s=missing">생년월일을 입력해 주세요.</p><p class="err" id="e-bd2" data-show="s=baddate">올바른 생년월일을 입력해 주세요. 오늘 이후 날짜는 쓸 수 없어요.</p></div>
+      <div class="field"><label class="check"><input type="checkbox" data-inv="missing" data-err="e-tm"><span><span class="slot">이용약관 동의 [약관 7-3 확인 전]</span> (필수) <a href="#">보기</a></span></label>
+        <p class="err" id="e-tm" data-show="s=missing">이용약관에 동의해 주세요.</p></div>
+      <label class="check"><input type="checkbox"><span><span class="slot">개인정보 처리방침 동의 [법무 7-2 확인 전]</span> (필수) <a href="#">보기</a></span></label>
+      <p class="muted small">시청 이력으로 방송을 추천받는 설정은 가입 뒤 <a href="reco-settings.html">추천 설정</a>에서 바꿀 수 있어요. <span class="slot">추천·시청 이력 수집 동의 방식 [법무 Q15·Q16 회신 후]</span></p>
+      <button class="btn primary" type="submit" data-show="s=normal|missing|dupemail|dupnick|shortpw|baddate|under14">가입하기</button>
+      <button class="btn primary" type="submit" disabled aria-busy="true" data-show="s=loading">가입하는 중</button>
+    </form>
+  </div>
+</div></main>
+<script src="mock.js"></script>
+<script>
+// 목업: 비밀번호 보기/숨기기, 상태별 오류 필드 표시(aria-invalid, aria-describedby), 첫 오류 필드 포커스
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('.pw [data-toggle]');
+  if (t) t.parentNode.querySelector('input').type = t.getAttribute('aria-pressed') === 'true' ? 'text' : 'password';
+});
+function inv(focus) {
+  var s = document.body.dataset.s, first = null;
+  document.querySelectorAll('[data-inv]').forEach(function (i) {
+    var on = document.body.dataset.m === 'signup' && i.dataset.inv.split(' ').indexOf(s) > -1;
+    if (on) { i.setAttribute('aria-invalid', 'true'); i.setAttribute('aria-describedby', i.dataset.err); if (!first) first = i; }
+    else { i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); }
+  });
+  if (focus && first) first.focus();
+}
+document.addEventListener('click', function (e) { if (e.target.closest('[data-set]')) inv(true); });
+inv(false);
+// 목업: ?next= 는 아래 내부 화면만 허용하고 그 외·없음은 main. 로그인 성공 상태(정상·처리 중 제외)에서만 이동한다.
+var NX = { 'main.html': '메인', 'activity.html': '내 활동', 'my.html': 'MY', 'favorites.html': '즐겨찾기', 'history.html': '내 후원·결제 내역', 'reco-settings.html': '추천 설정', 'reports.html': '내 신고', 'inquiry.html': '문의하기', 'withdraw.html': '탈퇴', 'live.html': '라이브 시청', 'channel.html': '방송국', 'subscriptions.html': '구독', 'upcoming.html': '예정 방송', 'notifications.html': '알림', 'charge.html': '열매 충전', 'search.html': '검색', 'videos.html': '다시보기', 'live-all.html': '라이브 전체 보기' };
+var nxv = new URLSearchParams(location.search).get('next');
+var nxf = Object.prototype.hasOwnProperty.call(NX, nxv) ? nxv : 'main.html';
+document.getElementById('nx-t').textContent = NX[nxf];
+document.querySelector('[data-show="m=login"] form').addEventListener('submit', function () {
+  if (document.body.dataset.s === 'normal') location.href = nxf;
+});
+</script>
+</body>
+</html>

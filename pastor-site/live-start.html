@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>라이브 시작 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal sig:before mode:normal send:browser k:none cont:0">
+<!-- 라이브 시작(PC). 사용자 결정 전: 제한 중 방송 가능 여부, 관리자 부분 부여(시작만·키만·TTS만), 예배 중 후원 메시지 처리 방식, 송출 중 화면·PC 나란히 보기(다음 묶음), 모바일 웹 안내 문구 -->
+<header id="site-header" data-active="live"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b>
+    <button data-set="s:normal">정상 대기</button><button data-set="s:loading">로딩</button><button data-set="s:denied">권한 거부</button><button data-set="s:nocam">카메라 없음</button><button data-set="s:keyerr">키 불러오기 실패</button><button data-set="s:limited">방송국 제한</button><button data-set="s:mobile">모바일 웹</button><button data-set="s:suspended">방송국 정지</button><button data-set="s:closed">방송국 폐쇄</button><button data-set="s:unsupported">브라우저 미지원</button><button data-set="s:titlerej">제목 서버 거절</button>
+  </div>
+  <div class="group"><b>송출 상태</b>
+    <button data-set="sig:before">방송 전</button><button data-set="sig:starting">서버 확인 중</button><button data-set="sig:startfail">시작 실패</button><button data-set="sig:timeout">시간 초과</button><button data-set="sig:wait">신호 기다리는 중</button><button data-set="sig:got">신호 받음</button><button data-set="sig:on">방송 중</button><button data-set="sig:cut">끊김</button><button data-set="sig:recon">재연결 중</button>
+  </div>
+  <div class="group"><b>방송 모드</b><button data-set="mode:normal">일반</button><button data-set="mode:worship">예배</button><b>송출</b><button data-set="send:browser">브라우저</button><button data-set="send:obs">OBS</button></div>
+  <div class="group"><b>스트림 키</b><button data-set="k:none">기본</button><button data-set="k:ok">재발급 성공</button><button data-set="k:fail">재발급 실패</button><button data-set="k:copied">복사 완료</button></div>
+  <p class="muted">사용자 결정 전: 제한 중 방송 가능 여부, 관리자 부분 부여(시작만·키만·TTS만), 예배 중 후원 메시지 처리 방식, 송출 중 화면·PC 나란히 보기(다음 묶음), 모바일 웹 안내 문구. 송출 상태는 실제 서버 확인 대신 목업 버튼으로 바꿔요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 관리자 이상만 쓸 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<section class="notice" role="alert" data-show="role=adm0"><strong>권한이 없어요</strong><p class="small">라이브 시작과 스트림 키는 소유자가 권한을 주면 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn" href="dashboard.html">대시보드로 가기</a></p></section>
+<section data-show="role=owner|admall s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:200px"></div></section>
+
+<section data-show="role=owner|admall s=mobile"><div class="notice"><p><span class="slot">휴대폰 라이브 안내 문구 확정 필요</span></p><p style="margin-top:8px"><a class="btn primary" href="upload.html">영상 올리기</a></p></div></section>
+
+<div class="stack" data-show="role=owner|admall s=normal|denied|nocam|keyerr|limited|suspended|closed|unsupported|titlerej">
+<div class="notice statusline" role="status">
+  <strong data-show="sig=before">방송 전</strong><strong data-show="sig=wait">송출 신호를 기다리는 중</strong><strong data-show="sig=got">신호를 받았어요 (서버 확인)</strong><strong data-show="sig=starting">서버 확인 중</strong><strong data-show="sig=startfail">방송을 시작하지 못했어요</strong><strong data-show="sig=timeout">서버 확인이 오래 걸려요</strong><strong data-show="sig=on">방송 중</strong><strong data-show="sig=cut">끊겼어요</strong><strong data-show="sig=recon">다시 연결하는 중</strong>
+  <span class="small muted" data-show="sig=starting">서버가 확인한 뒤에 "방송 중"으로 바뀌어요.</span>
+  <span class="small" data-show="sig=startfail|timeout"><button class="btn" type="button" id="retry-start" data-icon="retry" data-keep>다시 시도</button></span>
+  <span class="small" data-show="sig=cut">연결을 확인하고 다시 송출해 주세요.</span>
+  <span class="small muted" data-show="sig=recon">잠시 기다려 주세요. 연결되면 방송 중으로 돌아가요.</span>
+</div>
+<div class="notice danger" role="alert" data-show="s=limited"><strong>방송국이 제한 중이에요</strong><p>제한 중 방송 가능 여부: <span class="slot">정책 확정 전</span></p></div>
+<div class="notice danger" role="alert" data-show="s=suspended"><strong>방송국이 정지되었어요</strong><p>정지 중에는 방송을 시작할 수 없어요. 사유와 이의제기 방법은 알림에서 볼 수 있어요.</p></div>
+<div class="notice danger" role="alert" data-show="s=closed"><strong>방송국이 폐쇄되었어요</strong><p>폐쇄된 방송국에서는 방송을 시작할 수 없어요.</p></div>
+<div class="two">
+  <form class="stack" id="setf" onsubmit="return false" aria-label="방송 설정">
+    <p class="help" data-show="sig=starting|on|cut|recon">방송 중에는 설정을 바꿀 수 없어요. 방송 모드만 일반→예배로 바꿀 수 있어요.</p>
+    <h2>방송 설정</h2>
+    <label class="field"><span class="label">제목 (필수)</span><input class="input" id="ttl" placeholder="방송 제목" aria-describedby="why"><span class="err" role="alert" data-show="s=titlerej">제목에 계좌번호·연락처·외부 결제 링크처럼 보이는 내용이 있어 시작하지 못했어요. 고쳐서 다시 시도해 주세요.</span></label>
+    <label class="field"><span class="label">카테고리 (필수)</span><select class="input" id="cat"><option>설교</option><option>예배</option><option>강해</option><option>찬양</option></select><span class="help">마지막으로 쓴 값이에요</span></label>
+    <label class="field"><span class="label">공개 범위</span><select class="input"><option>전체 공개</option><option>링크 공개</option><option>비공개</option></select></label>
+    <fieldset class="pick" style="border:0;padding:0;margin:16px 0 0"><legend class="label" style="font-weight:700;margin-bottom:6px">방송 모드</legend>
+      <label><input type="radio" name="mode" value="normal" data-m="normal" checked><span><span class="t">일반 방송</span><span class="small muted">채팅과 음성(TTS)을 쓸 수 있어요</span></span></label>
+      <label><input type="radio" name="mode" value="worship" data-m="worship"><span><span class="t">예배 방송</span><span class="small muted">카테고리가 '예배'면 기본 선택돼요</span></span></label>
+    </fieldset>
+    <p class="help">방송 중에는 일반→예배로만 바꿀 수 있어요.</p>
+    <div class="notice" data-show="mode=worship"><p>예배 방송에서는 음성(TTS)으로 읽지 않아요. 켤 수 없어요.</p></div>
+    <label class="check" data-show="mode=worship"><input type="checkbox" disabled><span>음성(TTS) · 예배 방송에서는 켤 수 없어요</span></label>
+    <label class="check" data-show="mode=normal"><input type="checkbox" id="tts" checked><span>음성(TTS) 사용</span></label>
+    <p class="help err-no" data-show="mode=normal role=adm0">TTS 제어는 소유자만 사용할 수 있어요</p>
+    <fieldset style="border:0;padding:0;margin:16px 0 0"><legend class="label" style="font-weight:700">채팅</legend>
+      <label class="check"><input type="radio" name="chat" id="chat-o"><span>열기</span></label><label class="check"><input type="radio" name="chat" id="chat-c"><span>닫기</span></label>
+      <p class="help">일반은 열림, 예배는 닫힘이 기본이에요. 예배 방송도 방송 시작 전에 "열기"를 고를 수 있어요.</p></fieldset>
+    <p class="help">예배 중 후원 메시지 처리: <span class="slot">방송 설정에서 확정 예정</span></p>
+  </form>
+  <div class="stack">
+    <h2>송출 방식</h2>
+    <fieldset class="pick" id="sendf" style="border:0;padding:0;margin:0"><legend class="sr">송출 방식</legend>
+      <label><input type="radio" name="send" data-s="browser" checked><span><span class="t">이 컴퓨터로 바로 방송</span><span class="small muted">카메라와 마이크를 써요</span></span></label>
+      <label><input type="radio" name="send" data-s="obs"><span><span class="t">OBS 등 외부 프로그램</span><span class="small muted">서버 주소와 키를 입력해요</span></span></label>
+    </fieldset>
+    <div class="stack" data-show="send=browser s=normal|limited|keyerr|suspended|closed|titlerej">
+      <p>카메라와 마이크를 사용해요. [계속]을 누르면 허용 창이 떠요.</p>
+      <p data-show="cont=0"><button class="btn" type="button" id="cont">계속</button></p>
+      <div id="pv" hidden class="stack" data-show="cont=1"><div class="preview"><p>카메라 미리보기<br><span class="small">아직 방송 전이에요. 시청자에게 보이지 않아요.</span></p></div>
+        <p>마이크 <progress value="60" max="100" aria-label="마이크 소리 크기"></progress> <strong>소리가 들어와요</strong> <span class="muted small">(안 들어오면 "소리가 안 들어와요"로 표시돼요)</span></p>
+        <div class="row"><label class="field"><span class="label">카메라</span><select class="input"><option>기본 카메라</option></select></label><label class="field"><span class="label">마이크</span><select class="input"><option>기본 마이크</option></select></label></div></div>
+    </div>
+    <div class="notice danger" role="alert" data-show="send=browser s=denied"><strong>카메라와 마이크 권한이 필요해요</strong><p>브라우저 주소창의 자물쇠에서 허용으로 바꾼 뒤 다시 시도해 주세요.</p><p class="row" style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button><button class="btn" data-set="send:obs">OBS로 송출</button></p></div>
+    <div class="notice danger" role="alert" data-show="send=browser s=unsupported"><strong>이 브라우저에서는 바로 방송할 수 없어요</strong><p>다른 브라우저를 쓰거나 OBS 등 외부 프로그램으로 송출해 주세요.</p><p style="margin-top:8px"><button class="btn" data-set="send:obs">OBS로 송출</button></p></div>
+    <div class="notice danger" role="alert" data-show="send=browser s=nocam"><strong>카메라를 찾을 수 없어요</strong><p>다른 앱이 쓰고 있는지 확인해 주세요.</p><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <div class="stack" data-show="send=obs s=normal|denied|nocam|limited|suspended|closed|unsupported|titlerej">
+      <label class="field"><span class="label">서버 주소</span><span class="row"><input class="input" style="flex:1" readonly value="rtmp://sample.example/live"><button class="btn" type="button" data-icon="copy" data-label="서버 주소 복사"></button></span></label>
+      <div class="field"><span class="label" id="kl">스트림 키</span><span class="row"><input class="input" style="flex:1" id="key" type="password" readonly value="샘플키값" aria-labelledby="kl"><button class="btn" type="button" id="keyshow" data-keyok>보기</button><button class="btn" type="button" data-keyok id="keycopy" data-icon="copy" data-label="스트림 키 복사"></button><button class="btn" type="button" data-keyok data-open="rk-dlg">재발급</button></span>
+        <p class="help">키가 노출되면 다른 사람이 방송할 수 있어요. 남에게 보여 주지 마세요.</p>
+        <p class="help" data-show="sig=on|cut|recon">방송 중에는 재발급할 수 없어요.</p>
+        <p class="help" role="status" data-show="k=ok">새 키를 만들었어요. 이전 키는 더 이상 쓸 수 없어요. OBS 설정을 바꿔 주세요.</p>
+        <p class="err" role="alert" data-show="k=fail">키를 재발급하지 못했어요. 이전 키는 그대로 써요. 잠시 뒤 다시 시도해 주세요.</p>
+        <p class="help" role="status" data-show="k=copied">복사했어요.</p>
+        <p class="help" data-show="role=adm0">소유자만 사용할 수 있어요</p></div>
+    </div>
+    <div class="notice danger" role="alert" data-show="send=obs s=keyerr"><strong>스트림 키를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+  </div>
+</div>
+<div class="sticky-bar">
+  <p class="muted small" id="sum" aria-live="polite"></p>
+  <p class="row"><button class="btn primary" type="button" id="start" aria-describedby="why">방송 시작</button><button class="btn" type="button" id="stop" hidden>방송 종료</button></p>
+  <p class="help" id="why"></p>
+</div>
+</div>
+</div></main>
+<dialog id="rk-dlg" aria-labelledby="rk-t"><h2 id="rk-t">스트림 키 재발급</h2>
+  <p style="margin-top:8px">재발급하면 이전 키로는 방송할 수 없어요. OBS의 설정도 바꿔야 해요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>취소</button><button class="btn" type="button" id="rk-ok" data-close>재발급</button></div>
+</dialog>
+<dialog id="end-dlg" aria-labelledby="end-t"><h2 id="end-t">방송을 종료할까요?</h2>
+  <p style="margin-top:8px">종료하면 시청자 화면에서 방송이 끝나요. 자동 녹화 영상은 처리 뒤 권리 확인을 마쳐야 공개할 수 있어요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>계속 방송</button><button class="btn" type="button" id="end-ok" data-close>방송 종료</button></div>
+</dialog>
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); }, tm, lastMode, chatOpen;
+  document.addEventListener('change', function (e) { if (e.target.name === 'chat') chatOpen = e.target.id === 'chat-o'; });
+  window.mockAfter = function () {
+    var d = b.dataset, can = d.role === 'owner' || d.role === 'admall', worship = d.mode === 'worship';
+    var live = /^(on|cut|recon)$/.test(d.sig), lock = live || d.sig === 'starting';
+    document.querySelectorAll('input[name=mode]').forEach(function (r) { r.checked = r.dataset.m === d.mode; r.disabled = lock && !(r.dataset.m === 'worship' && !worship && live); });
+    document.querySelectorAll('input[name=send]').forEach(function (r) { r.checked = r.dataset.s === d.send; r.disabled = lock; });
+    // 모드가 바뀌면 채팅 기본값(일반 열림·예배 닫힘)으로 되돌리고, 그 뒤 수동 선택은 유지
+    if (d.mode !== lastMode) { chatOpen = !worship; lastMode = d.mode; }
+    $('chat-o').checked = chatOpen; $('chat-c').checked = !chatOpen;
+    $('chat-o').disabled = $('chat-c').disabled = lock;
+    ['ttl', 'cat'].forEach(function (i) { $(i).disabled = lock; });
+    document.querySelector('#setf select:not(#cat)').disabled = lock;
+    $('tts').disabled = d.role === 'adm0' || lock;
+    document.querySelectorAll('[data-keyok]').forEach(function (k) { k.disabled = !can || (live && k.dataset.open); });
+    var t = $('ttl').value.trim(), why = '';
+    if (!can) why = '소유자만 사용할 수 있어요';
+    else if (d.s === 'suspended') why = '방송국이 정지되어 시작할 수 없어요';
+    else if (d.s === 'closed') why = '방송국이 폐쇄되어 시작할 수 없어요';
+    else if (d.s === 'limited') why = '방송국 제한 중 · 방송 가능 여부 <span class="slot">정책 확정 전</span>';
+    else if (!t) why = '제목을 입력해 주세요';
+    else if (d.send === 'obs' && !/^(got|startfail|timeout)$/.test(d.sig)) why = '송출 신호를 기다리는 중이에요';
+    else if (d.send === 'browser' && (d.s === 'denied' || d.s === 'nocam' || d.s === 'unsupported')) why = '카메라와 마이크를 쓸 수 있어야 시작할 수 있어요';
+    else if (d.send === 'browser' && d.cont !== '1') why = '[계속]을 눌러 카메라와 마이크를 확인해 주세요';
+    $('start').disabled = !!why || d.sig === 'starting'; $('why').innerHTML = why; $('why').hidden = !why;
+    $('start').textContent = d.sig === 'starting' ? '서버 확인 중' : '방송 시작';
+    $('start').hidden = live; $('stop').hidden = !live; $('stop').disabled = !can;
+    if (live) { $('why').hidden = can; $('why').textContent = '소유자만 사용할 수 있어요'; }
+    $('sum').textContent = (worship ? '예배 방송' : '일반 방송') + ' · 채팅 ' + (worship ? '닫힘' : '열림') + ' · TTS ' + (worship || !$('tts').checked ? '꺼짐' : '켜짐') + ' · ' + document.querySelector('#setf select:not(#cat)').value;
+  };
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.name === 'mode') b.dataset.mode = t.dataset.m; if (t.name === 'send') b.dataset.send = t.dataset.s;
+    if (t.id === 'cat') { b.dataset.mode = t.value === '예배' ? 'worship' : b.dataset.mode; }
+    window.mockRender();
+  });
+  function start() { b.dataset.sig = 'starting'; window.mockRender(); clearTimeout(tm); tm = setTimeout(function () { if (b.dataset.sig === 'starting') { b.dataset.sig = 'on'; location.href = 'live-control.html?role=' + b.dataset.role + '&mode=' + b.dataset.mode + '&send=' + b.dataset.send; } }, 1500); } // 목업: 1.5초 뒤 서버 확인된 것으로 가정하고 live-control로 이동
+  $('ttl').addEventListener('input', window.mockRender);
+  $('start').onclick = start;
+  $('retry-start').onclick = start;
+  $('stop').onclick = function () { $('end-dlg').showModal(); };
+  $('end-ok').addEventListener('click', function () { b.dataset.sig = 'before'; window.mockRender(); });
+  $('rk-ok').addEventListener('click', function () { b.dataset.k = 'ok'; window.mockRender(); });
+  $('keycopy').addEventListener('click', function () { b.dataset.k = 'copied'; window.mockRender(); });
+  $('cont').onclick = function () { b.dataset.cont = '1'; window.mockRender(); };
+  $('keyshow').onclick = function () { var k = $('key'), s = k.type === 'password'; k.type = s ? 'text' : 'password'; this.textContent = s ? '숨기기' : '보기'; };
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

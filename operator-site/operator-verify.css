@@ -1,0 +1,39 @@
+/* 심사·환불 전용 (신규 색 토큰 없음) */
+.doc-box { min-height: 160px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-sub); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px; text-align: center; }
+.doc-box svg { width: 32px; height: 32px; stroke: var(--muted); fill: none; stroke-width: 2; }
+.read-line { padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-sub); }
+.radios { display: flex; flex-wrap: wrap; gap: 4px 24px; border: 0; padding: 0; margin: 0; }
+.radios legend { font-weight: 700; margin-bottom: 6px; padding: 0; }
+.check input[type="radio"] { width: 24px; height: 24px; accent-color: var(--strong); }
+.detail { border-top: 1px solid var(--line); padding-top: 24px; }
+
+/* 모바일 (1023 이하): 카드 표 — 제목 칸 + 상태 .tag 한 줄, 나머지 라벨 줄, 버튼 전체 폭 */
+.help.why { margin: 0 0 6px; }
+@media (max-width: 1023px) {
+  .tbl-wrap.cards.v tr { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; }
+  .tbl-wrap.cards.v td { order: 3; }
+  .tbl-wrap.cards.v td.c-title { order: 1; width: auto; flex: 1 1 0; font-weight: 700; overflow-wrap: anywhere; }
+  .tbl-wrap.cards.v td.c-tag { order: 2; width: auto; flex: none; margin-left: auto; }
+  .tbl-wrap.cards.v td.c-act { order: 9; }
+  .tbl-wrap.cards.v td.c-act .help { margin: 0 0 6px; }
+  .tabs [role="tab"] { flex: 1 1 0; padding: 0 8px; white-space: nowrap; }
+  .radios { flex-direction: column; }
+  .radios .check { min-height: var(--tap); }
+  .doc-box { padding: 16px; }
+  .doc-box img { max-width: 100%; }
+  .doc-box .btn, .detail .row .btn.primary, .detail .row .btn.danger { width: 100%; min-height: var(--tap); }
+  /* 열람 기록 3열 표는 카드화하지 않고 줄바꿈으로 */
+  .tbl-wrap:not(.cards) table { min-width: 0; width: 100%; }
+  .tbl-wrap:not(.cards) { overflow-x: visible; }
+  .tbl-wrap:not(.cards) th, .tbl-wrap:not(.cards) td { overflow-wrap: anywhere; padding-left: 8px; padding-right: 8px; }
+}
+
+/* 심사·이의제기 목록 카드: 2행에 보조 칸(.c-meta)을 한 줄로, 조치 종류(.c-kind)가 먼저 */
+.c-note { display: block; }
+@media (max-width: 1023px) {
+  .tbl-wrap.cards.v tr[hidden] { display: none; }
+  .tbl-wrap.cards.v td.c-meta { order: 4; width: auto; color: var(--muted); }
+  .tbl-wrap.cards.v td.c-meta::before { display: none; }
+  .tbl-wrap.cards.v td.c-kind { order: 3; }
+  .tbl-wrap.cards.v td.c-act .btn { display: flex; align-items: center; justify-content: center; }
+}

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>현황 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner t:sub s:normal range:default pub:on dlg:closed">
+<!-- 현황(DESIGN-REMAINING 2묶음). 숫자·기간·날짜·열매 수량은 슬롯. 원화 환산·수수료 없음. 후원 탭은 소유자만 -->
+<header id="site-header" data-active="stats"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>탭</b><button data-set="t:sub">구독·즐겨찾기</button><button data-set="t:don">후원 내역</button></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:f0">필터 결과 0건</button><button data-set="s:loading">로딩</button><button data-set="s:partial">부분 실패</button><button data-set="s:loaderr">전체 실패</button></div>
+  <div class="group"><b>기간</b><button data-set="range:default">기본</button><button data-set="range:narrow">결과 없는 기간</button><b>구독자 수 공개</b><button data-set="pub:on">켜짐</button><button data-set="pub:off">꺼짐</button><button data-set="pub:saveerr">저장 실패</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:msg">메시지 전문</button></div>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 닉네임·메시지·콘텐츠 이름은 모두 샘플이에요. 필터 결과 0건은 후원 탭에서만 보여요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 관리자 이상만 쓸 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<div class="stack" data-show="role=owner|adm0|admall">
+<div class="mem-head"><h1>현황</h1></div>
+<div class="tabs" role="tablist" aria-label="현황 구분">
+  <button role="tab" type="button" id="tb-sub" aria-selected="true" aria-controls="p-sub" data-t="sub">구독·즐겨찾기</button>
+  <button role="tab" type="button" id="tb-don" aria-selected="false" aria-controls="p-don" data-t="don" tabindex="-1">후원 내역</button>
+</div>
+
+<section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>현황을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="s=partial"><strong>일부 내용을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+
+<!-- 구독·즐겨찾기 탭 -->
+<section class="stack" id="p-sub" role="tabpanel" aria-labelledby="tb-sub" data-show="t=sub s=normal|partial|f0|empty">
+  <div class="empty" data-show="s=empty"><p><strong>아직 구독자가 없어요</strong></p><p>방송을 하거나 영상을 올리면 시청자가 구독할 수 있어요.</p><div class="row" style="justify-content:center"><a class="btn primary" href="live-start.html" data-show="role=owner|admall">라이브 시작</a><a class="btn" href="upload.html">영상 올리기</a></div></div>
+  <div class="stack" data-show="s=normal|partial|f0">
+    <div class="hide-m"><fieldset class="fgroup"><legend class="label">기간</legend><span class="chips">
+      <button class="chip" type="button" data-r="default" aria-pressed="true"><span class="slot">기간 1</span></button>
+      <button class="chip" type="button" data-r="narrow" aria-pressed="false"><span class="slot">기간 2</span></button></span></fieldset></div>
+    <div class="hide-d blk"><label class="field"><span class="label">기간</span><select class="input" id="rsel"><option value="default">기간 1</option><option value="narrow">기간 2</option></select></label></div>
+    <p class="help">기간 선택지는 정책 값이에요 <span class="slot">기간 옵션</span></p>
+    <div class="empty" data-show="range=narrow"><p><strong>이 기간에 반응이 없어요</strong></p><p><button class="btn" type="button" data-set="range:default">기간 초기화</button></p></div>
+    <div class="stack" data-show="range=default">
+      <div class="stats"><div class="stat"><span class="v"><span class="slot">숫자</span></span><span class="k">구독자</span></div><div class="stat"><span class="v"><span class="slot">숫자</span></span><span class="k">즐겨찾기</span></div></div>
+      <p class="help">구독은 알림과 모아보기예요. 구독했다고 영상을 볼 수 있는 건 아니에요.</p>
+      <h2>콘텐츠별 즐겨찾기</h2>
+      <table class="mem"><caption class="sr">콘텐츠별 즐겨찾기 순위</caption>
+        <thead><tr><th scope="col">순위</th><th scope="col">콘텐츠</th><th scope="col" class="amt">즐겨찾기</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><th scope="row">샘플 설교 영상</th><td class="amt"><span class="slot">숫자</span></td></tr>
+          <tr><td>2</td><th scope="row">샘플 찬양 영상</th><td class="amt"><span class="slot">숫자</span></td></tr>
+          <tr><td>3</td><th scope="row">샘플 강해 영상</th><td class="amt"><span class="slot">숫자</span></td></tr>
+        </tbody></table>
+      <div class="mcards">
+        <div class="mc"><p><strong>1. 샘플 설교 영상</strong></p><p class="small muted">즐겨찾기 <span class="slot">숫자</span></p></div>
+        <div class="mc"><p><strong>2. 샘플 찬양 영상</strong></p><p class="small muted">즐겨찾기 <span class="slot">숫자</span></p></div>
+        <div class="mc"><p><strong>3. 샘플 강해 영상</strong></p><p class="small muted">즐겨찾기 <span class="slot">숫자</span></p></div>
+      </div>
+    </div>
+  </div>
+  <div class="grants" id="pubbox"><label class="check"><span id="pub-l">구독자 수 공개</span><span class="row" style="gap:12px"><span class="gs" id="pub-s">켜짐</span><input type="checkbox" role="switch" id="pub" aria-labelledby="pub-l" aria-describedby="pub-h"></span></label>
+    <p class="help" id="pub-h">시청자에게 구독자 수를 보여 줄지 정해요.</p>
+    <p class="help" role="status" id="pub-ok" hidden>저장했어요</p>
+    <p class="err" role="alert" id="pub-e" hidden>오류: 저장하지 못했어요. 이전 값으로 되돌렸어요</p></div>
+</section>
+
+<!-- 후원 내역 탭 -->
+<section class="stack" id="p-don" role="tabpanel" aria-labelledby="tb-don" data-show="t=don s=normal|partial|f0|empty">
+  <div class="empty" data-show="role=adm0|admall"><p><strong>후원 내역은 소유자만 볼 수 있어요</strong></p></div>
+  <div class="stack" data-show="role=owner">
+    <p class="help">후원 금액은 소유자만 볼 수 있어요</p>
+    <div class="empty" data-show="s=empty"><p><strong>아직 받은 후원이 없어요</strong></p></div>
+    <div class="empty" data-show="s=f0"><p><strong>조건에 맞는 후원이 없어요</strong></p><p><button class="btn" type="button" data-set="s:normal">필터 초기화</button></p></div>
+    <div class="stack" data-show="s=normal|partial">
+      <div class="fbar">
+        <label class="field"><span class="label">콘텐츠·방송</span><select class="input"><option>전체</option><option>샘플 설교 영상</option><option>샘플 예배 방송</option></select></label>
+        <label class="field"><span class="label">정렬</span><select class="input"><option>최근 순</option><option>열매 많은 순</option></select></label>
+      </div>
+      <table class="mem"><caption class="sr">후원 내역</caption>
+        <thead><tr><th scope="col">일시</th><th scope="col">콘텐츠·방송</th><th scope="col">후원자</th><th scope="col" class="amt">열매</th><th scope="col">메시지</th></tr></thead>
+        <tbody id="dtb"></tbody></table>
+      <div class="mcards" id="dcards"></div>
+      <div class="pager"><button class="btn" type="button" disabled>이전</button><span class="small muted"><span class="slot">페이지</span></span><button class="btn" type="button">다음</button></div>
+    </div>
+  </div>
+</section>
+</div>
+</div></main>
+
+<dialog class="sheet" id="m-dlg" aria-labelledby="m-t"><h2 id="m-t">후원 메시지</h2>
+  <div class="stack" style="margin-top:12px">
+    <p class="small muted"><span id="m-who"></span> · <span class="slot">일시</span></p>
+    <p id="m-body" style="white-space:pre-wrap;overflow-wrap:anywhere"></p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>닫기</button></div>
+  </div>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); }, built = false;
+  // 샘플 후원 3건. 익명은 닉네임 대신 태그. 메시지는 텍스트로만 표시
+  var DON = [
+    { c: '샘플 설교 영상', w: '샘플닉네임1', m: '샘플 메시지입니다. 긴 메시지는 목록에서 두 줄까지만 보이고 누르면 전문을 볼 수 있어요. 이어지는 샘플 문장이 계속됩니다.' },
+    { c: '샘플 예배 방송', w: null, m: '짧은 샘플 메시지' },
+    { c: '샘플 설교 영상', w: '샘플닉네임2', m: '' }
+  ];
+  function who(x) { return x.w || '<span class="tag">익명</span>'; }
+  function msg(x, i) { return x.m ? '<button class="linkbtn" type="button" data-m="' + i + '" aria-label="메시지 전문 보기">' + x.m + '</button>' : '<span class="muted">메시지 없음</span>'; }
+  function build() {
+    if (built) return; built = true;
+    $('dtb').innerHTML = DON.map(function (x, i) { return '<tr><td><span class="slot">일시</span></td><td>' + x.c + '</td><td>' + who(x) + '</td><td class="amt"><span class="slot">수량</span></td><td>' + msg(x, i) + '</td></tr>'; }).join('');
+    $('dcards').innerHTML = DON.map(function (x, i) { return '<div class="mc"><p><strong>' + x.c + '</strong></p><p class="small">' + who(x) + ' · 열매 <span class="slot">수량</span></p><p class="small muted"><span class="slot">일시</span></p><p class="small">' + msg(x, i) + '</p></div>'; }).join('');
+  }
+  function vis(e) { return e && e.offsetParent !== null; }
+  window.mockAfter = function () {
+    if (d.role === 'mgr') return;
+    build();
+    ['sub', 'don'].forEach(function (k) { var t = $('tb-' + k), on = d.t === k; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
+    document.querySelectorAll('[data-r]').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.r === d.range)); });
+    $('rsel').value = d.range;
+    var on = d.pub !== 'off', sw = $('pub'); sw.checked = on; $('pub-s').textContent = on ? '켜짐' : '꺼짐';
+    var owner = d.role === 'owner'; sw.disabled = !owner;
+    $('pub-h').textContent = owner ? '시청자에게 구독자 수를 보여 줄지 정해요.' : '소유자만 바꿀 수 있어요';
+    var m = $('m-dlg');
+    if (d.dlg === 'msg' && !m.open) { var o = m._opener || Array.prototype.filter.call(document.querySelectorAll('[data-m]'), vis)[0]; if (!o) { d.dlg = 'closed'; return; } m._opener = o; $('m-who').innerHTML = who(DON[o.dataset.m]); $('m-body').textContent = DON[o.dataset.m].m; m.showModal(); }
+    if (d.dlg === 'closed' && m.open) m.close();
+  };
+  $('m-dlg').addEventListener('close', function () { var o = this._opener; this._opener = null; d.dlg = 'closed'; if (vis(o)) o.focus(); window.mockRender(); });
+  document.addEventListener('click', function (e) {
+    var m = e.target.closest('[data-m]'), r = e.target.closest('[data-r]'), t = e.target.closest('.tabs [data-t]');
+    if (m) { $('m-dlg')._opener = m; d.dlg = 'msg'; window.mockRender(); }
+    if (r) { d.range = r.dataset.r; window.mockRender(); document.querySelector('[data-r="' + d.range + '"]').focus(); }
+    if (t) { d.t = t.dataset.t; window.mockRender(); t.focus(); }
+  });
+  document.querySelector('.tabs').addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    d.t = d.t === 'sub' ? 'don' : 'sub'; window.mockRender(); $('tb-' + d.t).focus();
+  });
+  $('rsel').addEventListener('change', function () { d.range = this.value; window.mockRender(); $('rsel').focus(); });
+  $('pub').addEventListener('change', function () {
+    $('pub-ok').hidden = $('pub-e').hidden = true;
+    if (d.pub === 'saveerr') { $('pub-e').hidden = false; this.checked = true; return; } // 실패: 값 원복
+    d.pub = this.checked ? 'on' : 'off'; window.mockRender(); $('pub-ok').hidden = false;
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

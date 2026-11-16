@@ -1,0 +1,65 @@
+/* 파트너·감사 로그 전용 (신규 색 토큰 없음) */
+.op-main .filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; }
+.op-main .filters .field { flex: 0 0 auto; }
+.op-main hr.sep { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+.diff td, .diff th { padding: 6px 14px; }
+.diff .chg::after { content: " 변경"; font-weight: 700; }
+tr.detail > td { background: var(--bg-sub); }
+.op-main .tbl-wrap td .btn, .op-main .tbl-wrap td .linkbtn { min-height: var(--tap); }
+/* 모바일: 행 머리(th)는 카드 제목, 감사 로그 전후 보기 details */
+@media (max-width: 1023px) {
+  .op-main .filters { flex-direction: column; align-items: stretch; }
+  .op-main .filters .field { flex: none; }
+  .op-main .filters .btn { width: 100%; min-height: var(--tap); }
+  .tbl-wrap.cards > table > tbody > tr > th[scope="row"] { display: block; width: 100%; border: 0; padding: 0; background: none; font-size: 1rem; font-weight: 700; }
+  .tbl-wrap.cards td .tag { margin-left: 0; }
+  .tbl-wrap.cards details summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; text-decoration: underline; }
+  .tbl-wrap.cards details .tbl-wrap { margin-top: 8px; }
+  /* 전후 표는 카드 규칙에서 제외(3열 비교표 유지) */
+  .tbl-wrap.cards details .tbl-wrap { border: 1px solid var(--line); overflow-x: auto; }
+  .tbl-wrap.cards details table.diff { display: table; width: 100%; min-width: 0; }
+  .tbl-wrap.cards details table.diff thead { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: table-header-group; }
+  .tbl-wrap.cards details table.diff tbody { display: table-row-group; }
+  .tbl-wrap.cards details table.diff tr { display: table-row; border: 0; padding: 0; }
+  .tbl-wrap.cards details table.diff td, .tbl-wrap.cards details table.diff th { display: table-cell; width: auto; padding: 6px 14px; }
+}
+
+/* ---- VOD 재처리·금칙어 관리 (신규 색 토큰 없음). 아래 5줄은 operator-reports.css와 같은 규칙:
+   그 파일의 모바일 카드 규칙이 신고 표 전용이라 두 화면은 그 파일을 불러오지 않는다 ---- */
+.lock-row td { color: var(--muted); }
+.lock-row .tag { color: var(--text); }
+.quote { background: var(--bg-sub); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 0; }
+.radios { border: 0; padding: 0; margin: 0; }
+.radios legend { font-weight: 700; margin-bottom: 4px; }
+.ro { padding: 10px 14px; background: var(--bg-sub); border-radius: var(--radius); }
+.m-only { display: none; }
+.off-row th .slot, .off-row td { color: var(--muted); }
+.off-row .tag, .off-row .btn:not(:disabled) { color: var(--text); }
+.acts-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+dialog .item { display: block; padding: 12px 0; }
+dialog .stack > fieldset { min-width: 0; }
+dialog .textarea, dialog select.input { font-size: 1rem; }
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1024px) { .acts-row { flex-wrap: nowrap; } }
+@media (max-width: 1023px) {
+  .m-only { display: block; }
+  .op-main .mfull { width: 100%; }
+  .op-main .filters .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* 카드: 1행 제목+상태 / 2행 muted 묶음(· 구분) / 3행 한 줄 / 버튼 */
+  .tbl-wrap.cards.k > table > tbody > tr { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; }
+  .tbl-wrap.cards.k tr > td { width: auto; }
+  .tbl-wrap.cards.k tr > td::before { display: none !important; }
+  .tbl-wrap.cards.k > table > tbody > tr > .c-t { order: 1; flex: 1 1 60%; width: auto; min-width: 0; font-weight: 700; font-size: 1.05rem; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .tbl-wrap.cards.k > table > tbody > tr::after { content: ""; order: 3; flex: 1 0 100%; height: 0; } /* 제목·상태 행과 메타 행 분리 */
+  .tbl-wrap.cards.k tr > .c-s { order: 2; flex: none; }
+  .tbl-wrap.cards.k tr > .c-s .tag { margin-right: 0; }
+  .tbl-wrap.cards.k tr > .c-m { order: 4; font-size: .9rem; color: var(--muted); }
+  .tbl-wrap.cards.k tr > .c-m.c-dot::before { display: inline !important; content: "· "; }
+  .tbl-wrap.cards.k tr > .c-m.c-last { order: 5; }
+  .tbl-wrap.cards.k tr > .c-w { order: 6; width: 100%; font-size: .9rem; color: var(--muted); }
+  .tbl-wrap.cards.k tr > .c-w br { display: none; }
+  .tbl-wrap.cards.k tr > .c-a { order: 7; width: 100%; margin-top: 8px; }
+  .tbl-wrap.cards.k .acts-row .btn { flex: 1 1 0; width: auto; padding: 0 12px; }
+  .tbl-wrap.cards.k .acts-row .btn.bad, .tbl-wrap.cards.k .acts-row .help { flex: 1 1 100%; margin-top: 0; }
+  .tbl-wrap.cards.k .acts-row .btn.bad { order: 9; }
+}

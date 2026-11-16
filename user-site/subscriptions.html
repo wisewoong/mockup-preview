@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구독 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>.col { max-width: 880px; margin: 0 auto; padding: 24px 0 64px; } .item .act { display: flex; gap: 8px; align-items: center; }</style>
+</head>
+<body data-default="s:normal">
+<!-- 프로필 이미지는 Unsplash 무료 사진(img/). mock: 방송국, 목회자, 구독자 수는 샘플 값이다. -->
+<header id="site-header" data-active="subs"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:empty">구독 없음</button><button data-set="s:guest">비로그인</button><button data-set="s:loading">로딩</button><button data-set="s:error">오류</button><button data-set="s:unsubscribing">해제 중</button><button data-set="s:unfail">해제 실패</button></div>
+  <p class="muted">헤더 메뉴 구성은 제안이에요. 구독자 수 비공개 방송국과 방송국 상태 표시 슬롯은 정상 목록 안에 한 건씩 있어요. 구독 해제 버튼을 눌러 확인 대화상자를 볼 수 있어요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-subs" tabindex="-1">구독</h1>
+
+  <div data-show="s=normal|unsubscribing|unfail">
+    <p class="muted" id="cnt">구독 중 <span id="n">3</span></p>
+    <p class="sr" role="status" id="live"></p>
+    <div id="list" style="margin-top:8px">
+      <div class="item" data-name="샘물교회 이정훈 목사">
+        <img class="av" src="../portraits/men/65.jpg" alt="">
+        <a class="name" href="channel.html"><strong>샘물교회 이정훈 목사</strong><br><span class="muted small">성경공부 · <strong>구독 2,418명</strong></span></a>
+        <div class="act"><button class="btn unsub" data-show="s=normal|unfail">구독 해제</button><button class="btn" disabled data-show="s=unsubscribing">해제 중</button></div>
+        <p class="err alert" role="alert" data-show="s=unfail">구독을 해제하지 못했어요. 다시 시도해 주세요.</p>
+      </div>
+      <div class="item" data-name="은혜교회 박성민 목사">
+        <img class="av" src="../portraits/men/75.jpg" alt="">
+        <a class="name" href="channel.html"><strong>은혜교회 박성민 목사</strong><br><span class="muted small">예배</span></a>
+        <div class="act"><button class="btn unsub">구독 해제</button></div>
+      </div>
+      <div class="item" data-name="새벽빛교회 한지은 전도사">
+        <img class="av" src="../portraits/women/65.jpg" alt="">
+        <a class="name" href="channel.html"><strong>새벽빛교회 한지은 전도사</strong><br><span class="muted small">찬양 · <strong>구독 903명</strong></span></a>
+        <div class="act"><button class="btn unsub">구독 해제</button></div>
+        <p class="small muted alert" style="grid-column:1/-1">방송국 상태 표시: <span class="slot">방송국 상태 표시 방식</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty" data-show="s=empty" style="margin-top:16px"><p><strong>아직 구독한 방송국이 없어요</strong></p><p class="muted">구독하면 새 라이브와 다시보기 알림을 받을 수 있어요.</p><p><a class="btn primary" href="main.html">지금 라이브 보러 가기</a> <a class="btn" href="videos.html">다시보기 둘러보기</a></p></div>
+  <div class="notice" data-show="s=guest" style="margin-top:16px"><strong>로그인하면 구독한 방송국을 볼 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=subscriptions.html">로그인</a></p></div>
+  <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:16px"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></div>
+  <div class="notice danger" role="alert" data-show="s=error" style="margin-top:16px"><strong>구독 목록을 불러오지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>
+</div></main>
+
+<!-- 구독 해제 확인 대화상자: 다른 구성과 독립된 블록 -->
+<dialog id="dlg" aria-labelledby="dt">
+  <h2 id="dt" tabindex="-1"></h2>
+  <p style="margin-top:8px">새 라이브와 다시보기 알림을 받지 못하게 돼요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end">
+    <button class="btn" id="cancel" autofocus>취소</button>
+    <button class="btn bad" id="ok">구독 해제</button>
+  </div>
+</dialog>
+<script>
+  var dlg = document.getElementById('dlg'), cur = null, opener = null;
+  document.addEventListener('click', function (e) {
+    var u = e.target.closest('.unsub');
+    if (u) { opener = u; cur = u.closest('.item'); document.getElementById('dt').textContent = cur.dataset.name + ' 구독을 해제할까요?'; dlg.showModal(); document.getElementById('cancel').focus(); }
+  });
+  document.getElementById('cancel').onclick = function () { dlg.close(); if (opener) opener.focus(); };
+  document.getElementById('ok').onclick = function () {
+    dlg.close();
+    var nxt = cur.nextElementSibling, name = cur.dataset.name; cur.remove();
+    var n = document.querySelectorAll('#list .item').length;
+    document.getElementById('n').textContent = n;
+    document.getElementById('live').textContent = name + ' 구독을 해제했어요';
+    if (!n) { document.body.dataset.s = 'empty'; window.mockRender(); document.getElementById('h-subs').focus(); }
+    else (nxt ? nxt.querySelector('a') : document.getElementById('h-subs')).focus();
+  };
+</script>
+<script src="mock.js"></script>
+</body>
+</html>

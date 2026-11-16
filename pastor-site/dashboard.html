@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대시보드 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal auth:verified adj:on live:off">
+<!-- 대시보드. 사용자 결정 전: 구성원 첫 화면, 관리자의 인증 신청 가능 여부, 방송국 제한 중 방송 가능 여부 -->
+<header id="site-header" data-active="dashboard"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b>
+    <button data-set="s:normal">기본</button><button data-set="s:new">새 방송국(0건)</button><button data-set="s:loading">로딩</button><button data-set="s:error">일부 실패</button><button data-set="s:limited">방송국 제한</button><button data-set="s:suspended">방송국 정지</button><button data-set="s:closed">방송국 폐쇄</button>
+  </div>
+  <div class="group"><b>인증 상태</b>
+    <button data-set="auth:verified">인증됨</button><button data-set="auth:review">심사 중</button><button data-set="auth:none">미인증</button><button data-set="auth:rejected">반려</button><button data-set="auth:revoked">해제·정지</button><button data-set="auth:transfer">소유자 교체 직후</button>
+  </div>
+  <div class="group"><b>방송</b><button data-set="live:off">방송 안 함</button><button data-set="live:on">방송 중</button><button data-set="adj:on">조정 알림 있음</button><button data-set="adj:off">조정 알림 없음</button></div>
+  <p class="muted">사용자 결정 전: 구성원 첫 화면(방송국 1개면 이 화면, 2개 이상이면 선택 목록), 관리자의 인증 신청 가능 여부(권고: 불가), 제한 중 방송 가능 여부, 관리자 부분 부여. 확정(2026-11-15 추천 반영): 자동 녹화 영상의 권리 확인은 영상 올리기 목록의 [권리 확인하기]에서 받아요(새 화면 없음).</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr">
+  <h1>내 역할</h1>
+  <p style="margin-top:8px">샘플 방송국 <span class="tag">매니저</span></p>
+  <p class="muted" style="margin-top:8px">매니저는 방송 중 채팅 관리만 도와요. 방송 시작, 영상, 후원 설정은 쓸 수 없어요.</p>
+  <p style="margin-top:16px"><a class="btn primary" href="dashboard.html">채팅 관리</a></p>
+</section>
+
+<section data-show="role=owner|adm0|admall s=loading" role="status" aria-busy="true">
+  <p class="muted">불러오는 중</p>
+  <div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:120px"></div><div class="skeleton" style="height:80px"></div>
+</section>
+
+<div class="stack" data-show="role=owner|adm0|admall s=normal|new|error|limited|suspended|closed">
+  <div class="row between">
+    <h1>샘플 방송국 <span class="vbadge lg" data-show="auth=verified">인증됨</span></h1>
+    <p><span class="muted">방송국 상태</span> <strong data-show="s=normal|new|error">정상</strong><strong data-show="s=limited">일부 기능 제한</strong><strong data-show="s=suspended">방송국 정지</strong><strong data-show="s=closed">폐쇄</strong> <span class="tag role"></span></p>
+  </div>
+  <div class="notice danger" role="alert" data-show="s=limited"><strong>방송국 일부 기능이 제한되어 있어요</strong><p>제한 중 방송할 수 있는지는 <span class="slot">정책 확정 전</span>이에요.</p></div>
+  <div class="notice danger" role="alert" data-show="s=suspended"><strong>방송국이 정지되었어요</strong><p>사유와 이의제기 방법은 알림에서 볼 수 있어요.</p></div>
+  <div class="notice danger" role="alert" data-show="s=closed"><strong>방송국이 폐쇄되었어요</strong><p>폐쇄된 방송국에서는 방송과 영상 올리기를 할 수 없어요.</p></div>
+  <div class="notice" data-show="role=owner|admall adj=on"><strong>후원 설정이 조정되었어요</strong><p>운영사 한도가 바뀌어 설정이 자동으로 조정됐어요.</p><p style="margin-top:8px"><a class="btn" href="donation-settings.html?adj=on">후원 설정 보기</a></p></div>
+  <section class="panel todo" aria-labelledby="h-todo">
+    <h2 id="h-todo">오늘 할 일</h2>
+    <div data-show="s=normal|limited|suspended|closed|error">
+      <div class="item" data-show="role=owner|admall"><p><strong>예정 방송을 시작할 시간이에요</strong><br><span class="muted small">샘플 예정 방송 제목</span></p><a class="btn primary" href="live-start.html" data-show="role=owner|admall s=normal|error">라이브 시작</a><span data-show="role=owner|admall s=limited|suspended|closed"><button class="btn" disabled aria-describedby="why-t2">라이브 시작</button><span class="help" id="why-t2">방송국 상태 때문에 지금은 쓸 수 없어요</span></span></div>
+      <div class="item"><p><strong>권리 확인이 필요한 영상 2개</strong><br><span class="muted small">확인 전에는 공개할 수 없어요</span></p><a class="btn" href="videos.html?rt=need">확인하기</a></div>
+      <div class="item" data-show="auth=review|rejected|revoked"><p><strong>인증 결과를 확인해 주세요</strong></p><a class="btn" href="#h-auth">보기</a></div>
+      <div class="item" data-show="role=owner|admall adj=on"><p><strong>후원 설정 조정 알림을 확인해 주세요</strong></p><a class="btn" href="donation-settings.html?adj=on">확인하기</a></div>
+    </div>
+    <div class="empty" data-show="s=new"><p><strong>오늘 할 일이 없어요</strong></p></div>
+  </section>
+  <section class="panel" data-show="s=new"><h2>첫 방송을 준비해 보세요</h2><div class="row" style="margin-top:8px"><a class="btn primary" href="live-start.html" data-show="role=owner|admall">라이브 시작</a><a class="btn" href="upload.html">영상 올리기</a></div></section>
+  <section class="panel" aria-labelledby="h-live" data-show="role=owner|admall s=normal|new|limited|suspended|closed">
+    <h2 id="h-live">방송 상태</h2>
+    <div data-show="live=on role=owner|admall"><p><strong>방송 중</strong> · 경과 <strong>1시간 12분</strong> · 시청자 <strong>128명</strong></p><p style="margin-top:8px"><a class="btn" href="live-control.html">방송 관리</a></p></div>
+    <div data-show="live=off role=owner|admall">
+      <p>지금은 방송하지 않아요.</p>
+      <p style="margin-top:8px"><a class="btn primary" href="live-start.html" data-show="role=owner|admall s=normal|new|error">라이브 시작</a><button class="btn" disabled aria-describedby="why-l" data-show="role=owner|admall s=limited|suspended|closed">라이브 시작</button></p>
+      <p class="help" data-show="role=owner|admall s=limited">방송국 제한 중 · 방송 가능 여부 <span class="slot">정책 확정 전</span></p>
+      <p class="help" data-show="role=owner|admall s=suspended|closed">방송국 상태 때문에 지금은 쓸 수 없어요</p>
+    </div>
+    <div data-show="s=normal|limited|suspended|closed">
+      <p class="muted" style="margin-top:12px">예정 방송 <strong>샘플 예정 방송 제목</strong> · 내일 20:00</p>
+      <p class="muted">최근 영상 <strong>샘플 영상 제목</strong> <span class="tag">준비 완료</span></p>
+    </div>
+  </section>
+  <section class="notice danger" role="alert" data-show="s=error"><strong>방송 상태를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></section>
+  <div class="stats" data-show="s=normal|new|limited|suspended|closed|error">
+    <div class="stat"><span class="v" data-show="s=new">0</span><span class="v" data-show="s=normal|limited|suspended|closed|error"><span class="slot">숫자</span></span><span class="k">구독자</span></div>
+    <div class="stat"><span class="v" data-show="s=new">0</span><span class="v" data-show="s=normal|limited|suspended|closed|error"><span class="slot">숫자</span></span><span class="k">즐겨찾기</span></div>
+  </div>
+  <section class="panel" aria-labelledby="h-auth" id="h-auth-s">
+    <h2 id="h-auth">인증 상태</h2>
+    <div data-show="auth=verified"><p><span class="vbadge">인증됨</span> 인증됨 · 인증일 <span class="slot">날짜</span></p>
+      <label class="check" data-show="role=owner"><input type="checkbox" checked><span>소속 교단을 시청자에게 보이기</span></label>
+      <p class="help"><span class="slot">B1 인증 안내 문구</span></p></div>
+    <p data-show="auth=review">심사 중이에요. 결과는 알림으로 알려 드려요.</p>
+    <div data-show="auth=none"><p>인증 안 됨. 인증 없이도 방송할 수 있어요.</p></div>
+    <div class="notice danger" data-show="auth=rejected"><strong>인증이 반려되었어요</strong><p>사유 <span class="slot">반려 사유</span> · 재신청 <span class="slot">가능 여부</span></p></div>
+    <div class="notice danger" data-show="auth=revoked"><strong>인증이 해제되었어요</strong><p>사유 <span class="slot">사유</span> · <a href="sanctions.html">이의제기 하기</a></p></div>
+    <p data-show="auth=transfer">인증이 이전되지 않았어요. 인증이 필요하면 신청해 주세요.</p>
+    <p style="margin-top:12px" data-show="role=owner auth=none|rejected|transfer"><a class="btn primary" href="verification.html">인증 신청</a></p>
+    <p class="help" data-show="role=adm0|admall auth=none|rejected|transfer">인증 신청은 소유자만 할 수 있어요. <span class="slot">사용자 결정 전</span></p>
+  </section>
+</div>
+</div></main>
+<script src="mock.js"></script>
+</body>
+</html>

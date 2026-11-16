@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>목회자 심사 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-reports.css">
+<link rel="stylesheet" href="operator-verify.css">
+</head>
+<body data-default="role:super s:normal v:wait dlg:closed">
+<!-- 인증은 한 종류. 인증 없이도 방송국 개설·방송 가능하므로 반려·보완 문구에 방송 불가 표현 금지. 담당자·시각은 자동 기록. 모든 이름은 샘플.
+     상태 대응(목회자 verification v:): 검토 대기·재제출됨=review, 보완 요청 중=more, 승인=ok, 반려=no -->
+<header id="site-header" data-active="verification"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:noperm">열람 권한 없음</button><button data-set="s:noreason">사유 미입력</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:locked">다른 운영자 처리 중</button><button data-set="s:gone">신청자가 취소함</button><button data-set="s:saved">저장됨</button></div>
+  <div class="group"><b>열어 본 건</b><button data-set="v:wait">검토 대기</button><button data-set="v:resub">재제출됨</button><button data-set="v:more">보완 요청 중</button><button data-set="v:ok">승인</button><button data-set="v:no">반려</button><button data-set="v:cancel">신청자 취소</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:why">열람 사유</button><button data-set="dlg:confirm">저장 확인</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>목회자 심사</h1>
+    <p class="muted small">서류 보관기간 <span class="slot">보관기간 미정</span> · 보완 제출 기한 <span class="slot">제출 기한 미정</span></p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:160px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>신청 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=empty"><p><strong>심사할 신청이 없어요</strong></p></div>
+
+    <div class="stack" data-show="s=normal|noperm|noreason|saveerr|locked|gone|saved">
+      <div class="filters"><label class="row" style="gap:8px"><span>상태</span>
+        <select class="input" id="st"><option value="todo" selected>검토 대기·재제출됨</option><option value="">전체</option><option>검토 대기</option><option>재제출됨</option><option>보완 요청 중</option><option>승인</option><option>반려</option><option>신청자 취소</option></select></label></div>
+      <div class="empty" id="none" hidden><p><strong>조건에 맞는 신청이 없어요</strong></p><button class="btn" type="button" id="clear">필터 지우기</button></div>
+      <div class="tbl-wrap cards v" id="list"><table><caption class="sr">심사 신청 목록 (샘플)</caption>
+        <thead><tr><th scope="col">신청일</th><th scope="col">신청자 닉네임</th><th scope="col">상태</th><th scope="col">담당자</th><th scope="col"><span class="sr">검토</span></th></tr></thead>
+        <tbody>
+          <tr data-st="검토 대기"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임A</td><td class="c-tag"><span class="tag">검토 대기</span></td><td class="c-meta">— <span class="sr">담당자 없음</span></td><td class="c-act"><a class="btn" href="#detail" data-set="v:wait" aria-label="샘플닉네임A 신청 검토">검토</a></td></tr>
+          <tr data-st="재제출됨"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임B</td><td class="c-tag"><span class="tag">재제출됨</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="btn" href="#detail" data-set="v:resub" aria-label="샘플닉네임B 신청 검토">검토</a></td></tr>
+          <tr data-st="보완 요청 중"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임C</td><td class="c-tag"><span class="tag">보완 요청 중</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="btn" href="#detail" data-set="v:more" aria-label="샘플닉네임C 신청 검토">검토</a></td></tr>
+          <tr data-st="승인"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임D</td><td class="c-tag"><span class="tag">승인</span></td><td class="c-meta">샘플 운영자2</td><td class="c-act"><a class="btn" href="#detail" data-set="v:ok" aria-label="샘플닉네임D 신청 보기">보기</a></td></tr>
+          <tr data-st="반려"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임E</td><td class="c-tag"><span class="tag">반려</span></td><td class="c-meta">샘플 운영자2</td><td class="c-act"><a class="btn" href="#detail" data-set="v:no" aria-label="샘플닉네임E 신청 보기">보기</a></td></tr>
+          <tr data-st="신청자 취소"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임F</td><td class="c-tag"><span class="tag">신청자 취소</span></td><td class="c-meta">— <span class="sr">담당자 없음</span></td><td class="c-act"><a class="btn" href="#detail" data-set="v:cancel" aria-label="샘플닉네임F 신청 보기">보기</a></td></tr>
+        </tbody></table></div>
+
+      <section class="detail stack" id="detail" aria-labelledby="h-d"><h2 id="h-d">검토: <span id="who">샘플닉네임A</span> <span class="tag" id="v-tag"></span></h2>
+        <p class="only-m" data-show="v=wait|resub|more"><a class="linkbtn" href="#frm">결정하기 ↓</a></p>
+
+        <div class="notice" data-show="s=locked" role="status"><strong>다른 운영자가 처리 중이에요 (샘플 운영자2)</strong><p>지금은 읽기만 할 수 있어요. <span class="slot">잠금 해제 방식 미정</span></p></div>
+        <div class="notice" data-show="s=gone" role="status"><strong>신청자가 신청을 취소했어요</strong><p>결정을 저장할 수 없어요. 입력한 내용은 남아 있지 않아요.</p><p style="margin-top:8px"><a class="btn" href="#list">목록으로</a></p></div>
+        <div class="notice" data-show="s=saved" role="status" id="saved" tabindex="-1"><strong>결정을 저장했어요</strong><p>신청자에게 알림을 보냈어요.</p></div>
+
+        <div class="rd">
+          <div class="stack">
+            <section aria-labelledby="h-a"><h3 id="h-a">신청 내용</h3>
+              <dl class="kv">
+                <dt>신청 교단명</dt><dd><span data-show="v=wait|more|ok|no|cancel">샘플 교단</span><span data-show="v=resub">샘플 교단 (새 값)<br><span class="muted small">이전: 샘플 교단 (옛 값)</span></span></dd>
+                <dt>소속 교단 시청자 공개</dt><dd>공개함</dd>
+                <dt>신청 시각</dt><dd>샘플 시각</dd>
+              </dl></section>
+            <section class="stack" aria-labelledby="h-c"><h3 id="h-c">인증서</h3>
+              <p class="muted small" data-show="v=resub"><strong>새 서류</strong> · 재제출 샘플 시각</p>
+              <div class="doc-box">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                <p class="doc-msg" tabindex="-1"><strong>민감 서류예요. 열람하면 기록이 남아요</strong></p>
+                <button class="btn open-doc" type="button" data-open="why-dlg" aria-describedby="np1">서류 열기</button>
+                <p class="help" id="np1" data-show="s=noperm">서류 열람 권한이 없어요 <span class="slot">열람 권한 미정</span></p>
+              </div>
+              <details class="why" data-show="v=resub"><summary>이전 서류 (1차 제출 샘플 시각)</summary>
+                <div class="doc-box">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                  <p class="doc-msg" tabindex="-1"><strong>이전 서류예요. 열람하면 기록이 남아요</strong></p>
+                  <button class="btn open-doc" type="button" data-open="why-dlg" aria-describedby="np2">서류 열기</button>
+                  <p class="help" id="np2" data-show="s=noperm">서류 열람 권한이 없어요 <span class="slot">열람 권한 미정</span></p>
+                </div></details></section>
+            <section aria-labelledby="h-l"><h3 id="h-l">열람 기록</h3>
+              <div class="tbl-wrap" style="margin-top:8px"><table><caption class="sr">열람 기록</caption>
+                <thead><tr><th scope="col">시각</th><th scope="col">운영자</th><th scope="col">사유</th></tr></thead>
+                <tbody id="log"><tr><td>샘플 시각</td><td>샘플 운영자B</td><td>인증 심사</td></tr></tbody></table></div></section>
+          </div>
+
+          <form class="panel stack rd-form" id="frm" onsubmit="return false" aria-labelledby="h-f" novalidate data-show="v=wait|resub|more">
+            <h3 id="h-f">심사 결정</h3>
+            <div class="notice danger" data-show="s=saveerr" role="alert"><strong>저장하지 못했어요</strong><p>입력한 내용은 그대로 두었어요.</p></div>
+            <label class="field"><span class="label">확인한 교단명 <span class="muted">운영사가 확인한 값</span></span><input class="input" id="denom" aria-describedby="denom-e denom-h"><span class="err" id="denom-e" hidden>확인한 교단명을 입력해 주세요</span><span class="help" id="denom-h" style="display:block">신청 교단명과 다르면 확인한 값으로 적어요. 이 값이 시청자에게 보여요</span></label>
+            <fieldset class="radios"><legend>결과 <span class="muted">필수</span></legend>
+              <label class="check"><input type="radio" name="res" value="ok" aria-controls="why-f" checked> 승인</label>
+              <label class="check"><input type="radio" name="res" value="more" aria-controls="why-f"> 보완 요청</label>
+              <label class="check"><input type="radio" name="res" value="no" aria-controls="why-f" aria-describedby="no-h"> 반려</label></fieldset>
+            <p class="help" id="no-h">반려해도 방송국 개설·방송에는 영향이 없어요</p>
+            <label class="field" id="why-f"><span class="label" id="why-l"></span><textarea class="textarea" id="why" rows="4" aria-describedby="why-e why-h"></textarea><span class="err" id="why-e" hidden></span><span class="help" id="why-h" style="display:block"></span></label>
+            <p class="read-line">담당자 샘플 운영자 · 시각은 저장 시 자동 기록돼요</p>
+            <p class="muted small">저장하면 신청자에게 알림이 가요 <span class="slot">알림 문구 미정</span></p>
+            <p class="help" id="off-why" hidden></p>
+            <button class="btn primary block" type="button" id="save" aria-describedby="off-why">결정 저장</button>
+          </form>
+
+          <section class="panel rd-form" aria-labelledby="h-r" data-show="v=ok|no|cancel"><h3 id="h-r">결과</h3>
+            <dl class="kv">
+              <dt>결과</dt><dd><span data-show="v=ok">승인</span><span data-show="v=no">반려</span><span data-show="v=cancel">신청자 취소</span></dd>
+              <dt data-show="v=ok">확인 교단명</dt><dd data-show="v=ok">샘플 교단</dd>
+              <dt data-show="v=ok|no">사유</dt><dd data-show="v=ok|no">샘플 사유</dd>
+              <dt>담당자</dt><dd><span data-show="v=ok|no">샘플 운영자2</span><span data-show="v=cancel">— <span class="sr">담당자 없음</span></span></dd>
+              <dt>시각</dt><dd>샘플 시각</dd>
+            </dl></section>
+        </div>
+
+        <section aria-labelledby="h-h"><h3 id="h-h">이전 결정 이력</h3>
+          <ol class="tl" style="margin-top:8px">
+            <li data-show="v=ok"><strong>승인</strong> · 샘플 운영자2 · 샘플 시각<br>확인 교단명: 샘플 교단</li>
+            <li data-show="v=no"><strong>반려</strong> · 샘플 운영자2 · 샘플 시각<br>사유: 샘플 사유</li>
+            <li data-show="v=cancel"><strong>신청 취소</strong> · 신청자 · 샘플 시각</li>
+            <li data-show="v=resub"><strong>재제출</strong> · 신청자 · 샘플 시각<br>바뀐 것: 서류, 교단명</li>
+            <li data-show="v=resub|more"><strong>보완 요청</strong> · 샘플 운영자 · 샘플 시각<br>사유: 샘플 요청 내용</li>
+            <li><strong>신청</strong> · 신청자 · 샘플 시각</li>
+          </ol></section>
+        <p class="muted small">재신청 <span class="slot">재신청 가능 여부·횟수 미정</span> · 보완 요청 <span class="slot">횟수 한도 미정</span> · 서류 <span class="slot">서류 종류 미정</span></p>
+      </section>
+    </div>
+  </main>
+</div>
+
+<dialog id="why-dlg" aria-labelledby="why-t"><h2 id="why-t">열람 사유</h2>
+  <div class="stack" style="margin-top:12px">
+    <label class="field"><span class="label">사유 <span class="muted">필수</span></span><select class="input" id="r-sel" aria-describedby="r-e"><option value="">선택해 주세요</option><option>인증 심사</option><option>이의제기 확인</option><option>기타</option></select></label>
+    <label class="field"><span class="label">한 줄 메모</span><input class="input" id="r-txt"></label>
+    <span class="err" id="r-e" hidden>열람 사유를 골라 주세요</span></div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn" type="button" id="r-go">열람</button></div>
+</dialog>
+
+<dialog id="confirm-dlg" aria-labelledby="c-t"><h2 id="c-t"></h2>
+  <dl class="kv" style="margin-top:12px"><dt>신청자</dt><dd id="c-who"></dd><dt>결과</dt><dd id="c-res"></dd><dt>확인 교단명</dt><dd id="c-denom"></dd><dt>사유 요약</dt><dd id="c-why"></dd></dl>
+  <p style="margin-top:12px">신청자에게 알림이 가요.</p>
+  <p class="muted small" id="c-irrev">저장한 뒤에는 되돌리기 어려워요 <span class="slot">정정 절차 미정</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn" type="button" id="c-go">저장</button></div>
+</dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var TAG = { wait: '검토 대기', resub: '재제출됨', more: '보완 요청 중', ok: '승인', no: '반려', cancel: '신청자 취소' };
+  var RES = { ok: ['승인', '승인으로 저장할까요?', '메모 <span class="muted">선택</span>', '신청자에게 보이지 않아요', ''],
+    more: ['보완 요청', '보완을 요청할까요?', '요청 내용 <span class="muted">필수</span>', "신청자 화면 '요청 내용'에 그대로 보여요", '요청 내용을 입력해 주세요'],
+    no: ['반려', '반려로 저장할까요?', '반려 사유 <span class="muted">필수</span>', "신청자 화면 '사유'에 그대로 보여요", '반려 사유를 입력해 주세요'] };
+  var OFF = { noperm: '서류를 확인해야 결정할 수 있어요', locked: '읽기 전용이라 저장할 수 없어요', gone: '신청자가 취소해서 결정을 저장할 수 없어요' };
+  function res() { return document.querySelector('input[name=res]:checked').value; }
+  function lab() { var r = RES[res()]; $('why-l').innerHTML = r[2]; $('why-h').textContent = r[3]; $('why-e').textContent = r[4]; }
+  // 오류 표시 후 첫 오류 칸을 돌려준다(없으면 null)
+  function check() {
+    var r = res(), e1 = r === 'ok' && !$('denom').value.trim(), e2 = r !== 'ok' && !$('why').value.trim();
+    $('denom-e').hidden = !e1; $('denom').setAttribute('aria-invalid', String(e1));
+    $('why-e').hidden = !e2; $('why').setAttribute('aria-invalid', String(e2));
+    return e1 ? $('denom') : e2 ? $('why') : null;
+  }
+  function fill() {
+    var r = res(), w = $('why').value.trim();
+    $('c-t').textContent = RES[r][1]; $('c-who').textContent = $('who').textContent; $('c-res').textContent = RES[r][0];
+    $('c-denom').textContent = $('denom').value.trim() || '—'; $('c-why').textContent = w ? (w.length > 40 ? w.slice(0, 40) + '…' : w) : '—';
+    $('c-irrev').hidden = r === 'more'; $('c-go').className = 'btn' + (r === 'no' ? ' bad' : '');
+  }
+  function filter() {
+    var n = 0, v = $('st').value;
+    document.querySelectorAll('#list tbody tr').forEach(function (r) {
+      var ok = !v || r.dataset.st === v || (v === 'todo' && /^(검토 대기|재제출됨)$/.test(r.dataset.st));
+      r.hidden = !ok; if (ok) n++;
+    });
+    $('list').hidden = !n; $('none').hidden = !!n;
+  }
+  window.mockAfter = function () {
+    var s = b.dataset.s, why = b.dataset.v === 'more' ? '신청자가 보완해 보내면 다시 검토할 수 있어요' : OFF[s];
+    $('v-tag').textContent = TAG[b.dataset.v] || '';
+    document.querySelectorAll('.open-doc').forEach(function (x) { x.disabled = s === 'noperm'; });
+    if (s === 'gone') $('frm').reset();
+    if (s === 'noreason') { document.querySelector('input[name=res][value=no]').checked = true; $('why').value = ''; lab(); check(); }
+    $('frm').querySelectorAll('input,textarea,button').forEach(function (x) { x.disabled = !!why; });
+    $('off-why').hidden = !why; $('off-why').textContent = why || '';
+    lab(); filter();
+    var d = b.dataset.dlg !== 'closed' && $(b.dataset.dlg + '-dlg');
+    if (d && !d.open) { fill(); d.showModal(); }
+  };
+  ['why', 'confirm'].forEach(function (k) {
+    $(k + '-dlg').addEventListener('close', function () { if (b.dataset.dlg === k) { b.dataset.dlg = 'closed'; window.mockRender(); } });
+  });
+  var row = null;
+  // 행의 [검토]를 누르면 그 닉네임으로 상세를 연다(셸의 상태 전환보다 먼저 실행)
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('#list a[data-set]'); if (!a) return;
+    row = a.closest('tr'); $('who').textContent = a.closest('tr').querySelector('.c-title').textContent; if (b.dataset.s === 'saved') b.dataset.s = 'normal';
+  }, true);
+  $('st').addEventListener('change', filter);
+  $('clear').addEventListener('click', function () { $('st').value = ''; filter(); $('st').focus(); });
+  document.addEventListener('change', function (e) { if (e.target.name === 'res') { lab(); if (!$('why-e').hidden || !$('denom-e').hidden) check(); } });
+  $('save').addEventListener('click', function () {
+    var bad = check(); if (bad) { bad.focus(); return; }
+    fill(); $('confirm-dlg').showModal();
+  });
+  $('c-go').addEventListener('click', function () {
+    $('confirm-dlg').close();
+    b.dataset.v = res();
+    if (row) { var t = row.querySelector('.tag'); row.dataset.st = t.textContent = TAG[b.dataset.v]; row.children[3].textContent = '샘플 운영자'; row.querySelector('a[data-set]').dataset.set = 'v:' + b.dataset.v; }
+    b.dataset.s = 'saved'; window.mockRender(); $('saved').focus();
+  });
+  $('r-go').addEventListener('click', function () {
+    if (!$('r-sel').value) { $('r-e').hidden = false; $('r-sel').focus(); return; }
+    var d = $('why-dlg'), btn = d._opener && d._opener.classList.contains('open-doc') ? d._opener : document.querySelector('.open-doc:not([hidden])');
+    $('r-e').hidden = true; d.close(); if (!btn) return;
+    var msg = btn.closest('.doc-box').querySelector('.doc-msg');
+    btn.hidden = true; msg.innerHTML = '<strong>샘플 인증서 이미지 (가상 서류)</strong>';
+    var tr = document.createElement('tr'); tr.innerHTML = '<td>방금</td><td>샘플 운영자</td><td></td>'; tr.lastChild.textContent = $('r-sel').value + ($('r-txt').value ? ' · ' + $('r-txt').value : '');
+    $('log').insertBefore(tr, $('log').firstChild);
+    $('r-sel').value = ''; $('r-txt').value = ''; // 서류마다 사유를 따로 받는다
+    msg.focus(); // 서류 열기 버튼이 사라지므로 박스 안 안내문으로 포커스
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

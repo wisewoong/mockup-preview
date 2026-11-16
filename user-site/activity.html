@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 활동 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
+  .tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0 4px; }
+  ul.al { list-style: none; margin: 0; padding: 0; }
+  .item .t { min-width: 0; }
+  .item .t a { font-weight: 700; color: var(--strong); }
+  .item .t .m { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; font-size: .92rem; color: var(--muted); }
+  .item.gone { grid-template-columns: 1fr auto; }
+  .led { padding: 14px 0; border-top: 1px solid var(--line); }
+  .l1, .l2 { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .l1 .amt { font-weight: 700; color: var(--strong); text-align: right; flex: none; }
+  .l2 { margin-top: 2px; flex-wrap: wrap; }
+  .vbadge.mini { padding: 2px; }
+  .vbadge.mini svg { width: 1.2em; height: 1.2em; }
+  .badge { font-size: .8rem; }
+  @media (max-width: 767px) { .item { grid-template-columns: 56px 1fr auto; } .item.gone { grid-template-columns: 1fr auto; } }
+</style>
+</head>
+<body data-default="s:normal t:watch">
+<!-- 내 활동: 본 영상·방문한 목회자·후원 내역. 본 영상·방문 기록의 서버 저장 여부·삭제 범위는 미정(법무 7-2)이다. 방문한 목회자는 이 기기(localStorage)에만 저장한다. 후원 금액·명칭은 슬롯, 본인 내역만 보인다. -->
+<header id="site-header" data-active="act"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:off">기록 꺼짐</button><button data-set="s:loading">로딩</button><button data-set="s:error">목록 실패</button><button data-set="s:under19">만 19세 미만</button><button data-set="s:guest">비로그인</button>
+  </div>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-act" tabindex="-1">내 활동</h1>
+
+  <div data-show="s=normal|empty|off|loading|error|under19">
+    <div class="tabs" role="tablist" aria-label="내 활동 종류" style="margin-top:16px">
+      <button role="tab" data-set="t:watch" aria-selected="true" aria-controls="p-watch">본 영상</button><button role="tab" data-set="t:visit" aria-selected="false" aria-controls="p-visit">방문한 목회자</button><button role="tab" data-set="t:don" aria-selected="false" aria-controls="p-don">후원 내역</button>
+    </div>
+
+    <div class="notice" data-show="s=off t=watch|visit" style="margin-top:16px"><strong>시청·방문 기록을 남기지 않고 있어요</strong><p>꺼 둔 동안의 활동은 여기에 나오지 않아요.</p><p style="margin-top:8px"><a class="btn" href="reco-settings.html">설정에서 켜기</a></p></div>
+    <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:16px"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px;margin-top:12px"></div><div class="skeleton" style="height:56px;margin-top:12px"></div><div class="skeleton" style="height:56px;margin-top:12px"></div></div>
+    <div class="notice danger" role="alert" data-show="s=error" style="margin-top:16px"><strong>기록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+
+    <!-- 본 영상 -->
+    <section id="p-watch" role="tabpanel" aria-label="본 영상" data-show="t=watch s=normal|empty|off|under19">
+      <div class="tools"><span class="muted small"><span data-show="s=off">기록 남기기 꺼짐</span><span data-show="s=normal|empty|under19">기록 남기기 켜짐</span> · <a href="reco-settings.html">설정</a></span><button class="btn" data-clear="본 영상 기록을 모두 지울까요?">기록 전체 지우기</button></div>
+      <ul class="al" id="l-watch" data-show="s=normal|off|under19">
+        <li class="item"><img class="av" src="img/bible.jpg" alt=""><div class="t"><a href="videos.html">로마서 8장 강해 11회</a><div class="m"><span>샘물교회 이정훈 목사</span><span class="vbadge mini" aria-label="인증 목회자, 운영사 확인" title="인증 목회자"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg></span></div><div class="m">11월 14일 · 다시보기로 시청</div></div><button class="btn ib" data-del data-icon="x" data-label="로마서 8장 강해 11회 기록에서 지우기">지우기</button></li>
+        <li class="item"><img class="av" src="img/sanctuary.jpg" alt=""><div class="t"><a href="live.html">주일 낮 예배 실시간 방송</a><div class="m"><span>은혜교회 박성민 목사</span></div><div class="m">11월 14일 · 라이브로 시청</div></div><button class="btn ib" data-del data-icon="x" data-label="주일 낮 예배 실시간 방송 기록에서 지우기">지우기</button></li>
+        <li class="item gone"><div class="t"><strong>지금은 볼 수 없는 영상이에요</strong><div class="m">11월 12일</div></div><button class="btn ib" data-del data-icon="x" data-label="볼 수 없는 영상 기록에서 지우기">지우기</button></li>
+      </ul>
+      <div class="empty" data-empty="watch" style="margin-top:16px"><p><strong>아직 본 영상이 없어요</strong></p><p><a class="btn" href="main.html">라이브 보러 가기</a></p></div>
+    </section>
+
+    <!-- 방문한 목회자: 이 기기(localStorage)에만 저장 -->
+    <section id="p-visit" role="tabpanel" aria-label="방문한 목회자" data-show="t=visit s=normal|empty|off|under19">
+      <div class="notice" style="margin-top:16px"><p>이 기록은 이 기기에만 저장돼요. 서버로 보내지 않아요. 브라우저 데이터를 지우면 사라지고, 기기를 바꾸면 이어지지 않아요.</p></div>
+      <div class="tools"><span class="muted small"><span data-show="s=off">기록 남기기 꺼짐</span><span data-show="s=normal|empty|under19">기록 남기기 켜짐</span> · <a href="reco-settings.html">설정</a></span><button class="btn" data-clear="방문 기록을 모두 지울까요?">기록 전체 지우기</button></div>
+      <ul class="al" id="l-visit" data-show="s=normal|off|under19"></ul>
+      <div class="empty" data-empty="visit" style="margin-top:16px"><p><strong>아직 방문한 방송국이 없어요</strong></p><p><a class="btn" href="search.html">방송국 찾아보기</a></p></div>
+    </section>
+
+    <!-- 후원 내역: 본인 내역만. 지우기 없음 -->
+    <section id="p-don" role="tabpanel" aria-label="후원 내역" data-show="t=don s=normal|empty|off|under19">
+      <div class="notice" style="margin-top:16px"><p>이 내역은 내 계정에서만 볼 수 있어요. 다른 시청자에게는 보이지 않아요. <span class="slot">후원받은 목회자에게 보이는 범위</span></p></div>
+      <ul class="al" id="l-don" data-show="s=normal|off">
+        <li class="led"><div class="l1"><span><strong>후원</strong> 샘물교회 이정훈 목사 · 로마서 8장 강해 12회</span><span class="amt"><span class="slot">금액</span> <span class="slot">S1 명칭</span></span></div><div class="l2 muted small"><span><time>11월 13일 20:41</time> <span class="badge plain">완료</span></span></div></li>
+        <li class="led"><div class="l1"><span><strong>후원</strong> 은혜교회 박성민 목사 · 익명으로 후원</span><span class="amt"><span class="slot">금액</span> <span class="slot">S1 명칭</span></span></div><div class="l2 muted small"><span><time>11월 10일 19:02</time> <span class="badge plain">완료</span></span></div></li>
+      </ul>
+      <div class="empty" data-show="s=empty" style="margin-top:16px"><p><strong>아직 후원한 내역이 없어요</strong></p></div>
+      <div class="empty" data-show="s=under19" style="margin-top:16px"><p><strong>아직 후원한 내역이 없어요</strong></p><p class="muted small">충전과 후원은 만 19세부터 할 수 있어요. <span class="slot">법무 7-2 확인 전</span></p></div>
+      <p class="help" style="margin-top:12px">후원 내역은 지울 수 없어요.</p>
+      <p style="margin-top:4px"><a href="history.html">충전·환불 포함 전체 내역 보기</a></p>
+    </section>
+    <p class="sr" role="status" id="live-msg"></p>
+  </div>
+
+  <div class="notice" data-show="s=guest" style="margin-top:16px"><strong>로그인하면 내 활동을 볼 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=activity.html">로그인</a></p></div>
+</div></main>
+
+<dialog id="dlg" aria-labelledby="dt">
+  <h2 id="dt" tabindex="-1">기록을 모두 지울까요?</h2>
+  <p style="margin-top:8px">지우면 되돌릴 수 없어요. <span class="slot">삭제 범위·추천·통계 영향 [법무 7-2]</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end">
+    <button class="btn" id="cancel" autofocus>취소</button>
+    <button class="btn bad" id="ok">지우기</button>
+  </div>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+// 방문한 목회자: 이 기기(localStorage)에만 저장한다. 저장소를 못 쓰면(비공개 모드 등) 메모리 값으로 보여 주고 저장은 건너뛴다.
+var KEY = 'mw.visited', SEED = [
+  { id: 'saemul', n: '샘물교회', p: '이정훈 목사', a: 'men/65', c: 1, live: 1, sub: 1, d: '11월 14일' },
+  { id: 'eunhye', n: '은혜교회', p: '박성민 목사', a: 'men/75', c: 1, sub: 1, d: '11월 13일' },
+  { id: 'closed', gone: 1, d: '11월 8일' }
+];
+var vis;
+try { vis = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+if (!Array.isArray(vis)) vis = SEED.slice();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(vis)); } catch (e) {} }
+var SH = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>';
+function drawVisits() {
+  document.getElementById('l-visit').innerHTML = vis.map(function (v) {
+    var x = '<button class="btn ib" data-del data-vid="' + v.id + '" data-icon="x" data-label="' + (v.gone ? '볼 수 없는 방송국' : v.n) + ' 기록에서 지우기">지우기</button>';
+    if (v.gone) return '<li class="item gone"><div class="t"><strong>지금은 볼 수 없는 방송국이에요</strong><div class="m">마지막 방문 ' + v.d + '</div></div>' + x + '</li>';
+    return '<li class="item"><img class="av" src="../portraits/' + v.a + '.jpg" alt=""><div class="t"><a href="channel.html"><strong>' + v.n + ' ' + v.p + '</strong></a><div class="m">' +
+      (v.c ? '<span class="vbadge" aria-label="인증 목회자, 운영사 확인">' + SH + '인증 목회자</span>' : '') +
+      (v.live ? '<span class="badge"><i class="dot" aria-hidden="true"></i><span aria-hidden="true">LIVE</span><span class="sr">라이브</span></span>' : '') +
+      (v.sub ? '<span class="badge plain">구독 중</span>' : '') + '</div><div class="m">마지막 방문 ' + v.d + '</div></div>' + x + '</li>';
+  }).join('');
+  if (window.mockIcons) window.mockIcons(document.getElementById('l-visit'));
+}
+drawVisits();
+// 빈 상태: 목록이 비었거나 s가 empty/under19이면 보인다(후원 탭은 위 data-show로 처리)
+window.mockDerive = function (b) {
+  ['watch', 'visit'].forEach(function (k) {
+    var n = document.querySelectorAll('#l-' + k + ' li').length, e = document.querySelector('[data-empty=' + k + ']');
+    e.hidden = !(n === 0 || b.dataset.s === 'empty' || b.dataset.s === 'under19');
+  });
+};
+var dlg = document.getElementById('dlg'), opener, tab, say = document.getElementById('live-msg');
+function msg(t) { say.textContent = ''; setTimeout(function () { say.textContent = t; }, 50); }
+document.addEventListener('click', function (e) {
+  var d = e.target.closest('[data-del]'), c = e.target.closest('[data-clear]');
+  if (d) {
+    var li = d.closest('li'), nx = li.nextElementSibling || li.previousElementSibling, id = d.dataset.vid;
+    if (id) { vis = vis.filter(function (v) { return v.id !== id; }); save(); }
+    li.remove(); msg('기록에서 지웠어요');
+    var f = nx && nx.querySelector('[data-del]'); if (f) f.focus(); else document.getElementById('h-act').focus();
+    window.mockRender();
+  }
+  if (c) { opener = c; tab = document.body.dataset.t; document.getElementById('dt').textContent = c.dataset.clear; dlg.showModal(); document.getElementById('cancel').focus(); }
+});
+dlg.addEventListener('close', function () { if (opener) opener.focus(); });
+document.getElementById('cancel').onclick = function () { dlg.close(); };
+document.getElementById('ok').onclick = function () {
+  if (tab === 'visit') { vis = []; save(); drawVisits(); } else document.getElementById('l-watch').innerHTML = '';
+  dlg.close(); msg('기록을 모두 지웠어요'); window.mockRender();
+};
+// 기록 남기기 설정(reco-settings 와 같은 키). 쿼리 s 가 없을 때만 꺼짐 상태로 시작한다.
+try { if (localStorage.getItem('mw.record') === 'off' && !new URLSearchParams(location.search).has('s')) document.body.dataset.s = 'off'; } catch (e) {}
+window.mockRender();
+</script>
+</body>
+</html>

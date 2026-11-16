@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>예정 방송 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
+  .when { font-size: 1.4rem; font-weight: 700; color: var(--strong); line-height: 1.4; }
+  .ch-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .ch-line a { text-decoration: none; }
+  .ch-line a:hover strong { text-decoration: underline; }
+  .pstage .badges { z-index: 1; }
+</style>
+</head>
+<body data-default="s:before sh:ok">
+<!-- 예정 방송 상세. 취소·지연은 명세 §3.3 콘텐츠 상태에 없어 상태 이름은 슬롯(확정 전). 즐겨찾기 OFF면 시작 전 알림을 끄는 묶음은 사용자 결정 전. 공유 시트는 mock.js의 [data-share]. -->
+<header id="site-header" data-active="up"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b>
+    <button data-set="s:before">시작 전</button><button data-set="s:soon">곧 시작</button><button data-set="s:started">시작됨</button><button data-set="s:delayed">지연(새 시각)</button><button data-set="s:delayednt">지연(시각 미정)</button><button data-set="s:cancelled">취소</button><button data-set="s:past">지난 방송</button><button data-set="s:loading">로딩</button><button data-set="s:error">오류</button><button data-set="s:gone">볼 수 없음</button><button data-set="s:guest">비로그인</button><button data-set="s:alarmfail">알림 저장 실패</button>
+  </div>
+  <div class="group"><b>공유 시트</b>
+    <button data-set="sh:ok">기본</button><button data-set="sh:copyfail">복사 실패</button><button data-set="sh:linkfail">링크 생성 실패</button><button data-set="sh:restricted">권한 제한</button>
+  </div>
+  <p class="muted">OS 공유 지원 기기는 공유 시트 대신 OS 시트가 열려요. 취소·지연 상태 이름과 즐겨찾기-알림 묶음은 사용자 결정 전이에요. 비공개 콘텐츠의 공유 버튼 노출·링크 복사 허용도 사용자 결정 전이에요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <div data-show="s=before|soon|started|delayed|delayednt|cancelled|past|guest|alarmfail" class="stack">
+    <div class="pstage"><img src="img/fellowship.jpg" alt=""><div class="badges"><span class="badge plain">방송 예정</span></div></div>
+    <h1 id="h-up" tabindex="-1">저녁 성경공부 요한복음 3장</h1>
+
+    <div>
+      <p class="when"><time datetime="2026-11-14T20:00">오늘 저녁 8시 시작</time></p>
+      <p class="muted small">11월 14일 (토) 오후 8:00</p>
+      <p class="muted small" data-show="s=before|guest|alarmfail">시작까지 2시간 30분</p>
+    </div>
+    <div class="notice" role="status" data-show="s=soon"><strong>곧 시작해요</strong></div>
+    <div class="notice" role="status" data-show="s=started"><strong>방송이 시작됐어요</strong><p style="margin-top:8px"><a class="btn primary" href="live.html?variant=general">라이브 보러 가기</a></p></div>
+    <div class="notice" role="status" data-show="s=delayed"><strong>방송 시작이 늦어지고 있어요</strong><p>새 시작 시각: 오후 8:30</p></div>
+    <div class="notice" role="status" data-show="s=delayednt"><strong>방송 시작이 늦어지고 있어요</strong><p>새 시각이 정해지면 알려 드려요.</p></div>
+    <div class="notice danger" role="alert" data-show="s=cancelled"><strong>이 방송은 취소됐어요</strong><p class="muted small"><span class="slot">취소 상태 이름 확정 전</span></p><p style="margin-top:8px"><a class="btn" href="channel.html">방송국 다른 방송 보기</a></p></div>
+    <div class="notice danger" role="alert" data-show="s=past"><strong>방송 시간이 지났어요</strong><p style="margin-top:8px"><a class="btn" href="channel.html">방송국 다른 방송 보기</a></p></div>
+
+    <div class="ch-line">
+      <a href="channel.html"><img class="pa lg" src="../portraits/men/65.jpg" alt=""><strong>샘물교회 이정훈 목사</strong> <span class="vbadge" aria-label="인증 목회자, 운영사 확인" title="운영사가 교단 인증서를 확인했어요. [B1 문구 법무 확인 전]"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2.1 5.4-5 6.5-2.9-1.1-5-3.5-5-6.5v-4z"/><path d="M5.6 8.1l1.7 1.7 3.2-3.4"/></svg>인증 목회자</span></a>
+      <button class="btn" data-toggle aria-pressed="false" data-on="구독 중" data-off="구독">구독</button>
+    </div>
+
+    <div>
+      <button class="btn ik" id="fav" data-toggle aria-pressed="false" data-icon="bookmark" data-keep data-on="즐겨찾기 해제" data-off="즐겨찾기">즐겨찾기</button>
+      <label class="check" style="margin-top:8px"><input type="checkbox" id="alarm" disabled><span>시작 전 알림 받기</span></label>
+      <p class="help" id="alarm-h"></p>
+      <p class="err" role="alert" data-show="s=alarmfail">알림 설정을 저장하지 못했어요 <button class="btn" type="button" style="min-height:44px;margin-left:8px">다시 시도</button></p>
+      <p class="help" data-show="s=guest"><a href="login.html?next=upcoming.html">로그인하면 쓸 수 있어요</a></p>
+    </div>
+
+    <div>
+      <p>요한복음 3장을 함께 읽고 나누는 저녁 성경공부예요.</p>
+      <p style="margin-top:8px"><span class="tag">성경공부</span> <span class="slot">방송 모드</span></p>
+    </div>
+    <div><button class="btn ik" data-icon="share" data-keep data-share="저녁 성경공부 요한복음 3장 · 샘물교회 이정훈 목사">공유</button></div>
+  </div>
+
+  <div data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton thumb" style="margin-top:12px"></div><div class="skeleton line"></div><div class="skeleton line" style="width:70%"></div><div class="skeleton line" style="width:50%"></div></div>
+  <div class="notice danger" role="alert" data-show="s=error"><strong>예정 방송을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+  <div class="empty" data-show="s=gone"><p><strong>볼 수 없는 방송이에요</strong></p><p><a class="btn" href="main.html">홈으로</a></p></div>
+</div></main>
+<script src="mock.js"></script>
+<script>
+// 목업: 즐겨찾기-알림 묶음(즐겨찾기 OFF면 알림 체크 비활성). 취소·지난 방송·알림 저장 실패는 즐겨찾기 ON 상태로 시작한다.
+var last = null;
+function setFav(on) { var f = document.getElementById('fav'); f.setAttribute('aria-pressed', on); f.lastChild.textContent = on ? f.dataset.on : f.dataset.off; }
+function sync() {
+  var s = document.body.dataset.s, f = document.getElementById('fav'), a = document.getElementById('alarm'), h = document.getElementById('alarm-h');
+  if (last !== s) { last = s; if (['cancelled', 'past', 'alarmfail', 'soon', 'delayed', 'delayednt'].indexOf(s) > -1) setFav(true); else setFav(false); a.checked = ['soon', 'delayed', 'delayednt'].indexOf(s) > -1; }
+  var on = f.getAttribute('aria-pressed') === 'true', dead = s === 'cancelled' || s === 'past';
+  a.disabled = !on || dead; if (!on) a.checked = false;
+  h.innerHTML = dead ? '' : (on ? '시작 <span class="slot">알림 시점</span>에 알림을 보내요' : '즐겨찾기하면 시작 전 알림을 받을 수 있어요');
+}
+document.addEventListener('click', function () { setTimeout(sync, 0); });
+sync();
+</script>
+</body>
+</html>

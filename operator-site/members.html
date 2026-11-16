@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회원 관리 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+<link rel="stylesheet" href="operator-verify.css">
+<link rel="stylesheet" href="operator-members.css">
+</head>
+<body data-default="role:op s:idle">
+<!-- 이 화면에서는 조치하지 않는다(상세에서만). 신고 건수 열·정렬·"N건 이상" 필터·일괄 조치·연령·가입일 열을 두지 않는다. 닉네임 순 고정. -->
+<header id="site-header" data-active="members"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:idle">검색 전</button><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button> <span class="help">닉네임·방송국은 모두 가상 샘플</span></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>회원 관리</h1>
+    <p class="muted small">닉네임과 내부 회원 번호만 보여요. 실명·연락처·생년월일은 이 화면에 없어요. <span class="slot">개인정보 열람 기록 고지 문구</span></p>
+
+    <form class="filters" id="sf" role="search" aria-label="회원 검색" novalidate>
+      <label class="field"><span class="label">닉네임 또는 회원 번호</span><input class="input" type="search" id="q" autocomplete="off" aria-describedby="q-e q-h"><span class="err" id="q-e" hidden>닉네임이나 회원 번호를 입력해 주세요.</span><span class="help" id="q-h" style="display:block"><span class="slot">검색 방식(일부 일치·최소 글자 수) 미정</span></span></label>
+      <label class="field"><span class="label">역할</span><select class="input" id="f-role"><option>전체</option><option>회원</option><option>목회자</option><option>운영자</option></select><span class="help" style="display:block">&nbsp;</span></label>
+      <label class="field"><span class="label">계정 상태</span><select class="input" id="f-st" aria-describedby="st-h"><option>전체</option><option>정상</option><option>기능 제한</option><option>정지</option><option>휴면</option><option>탈퇴</option></select><span class="help" id="st-h" style="display:block"><span class="slot">계정 상태 종류 미정</span></span></label>
+      <div class="field"><button class="btn primary" type="submit" id="go">검색</button><span class="help" style="display:block" aria-hidden="true">&nbsp;</span></div>
+    </form>
+
+    <p id="msg" tabindex="-1" role="status" data-show="s=normal">검색 결과 샘플 4명</p>
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:120px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>목록을 불러오지 못했어요</strong><p>검색어와 필터는 그대로 두었어요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=idle"><p><strong>닉네임이나 회원 번호로 검색해 주세요</strong></p><p>전체 회원 목록은 먼저 보여 주지 않아요.</p></div>
+    <div class="empty" data-show="s=empty"><p><strong>찾는 회원이 없어요</strong></p><p>닉네임을 다시 확인해 주세요. 회원 번호로도 찾을 수 있어요.</p></div>
+
+    <div class="stack" data-show="s=normal">
+      <div class="tbl-wrap cards v"><table><caption class="sr">회원 검색 결과 (샘플)</caption>
+        <thead><tr><th scope="col">닉네임</th><th scope="col">계정 상태</th><th scope="col">역할</th><th scope="col">방송국 소속</th><th scope="col">작업</th></tr></thead>
+        <tbody>
+          <tr><th scope="row" class="c-title">샘플 닉네임 가 <span class="muted small">회원 번호 샘플 0001</span></th><td class="c-tag"><span class="tag">정상</span></td><td class="c-meta">회원</td><td class="c-meta c-none">—</td>
+            <td class="c-act"><a class="btn" href="member-detail.html?n=가&amp;no=0001" aria-label="샘플 닉네임 가 상세">상세</a></td></tr>
+          <tr><th scope="row" class="c-title">샘플 닉네임 나 <span class="muted small">회원 번호 샘플 0002</span></th><td class="c-tag"><span class="tag">기능 제한</span></td><td class="c-meta">목회자</td><td class="c-meta">소유 · 샘플 방송국 가</td>
+            <td class="c-act"><a class="btn" href="member-detail.html?n=나&amp;no=0002&amp;m=limited&amp;st=owner" aria-label="샘플 닉네임 나 상세">상세</a></td></tr>
+          <tr><th scope="row" class="c-title">샘플 닉네임 다 <span class="muted small">회원 번호 샘플 0003</span></th><td class="c-tag"><span class="tag bad">정지</span></td><td class="c-meta">회원</td><td class="c-meta">매니저 · 샘플 방송국 나</td>
+            <td class="c-act"><a class="btn" href="member-detail.html?n=다&amp;no=0003&amp;m=suspended&amp;st=staff" aria-label="샘플 닉네임 다 상세">상세</a></td></tr>
+          <tr><th scope="row" class="c-title">샘플 닉네임 라 <span class="muted small">회원 번호 샘플 0004</span></th><td class="c-tag"><span class="tag">탈퇴</span></td><td class="c-meta">회원</td><td class="c-meta c-none">—</td>
+            <td class="c-act"><a class="btn" href="member-detail.html?n=라&amp;no=0004&amp;m=left&amp;h=none" aria-label="샘플 닉네임 라 상세">상세</a></td></tr>
+        </tbody></table></div>
+      <p class="row"><button class="btn" type="button">더 보기</button> <span class="slot">한 번에 보이는 수</span></p>
+    </div>
+  </main>
+</div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  window.mockAfter = function () {
+    var ld = b.dataset.s === 'loading';
+    $('go').disabled = ld; $('go').textContent = ld ? '검색 중…' : '검색';
+  };
+  $('sf').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var bad = !$('q').value.trim();
+    $('q-e').hidden = !bad;
+    if (bad) { $('q').setAttribute('aria-invalid', 'true'); $('q').focus(); return; }
+    $('q').removeAttribute('aria-invalid');
+    b.dataset.s = 'normal'; window.mockRender(); $('msg').focus(); // 샘플: 검색어와 무관하게 같은 4명
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

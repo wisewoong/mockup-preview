@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>정산 내역 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal st:confirmed adj:none hold:none pay:none dlg:closed">
+<!-- 정산 내역(DESIGN-REMAINING 2묶음). 소유자만, 읽기 전용. 금액·날짜·사유·요율 기간은 모두 슬롯, 계산·지급은 수동(구조만) -->
+<header id="site-header" data-active="settlements"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
+  <div class="group"><b>최근 정산</b><button data-set="st:collecting">집계 중</button><button data-set="st:confirmed">확정</button><button data-set="st:payready">지급 대기</button><button data-set="st:paid">지급 완료</button></div>
+  <div class="group"><b>조정</b><button data-set="adj:none">없음</button><button data-set="adj:on">있음</button><b>보류</b><button data-set="hold:none">없음</button><button data-set="hold:on">보류 중</button><b>지급</b><button data-set="pay:none">정상</button><button data-set="pay:fail">지급 실패</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:detail">상세 열림</button></div>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 상태 막대는 맨 위 월에 적용돼요. 상품명·금액·날짜·사유는 모두 샘플 슬롯이에요. 사용자 결정 전: 수령 주체, 세금 처리, 지급 상태 입력 경로.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=adm0|admall|mgr"><div class="empty"><p><strong>정산은 소유자만 볼 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<div class="stack" data-show="role=owner">
+<div class="mem-head"><h1>정산 내역</h1></div>
+<div class="notice"><strong>정산 금액은 운영사가 확인해 확정해요 <span class="slot">확정 시점</span></strong></div>
+<p class="help">받는 분: <span class="slot">목회자 개인 기준</span></p>
+
+<section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>정산 내역을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="empty" data-show="s=empty"><p><strong>아직 정산할 내역이 없어요</strong></p><p>첫 정산은 <span class="slot">시점</span>에 만들어져요.</p></div>
+
+<div class="stack" data-show="s=normal">
+  <div class="notice danger" role="alert" data-show="hold=on"><strong>이 정산은 보류 중이에요</strong>
+    <p class="small">사유 <span class="slot">사유</span> · 범위 <span class="slot">범위</span> · 시각 <span class="slot">시각</span> · 처리: 운영사</p>
+    <p class="help">신고가 접수됐다는 이유만으로 보류하지 않아요 <span class="slot">정책 확정 전</span></p>
+    <p style="margin-top:8px"><a class="btn" href="sanctions.html">이의제기</a></p></div>
+  <div class="notice danger" role="alert" data-show="pay=fail"><strong>지급하지 못했어요. 운영사가 확인 중이에요</strong>
+    <p class="small">실패 사유 <span class="slot">사유</span> · 재시도 이력 <span class="slot">이력</span></p></div>
+
+  <section class="limit" aria-label="현재 상태"><dl>
+    <dt>가장 최근 정산 월</dt><dd><span class="slot">월</span></dd>
+    <dt>상태</dt><dd id="c-st"></dd>
+    <dt>지급 예정 금액</dt><dd id="c-amt"></dd>
+  </dl></section>
+
+  <h2>월별 정산</h2>
+  <table class="mem"><caption class="sr">월별 정산 내역</caption>
+    <thead><tr><th scope="col">대상 월</th><th scope="col">상태</th><th scope="col">후원 합계</th><th scope="col">수수료(플랫폼·결제)</th><th scope="col">조정</th><th scope="col">세금</th><th scope="col">보류 금액</th><th scope="col">지급 예정</th><th scope="col">작업</th></tr></thead>
+    <tbody id="tb"></tbody></table>
+  <div class="mcards" id="cards"></div>
+</div>
+</div>
+</div></main>
+
+<dialog class="sheet wide" id="d-dlg" aria-labelledby="d-t"><h2 id="d-t">정산 상세</h2>
+  <div class="stack" style="margin-top:12px">
+    <div class="limit"><dl><dt>대상 월</dt><dd><span class="slot">월</span></dd><dt>상태</dt><dd id="d-st"></dd><dt>지급 예정 금액</dt><dd id="d-amt"></dd></dl></div>
+    <h3>후원별 환산 기준</h3>
+    <ul class="plain" id="d-list"></ul>
+    <h3>조정 이력</h3>
+    <p class="muted" id="d-noadj">조정 내역이 없어요.</p>
+    <ul class="plain" id="d-adj" hidden><li class="mc"><span class="slot">조정</span> · <span class="slot">날짜</span> · <span class="slot">금액</span> · <span class="slot">사유</span></li></ul>
+    <p class="help">마감된 정산은 고치지 않고 조정 내역으로 남겨요. 새 요율은 이미 마감된 정산에 적용되지 않아요.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>닫기</button></div>
+  </div>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); };
+  var SL = { collecting: '집계 중', confirmed: '확정', payready: '지급 대기', paid: '지급 완료' };
+  var AMT = '<span class="slot">금액</span>', WAIT = '<span class="sr">집계 전</span>집계 후 표시돼요';
+  function rows() {
+    return [{ st: d.st, hold: d.hold === 'on', fail: d.pay === 'fail', adj: d.adj === 'on' }, { st: 'paid', adj: false }, { st: 'paid', adj: false }];
+  }
+  function label(x) { return x.hold ? '정산 보류' : x.fail ? '지급 실패' : SL[x.st]; }
+  function tag(x) { return '<span class="tag' + (x.hold || x.fail ? ' bad' : '') + '">' + label(x) + '</span>' + (x.adj ? '<span class="tag">조정 있음</span>' : ''); }
+  function a(x) { return x.st === 'collecting' ? WAIT : AMT; }
+  function btn(i) { return '<button class="btn" type="button" data-d="' + i + '" aria-label="정산 상세 보기">상세</button>'; }
+  function vis(e) { return e && e.offsetParent !== null; }
+  window.mockAfter = function () {
+    if (d.role !== 'owner') return;
+    var r = rows(), x = r[0];
+    $('c-st').innerHTML = tag(x); $('c-amt').innerHTML = a(x); $('d-st').innerHTML = tag(x); $('d-amt').innerHTML = a(x);
+    $('tb').innerHTML = r.map(function (y, i) { return '<tr><th scope="row"><span class="slot">월</span></th><td>' + tag(y) + '</td><td>' + a(y) + '</td><td>' + a(y) + '</td><td>' + (y.adj ? AMT : '<span class="muted">없음</span>') + '</td><td>' + a(y) + '</td><td>' + (y.hold ? AMT : '<span class="muted">없음</span>') + '</td><td>' + a(y) + '</td><td>' + btn(i) + '</td></tr>'; }).join('');
+    $('cards').innerHTML = r.map(function (y, i) { return '<div class="mc"><p><strong><span class="slot">월</span></strong> ' + tag(y) + '</p><p class="big">' + a(y) + '</p><p class="small muted">지급 예정</p><div class="limit" style="margin-top:8px"><dl><dt>후원 합계</dt><dd>' + a(y) + '</dd><dt>수수료</dt><dd>' + a(y) + '</dd><dt>조정</dt><dd>' + (y.adj ? AMT : '없음') + '</dd><dt>세금</dt><dd>' + a(y) + '</dd><dt>보류 금액</dt><dd>' + (y.hold ? AMT : '없음') + '</dd></dl></div><div class="mem-acts">' + btn(i) + '</div></div>'; }).join('');
+    $('d-list').innerHTML = ['기본', '파트너'].map(function (p, i) { return '<li class="mc"><span class="slot">후원 ' + (i + 1) + '</span><br>이 후원의 열매는 <span class="slot">상품명</span> 구매 기준으로 환산했어요<br><span class="small muted">적용 정책: ' + p + (i ? ' (<span class="slot">적용 기간</span>)' : '') + '</span></li>'; }).join('');
+    $('d-adj').hidden = !x.adj; $('d-noadj').hidden = x.adj;
+    var m = $('d-dlg');
+    if (d.dlg === 'detail' && !m.open) { if (m._i == null) m._i = '0'; m.showModal(); }
+    if (d.dlg === 'closed' && m.open) m.close();
+  };
+  $('d-dlg').addEventListener('close', function () { var i = this._i; this._i = null; d.dlg = 'closed'; window.mockRender(); var o = Array.prototype.filter.call(document.querySelectorAll('[data-d="' + i + '"]'), vis)[0]; if (o) o.focus(); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-d]'); if (t) { $('d-dlg')._i = t.dataset.d; d.dlg = 'detail'; window.mockRender(); }
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>
