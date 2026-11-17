@@ -28,14 +28,14 @@
 <p class="help">받는 분: <span class="slot">목회자 개인 기준</span></p>
 
 <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
-<div class="notice danger" role="alert" data-show="s=loaderr"><strong>정산 내역을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>정산 내역을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
 <div class="empty" data-show="s=empty"><p><strong>아직 정산할 내역이 없어요</strong></p><p>첫 정산은 <span class="slot">시점</span>에 만들어져요.</p></div>
 
 <div class="stack" data-show="s=normal">
   <div class="notice danger" role="alert" data-show="hold=on"><strong>이 정산은 보류 중이에요</strong>
     <p class="small">사유 <span class="slot">사유</span> · 범위 <span class="slot">범위</span> · 시각 <span class="slot">시각</span> · 처리: 운영사</p>
     <p class="help">신고가 접수됐다는 이유만으로 보류하지 않아요 <span class="slot">정책 확정 전</span></p>
-    <p style="margin-top:8px"><a class="btn" href="sanctions.html">이의제기</a></p></div>
+    <p style="margin-top:8px"><a class="btn lnk" href="sanctions.html">이의제기</a></p></div>
   <div class="notice danger" role="alert" data-show="pay=fail"><strong>지급하지 못했어요. 운영사가 확인 중이에요</strong>
     <p class="small">실패 사유 <span class="slot">사유</span> · 재시도 이력 <span class="slot">이력</span></p></div>
 
@@ -79,7 +79,7 @@
   function label(x) { return x.hold ? '정산 보류' : x.fail ? '지급 실패' : SL[x.st]; }
   function tag(x) { return '<span class="tag' + (x.hold || x.fail ? ' bad' : x.st === 'paid' ? ' ok' : '') + '">' + label(x) + '</span>' + (x.adj ? '<span class="tag">조정 있음</span>' : ''); }
   function a(x) { return x.st === 'collecting' ? WAIT : AMT; }
-  function btn(i) { return '<button class="btn" type="button" data-d="' + i + '" aria-label="정산 상세 보기">상세</button>'; }
+  function btn(i) { return '<button class="btn lnk" type="button" data-d="' + i + '" aria-label="정산 상세 보기">상세</button>'; }
   function vis(e) { return e && e.offsetParent !== null; }
   window.mockAfter = function () {
     if (d.role !== 'owner') return;

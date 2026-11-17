@@ -12,12 +12,17 @@
   .prof { flex-wrap: wrap; }
   .prof .grow { flex: 1 1 160px; min-width: 0; }
   @media (max-width: 767px) { .prof .acct { flex: 0 0 100%; } }
-  .bal { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 16px; }
-  .bal strong { font-size: 1.5rem; }
-  ul.menu { list-style: none; margin: 8px 0 0; padding: 0; }
-  ul.menu li > a, ul.menu li > .rowst { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: var(--tap); border-top: 1px solid var(--line); text-decoration: none; color: var(--text); }
-  ul.menu li > a:hover { background: var(--bg-sub); }
-  ul.menu .val { color: var(--muted); font-size: .9rem; }
+  .bal { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding: 18px 20px; background: var(--s1); border-radius: 14px; margin-top: 16px; }
+  .bal strong { font-size: 1.5rem; color: var(--accent); }
+  ul.menu { list-style: none; margin: 8px 0 0; padding: 4px 20px; background: var(--s1); border-radius: 14px; }
+  ul.menu li + li { border-top: 1px solid var(--line); }
+  ul.menu li > a, ul.menu li > .rowst { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; text-decoration: none; color: var(--text); }
+  ul.menu li > a:hover { color: var(--accent); }
+  ul.menu li > a::after { content: "›"; color: var(--muted); font-size: 1.3rem; margin-left: 4px; }
+  ul.menu .val { color: var(--muted); font-size: .9rem; margin-left: auto; }
+  .col h2 { font-size: 1.05rem; }
+  .col a.quiet { color: var(--muted); text-decoration: none; }
+  a.quiet:hover { color: var(--danger); }
 </style>
 </head>
 <body data-default="s:normal">
@@ -50,18 +55,18 @@
       <a class="btn primary" href="charge.html" data-show="s=normal|zero|proffail|balfail|logoutfail"><span class="slot" style="margin-right:8px">S1 명칭</span>충전하기</a>
       <p class="muted small" data-show="s=under19">충전과 후원은 만 19세부터 할 수 있어요. <span class="slot">법무 7-2 확인 전</span></p>
     </div>
-    <p style="margin-top:8px"><a href="history.html">충전·후원 내역</a></p>
 
-    <h2 style="margin-top:24px">설정</h2>
+    <h2 style="margin-top:28px">설정</h2>
     <ul class="menu">
+      <li><a href="history.html"><span>충전·후원 내역</span></a></li>
       <li><div class="rowst"><span>알림 설정</span><span class="val"><span class="slot">화면 미작성</span></span></div></li>
       <li><a href="reco-settings.html"><span>추천·기록 설정</span><span class="val">추천 켜짐</span></a></li>
     </ul>
 
-    <h2 style="margin-top:24px">계정</h2>
-    <p style="margin-top:8px"><a class="btn" href="main.html?auth=guest">로그아웃</a></p>
+    <h2 style="margin-top:28px">계정</h2>
+    <p style="margin-top:8px"><a class="btn" style="margin-left:-12px" href="main.html?auth=guest">로그아웃</a></p>
     <p class="err" role="alert" data-show="s=logoutfail">로그아웃하지 못했어요 <button class="btn" type="button" data-icon="retry" data-keep>다시 시도</button></p>
-    <p class="small muted" style="margin-top:32px"><a href="withdraw.html">탈퇴</a></p>
+    <p class="small muted" style="margin-top:32px"><a class="quiet" href="withdraw.html">탈퇴</a></p>
   </div>
 
   <div class="notice" data-show="s=guest" style="margin-top:16px"><strong>로그인하면 내 정보와 설정을 볼 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=my.html">로그인</a></p></div>

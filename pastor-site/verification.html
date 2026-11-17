@@ -26,9 +26,10 @@
 <div class="notice"><strong>인증 없이도 방송국을 만들고 방송할 수 있어요</strong><p class="small">인증은 시청자에게 인증 배지를 보여 주는 용도예요.</p></div>
 
 <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:120px;margin-top:12px"></div></section>
-<div class="notice danger" role="alert" data-show="s=loaderr"><strong>인증 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>인증 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
 
 <div class="stack" data-show="s=normal">
+  <ol class="vsteps" id="vsteps" aria-label="인증 진행 단계"><li>신청</li><li>심사</li><li>결과</li></ol>
   <section class="limit" aria-label="현재 상태"><dl>
     <dt>상태</dt><dd id="v-st"></dd>
     <dt>신청일</dt><dd><span class="slot">신청일</span></dd>
@@ -39,12 +40,12 @@
 
   <div class="notice" role="status" data-show="v=review"><strong>심사 중이에요. 결과는 알림으로 알려 드려요</strong>
     <p class="small">제출한 내용은 고칠 수 없어요.</p>
-    <p style="margin-top:8px" data-show="role=owner"><button class="btn" type="button" data-open="cancel-dlg">신청 취소</button> <span class="help"><span class="slot">취소 가능 여부</span></span></p></div>
+    <p style="margin-top:8px" data-show="role=owner"><button class="btn lnk" type="button" data-open="cancel-dlg">신청 취소</button> <span class="help"><span class="slot">취소 가능 여부</span></span></p></div>
   <div class="notice" role="status" data-show="v=more"><strong>서류를 더 보내 주세요</strong><p class="small">요청 내용 <span class="slot">요청 내용</span></p></div>
   <div class="notice" role="status" data-show="v=ok"><strong>인증되었어요</strong><p class="small">교단명 <span class="slot">교단명</span> · 승인일 <span class="slot">승인일</span></p></div>
   <div class="notice danger" role="alert" data-show="v=no"><strong>인증 신청이 반려됐어요</strong><p class="small">사유 <span class="slot">사유</span> · 재신청 <span class="slot">가능 여부</span></p>
-    <p style="margin-top:8px" data-show="role=owner"><button class="btn" type="button" id="re">다시 신청</button></p></div>
-  <div class="notice danger" role="alert" id="n-fail" data-show="v=fail"><strong>오류: 보내지 못했어요. 입력한 내용과 파일은 그대로예요</strong><p style="margin-top:8px" data-show="role=owner"><button class="btn" type="button" id="retry" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <p style="margin-top:8px" data-show="role=owner"><button class="btn lnk" type="button" id="re">다시 신청</button></p></div>
+  <div class="notice danger" role="alert" id="n-fail" data-show="v=fail"><strong>오류: 보내지 못했어요. 입력한 내용과 파일은 그대로예요</strong><p style="margin-top:8px" data-show="role=owner"><button class="btn lnk" type="button" id="retry" data-icon="retry" data-keep>다시 시도</button></p></div>
 
   <div class="panel stack" data-show="v=review|more|ok"><h2>제출한 내용</h2><p class="small">교단명 <span class="slot">교단명</span></p><p class="small">파일 <span class="slot">파일명</span></p></div>
 
@@ -83,10 +84,12 @@
   function err(id, f, msg) { var e = $(id); e.hidden = !msg; e.textContent = msg ? '오류: ' + msg : ''; if (f) { if (msg) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid'); } }
   function list() {
     var n = file ? file.name + ' (' + Math.max(1, Math.round(file.size / 1024)) + 'KB)' : (d.v === 'file' || d.v === 'more' ? '<span class="slot">파일명</span>' : '');
-    $('fl-list').innerHTML = n ? '<li class="row" style="justify-content:space-between;border-top:1px solid var(--line)"><span style="min-width:0;overflow-wrap:anywhere">' + (file ? n.replace(/</g, '&lt;') : n) + '</span><button class="btn" type="button" id="fl-rm" aria-label="파일 빼기">빼기</button></li>' : '';
+    $('fl-list').innerHTML = n ? '<li class="row" style="justify-content:space-between;border-top:1px solid var(--line)"><span style="min-width:0;overflow-wrap:anywhere">' + (file ? n.replace(/</g, '&lt;') : n) + '</span><button class="btn lnk" type="button" id="fl-rm" aria-label="파일 빼기">빼기</button></li>' : '';
   }
   window.mockAfter = function () {
     if (d.role === 'mgr') return;
+    var si = { review: 1, more: 1, ok: 2, no: 2 }[d.v] || 0;
+    document.querySelectorAll('#vsteps li').forEach(function (li, n) { li.className = n < si ? 'done' : n === si ? 'now' : ''; });
     $('v-st').innerHTML = '<span class="tag' + (d.v === 'no' ? ' bad' : '') + '">' + ST[d.v] + '</span>';
     err('fl-e', $('fl'), d.v === 'filebad' ? '이 파일은 올릴 수 없어요. 형식과 용량을 확인해 주세요' : '');
     list();

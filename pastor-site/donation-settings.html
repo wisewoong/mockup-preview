@@ -20,19 +20,19 @@
 </div></div>
 
 <main class="wrap"><div class="col">
-<section data-show="role=mgr"><div class="empty"><p><strong>후원과 정산은 방송국 소유자만 볼 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+<section data-show="role=mgr"><div class="empty"><p><strong>후원과 정산은 방송국 소유자만 볼 수 있어요</strong></p><p><a class="btn lnk" href="dashboard.html">대시보드로</a></p></div></section>
 
-<section class="notice" role="alert" data-show="role=adm0"><strong>권한이 없어요</strong><p class="small">후원 설정은 소유자가 권한을 주면 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn" href="dashboard.html">대시보드로 가기</a></p></section>
+<section class="notice" role="alert" data-show="role=adm0"><strong>권한이 없어요</strong><p class="small">후원 설정은 소유자가 권한을 주면 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn lnk" href="dashboard.html">대시보드로 가기</a></p></section>
 <section data-show="role=owner|admall s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:120px"></div><div class="skeleton" style="height:160px"></div></section>
 
-<div class="notice danger" role="alert" data-show="role=owner|admall s=loaderr"><strong>후원 설정을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="role=owner|admall s=loaderr"><strong>후원 설정을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
 
 <div class="stack" data-show="role=owner|admall s=normal|unset|saveerr|reject|saved|err">
 <h1>후원 설정</h1>
 <div class="notice" data-show="adj=on"><strong>후원 설정이 조정되었어요</strong>
   <p>후원 최소 금액이 <span class="slot">이전 값</span>에서 <span class="slot">새 값</span>으로 바뀌었어요.</p>
   <p>새 한도는 <span class="slot">최소</span>부터 <span class="slot">최대</span>까지예요. 한도 안에서 다시 설정할 수 있어요.</p>
-  <p style="margin-top:8px"><button class="btn" type="button" data-set="adj:off">확인</button></p></div>
+  <p style="margin-top:8px"><button class="btn lnk" type="button" data-set="adj:off">확인</button></p></div>
 <div class="notice" role="status" data-show="s=saved"><strong>저장했어요</strong><p class="small muted">변경자와 시각이 이력에 남았어요.</p></div>
 <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 값은 그대로 두었어요. 잠시 뒤 다시 저장해 주세요.</p></div>
 <div class="notice danger" role="alert" data-show="s=reject"><strong>운영사 한도가 바뀌었어요</strong><p>새 범위는 <span class="slot">새 한도</span>입니다. 입력한 값은 그대로 두었어요. 한도 안으로 고쳐 주세요.</p></div>
@@ -63,8 +63,8 @@
 <section class="panel" aria-labelledby="h-his"><h2 id="h-his">변경 이력</h2>
   <div class="empty" data-show="hist=none"><p><strong>아직 변경 이력이 없어요</strong></p></div>
   <div data-show="hist=some">
-    <table class="hide-m" style="width:100%;border-collapse:collapse"><caption class="sr">변경 이력</caption>
-      <thead><tr><th scope="col" style="text-align:left">시각</th><th scope="col" style="text-align:left">변경자</th><th scope="col" style="text-align:left">항목</th><th scope="col" style="text-align:left">이전 → 새</th></tr></thead>
+    <table class="hist hide-m" style="width:100%"><caption class="sr">변경 이력</caption>
+      <thead><tr><th scope="col">시각</th><th scope="col">변경자</th><th scope="col">항목</th><th scope="col">이전 → 새</th></tr></thead>
       <tbody id="hrows">
         <tr><td>샘플 시각</td><td>운영사 한도 변경으로 자동 조정</td><td>후원 최소 금액</td><td><span class="slot">이전</span> → <span class="slot">새</span></td></tr>
         <tr><td>샘플 시각</td><td>샘플닉네임</td><td>TTS 최소 후원액</td><td><span class="slot">이전</span> → <span class="slot">새</span></td></tr>

@@ -23,8 +23,8 @@
 
 <main class="wrap">
 <section class="stack" style="padding-top:24px" role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:200px"></div></section>
-<section style="padding-top:24px" data-show="s=loaderr"><div class="notice danger" role="alert"><strong>방송 정보를 불러오지 못했어요</strong><p class="small">방송에는 영향이 없어요. 다시 시도해 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div></section>
-<section style="padding-top:24px" data-show="s=unsupported"><div class="notice"><strong>이 기기에서는 방송 관리 화면을 쓸 수 없어요</strong><p class="small">컴퓨터 같은 다른 기기에서 열어 확인해 주세요.</p><p style="margin-top:8px"><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+<section style="padding-top:24px" data-show="s=loaderr"><div class="notice danger" role="alert"><strong>방송 정보를 불러오지 못했어요</strong><p class="small">방송에는 영향이 없어요. 다시 시도해 주세요.</p><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div></section>
+<section style="padding-top:24px" data-show="s=unsupported"><div class="notice"><strong>이 기기에서는 방송 관리 화면을 쓸 수 없어요</strong><p class="small">컴퓨터 같은 다른 기기에서 열어 확인해 주세요.</p><p style="margin-top:8px"><a class="btn lnk" href="dashboard.html">대시보드로</a></p></div></section>
 
 <!-- 종료 후 요약 -->
 <section class="col stack" data-show="s=normal end=done" aria-label="방송 요약">
@@ -35,7 +35,7 @@
     <p><span class="tag">다시보기 준비 중</span>자동 녹화 영상은 처리가 끝나면 영상 관리에 나타나요.</p>
     <p class="small">공개하려면 영상 관리에서 권리 확인을 마쳐야 해요.</p>
   </div>
-  <p class="row"><a class="btn primary" href="videos.html?rt=need">영상 관리로</a><a class="btn" href="dashboard.html">대시보드로</a></p>
+  <p class="row"><a class="btn primary" href="videos.html?rt=need">영상 관리로</a><a class="btn lnk" href="dashboard.html">대시보드로</a></p>
 </section>
 
 <div data-show="s=normal end=none|confirm|wait|fail" id="main">
@@ -46,8 +46,8 @@
   </div>
   <p class="help" id="end-why" hidden></p>
 </div>
-<div class="notice danger" role="alert" data-show="end=fail" style="margin-top:16px"><strong>방송을 종료하지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" id="end-retry" data-icon="retry" data-keep>다시 시도</button></p></div>
-<div class="notice danger" role="alert" data-show="sig=reconfail" style="margin-top:16px"><strong>서버가 방송을 종료했어요</strong><p class="small">연결이 <span class="slot">재연결 대기 시간</span> 안에 돌아오지 않았어요. 다시 방송하려면 라이브 시작에서 새로 시작해 주세요.</p><p class="row" style="margin-top:8px"><button class="btn" type="button" data-set="end:done">요약 보기</button><a class="btn" href="live-start.html">라이브 시작</a></p></div>
+<div class="notice danger" role="alert" data-show="end=fail" style="margin-top:16px"><strong>방송을 종료하지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" id="end-retry" data-icon="retry" data-keep>다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="sig=reconfail" style="margin-top:16px"><strong>서버가 방송을 종료했어요</strong><p class="small">연결이 <span class="slot">재연결 대기 시간</span> 안에 돌아오지 않았어요. 다시 방송하려면 라이브 시작에서 새로 시작해 주세요.</p><p class="row" style="margin-top:8px"><button class="btn lnk" type="button" data-set="end:done">요약 보기</button><a class="btn lnk" href="live-start.html">라이브 시작</a></p></div>
 
 <div class="tabs mtabs" role="tablist" aria-label="화면 선택" style="margin-top:16px">
   <button class="" role="tab" type="button" id="mt-mine" aria-selected="true" aria-controls="p-mine" data-mt="mine">내 방송</button>
@@ -59,14 +59,14 @@
     <div class="preview" id="pv"><p><strong style="color:inherit" id="pv-t"></strong><br><span class="small" id="pv-s"></span></p></div>
     <fieldset class="row" id="fs-ctl" style="border:0;padding:0;margin:16px 0 0" data-show="send=browser"><legend class="sr">송출 제어</legend>
       <button class="btn toggle" type="button" id="mic" aria-pressed="false">마이크 켜짐</button><button class="btn toggle" type="button" id="cam" aria-pressed="false">카메라 켜짐</button></fieldset>
-    <div class="row between"><p>방송 모드 <span class="tag" id="md-t"></span></p><button class="btn" type="button" id="md-btn" aria-describedby="ctl-why">예배 방송으로 전환</button></div>
+    <div class="row between"><p>방송 모드 <span class="tag" id="md-t"></span></p><button class="btn lnk" type="button" id="md-btn" aria-describedby="ctl-why">예배 방송으로 전환</button></div>
     <p class="help" id="md-help" hidden>방송 중에는 일반에서 예배로만 바꿀 수 있어요.</p>
     <p class="help" id="ctl-why" hidden></p>
   </section>
   <section class="panel stack" id="p-view" role="tabpanel" aria-labelledby="mt-view" aria-label="시청자 화면">
     <h2>시청자가 보는 화면</h2>
     <div class="preview"><p>시청자 화면<br><span class="small">몇 초 늦게 보일 수 있어요.</span></p></div>
-    <p class="row"><span class="tag" id="mute-t">음소거 중</span><button class="btn" type="button" id="mute">소리 켜기</button><button class="btn ik" type="button" id="lcopy" data-icon="copy" data-keep>링크 복사</button></p>
+    <p class="row"><span class="tag" id="mute-t">음소거 중</span><button class="btn lnk" type="button" id="mute">소리 켜기</button><button class="btn lnk ik" type="button" id="lcopy" data-icon="copy" data-keep>링크 복사</button></p>
     <p class="help" id="lok" role="status" hidden>복사했어요.</p>
   </section>
 </div>
@@ -92,11 +92,11 @@
 
   <section class="panel stack" id="p-chat" role="tabpanel" aria-labelledby="st-chat" aria-label="채팅 관리">
     <h2>채팅 관리</h2>
-    <div class="row"><span class="tag" id="chat-t"></span><button class="btn" type="button" id="chat-tg"></button><button class="btn toggle" type="button" id="slow" aria-pressed="false">느린 모드 <span class="slot">간격</span></button></div>
+    <div class="row"><span class="tag" id="chat-t"></span><button class="btn lnk" type="button" id="chat-tg"></button><button class="tg" type="button" id="slow" aria-pressed="false"><i></i>느린 모드 <span class="slot">간격</span></button></div>
     <div class="empty" data-show="chat=closed"><p>채팅이 닫혀 있어요</p></div>
     <ul class="msg-list" data-show="chat=open|slow" id="chat-list">
-      <li><span><strong>샘플닉네임1</strong> <span class="tag" id="s-m1" hidden></span><br>안녕하세요, 샘플 채팅이에요</span><button class="btn" type="button" data-m="m1" aria-label="샘플닉네임1 메시지 관리">관리</button></li>
-      <li><span><strong>샘플닉네임2</strong> <span class="tag" id="s-m2" hidden></span><br>샘플 채팅 메시지예요</span><button class="btn" type="button" data-m="m2" aria-label="샘플닉네임2 메시지 관리">관리</button></li>
+      <li><span><strong>샘플닉네임1</strong> <span class="tag" id="s-m1" hidden></span><br>안녕하세요, 샘플 채팅이에요</span><button class="btn lnk" type="button" data-m="m1" aria-label="샘플닉네임1 메시지 관리">관리</button></li>
+      <li><span><strong>샘플닉네임2</strong> <span class="tag" id="s-m2" hidden></span><br>샘플 채팅 메시지예요</span><button class="btn lnk" type="button" data-m="m2" aria-label="샘플닉네임2 메시지 관리">관리</button></li>
       <li><span><strong>샘플매니저1</strong> <span class="tag mgr">매니저</span><br>샘플 매니저 메시지예요</span></li>
     </ul>
   </section>
@@ -109,7 +109,7 @@
     <p class="help" data-show="role=mgr mode=normal">TTS 제어는 관리자 이상만 쓸 수 있어요</p>
     <p data-show="mode=normal tts=muted"><span class="tag bad">긴급 음소거 중</span></p>
     <fieldset id="fs-tts" style="border:0;padding:0;margin:0"><legend class="sr">TTS 제어</legend>
-      <p class="row"><button class="btn" type="button">읽기 중지</button><button class="btn" type="button">건너뛰기</button><button class="btn toggle bad" type="button" id="tts-mute" aria-pressed="false">긴급 음소거</button></p>
+      <p class="row"><button class="btn lnk" type="button">읽기 중지</button><button class="btn lnk" type="button">건너뛰기</button><button class="btn toggle bad" type="button" id="tts-mute" aria-pressed="false">긴급 음소거</button></p>
       <p class="small muted" style="margin-top:12px">대기열 <strong>2</strong>건 (샘플)</p>
     </fieldset>
   </section>
@@ -136,7 +136,7 @@
 </dialog>
 <dialog id="end-dlg" aria-labelledby="end-t"><h2 id="end-t">방송을 종료할까요?</h2>
   <p style="margin-top:8px">종료하면 시청자 화면에서 방송이 끝나요. 자동 녹화 영상은 처리 뒤 권리 확인을 마쳐야 공개할 수 있어요.</p>
-  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>계속 방송</button><button class="btn" type="button" id="end-ok">방송 종료</button></div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>계속 방송</button><button class="btn bad" type="button" id="end-ok">방송 종료</button></div>
 </dialog>
 <dialog id="mode-dlg" aria-labelledby="mode-t"><h2 id="mode-t">예배 방송으로 바꿀까요?</h2>
   <p style="margin-top:8px">예배 방송에서는 음성(TTS)을 쓸 수 없어요. 방송 중에는 일반으로 되돌릴 수 없어요.</p>

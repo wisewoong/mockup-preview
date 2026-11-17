@@ -28,3 +28,13 @@
   .files li .btn, .rel li .btn { min-height: var(--tap); }
   .pick-file { width: 100%; }
 }
+/* bo-pages2: 행 액션은 글자 링크(.go), 목록 줄 정렬 */
+.rel li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; }
+.files .f-acts { align-items: center; gap: 0; }
+@media (max-width: 1023px) {
+  .tbl-wrap.cards.v > table > tbody > tr { gap: 4px 4px; }
+  .tbl-wrap.cards.v > table > tbody > tr > td.c-act { margin-top: 4px; }
+  .tbl-wrap.cards.v > table > tbody > tr > td.c-act .go { padding-left: 0; }
+  .rel li .go { margin-left: -10px; }
+  .tbl-wrap.cards.v > table > tbody > tr > th.c-title { background: transparent; padding: 0; font-size: 1.05rem; }
+}

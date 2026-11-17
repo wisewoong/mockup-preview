@@ -27,7 +27,7 @@
 <p class="help">신고가 접수됐다는 이유만으로 조치하지 않아요 <span class="slot">정책 확정 전</span></p>
 
 <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
-<div class="notice danger" role="alert" data-show="s=loaderr"><strong>제재 안내를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>제재 안내를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
 <div class="empty" data-show="s=empty"><p><strong>현재 적용 중인 조치가 없어요</strong></p></div>
 
 <div class="stack" data-show="s=normal">
@@ -56,7 +56,7 @@
       <div class="notice" role="status" data-show="appeal=ok"><strong><span class="tag ok">받아들여짐</span> 조치를 풀었어요</strong><p class="small">해제 시각 <span class="slot">시각</span></p></div>
       <div class="notice" role="status" data-show="appeal=no"><strong><span class="tag bad">받아들여지지 않음</span></strong><p class="small">사유 <span class="slot">사유</span></p><p class="small">다른 의견이 있으면 <span class="slot">추가 이의제기 가능 여부</span></p></div>
       <div class="notice" role="status" data-show="appeal=more"><strong>내용을 더 보내 주세요</strong><p class="small">요청 내용 <span class="slot">요청 내용</span></p></div>
-      <div class="notice danger" role="alert" id="n-fail" tabindex="-1" data-show="appeal=fail"><strong>오류: 보내지 못했어요. 입력한 내용과 파일은 그대로예요</strong><p style="margin-top:8px"><button class="btn" type="button" id="ap-retry" data-icon="retry" data-keep>다시 시도</button></p></div>
+      <div class="notice danger" role="alert" id="n-fail" tabindex="-1" data-show="appeal=fail"><strong>오류: 보내지 못했어요. 입력한 내용과 파일은 그대로예요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" id="ap-retry" data-icon="retry" data-keep>다시 시도</button></p></div>
       <p class="help" data-show="appeal=late">이의제기할 수 있는 기간이 지났어요 <span class="slot">기간</span>. 문의는 <span class="slot">운영팀 문의 경로</span>로 해 주세요.</p>
 
       <div class="stack panel" data-show="appeal=sent|review|ok|no|more"><h3>내가 보낸 내용</h3><p class="small"><span class="slot">내가 쓴 사유</span></p><p class="small">파일 <span class="slot">파일명</span></p></div>
@@ -86,8 +86,8 @@
     'station-l': ['방송국 제한', '방송국이 제한 중이에요. <span class="slot">제한 범위</span>', ''],
     'station-s': ['방송국 정지', '방송국이 정지됐어요. <span class="slot">정지 중 제한 사항</span>', ''],
     'station-c': ['방송국 폐쇄', '방송국을 더 쓸 수 없어요', ''],
-    content: ['영상 공개 제한', '이 영상은 운영 조치로 공개할 수 없어요.', '<a class="btn" href="videos.html">영상 관리로</a>'],
-    settle: ['정산 보류', '정산이 보류 중이에요. 신고 접수만으로 보류하지 않아요.', '<a class="btn" href="settlements.html">정산 내역으로</a>'],
+    content: ['영상 공개 제한', '이 영상은 운영 조치로 공개할 수 없어요.', '<a class="btn lnk" href="videos.html">영상 관리로</a>'],
+    settle: ['정산 보류', '정산이 보류 중이에요. 신고 접수만으로 보류하지 않아요.', '<a class="btn lnk" href="settlements.html">정산 내역으로</a>'],
     ext: ['외부 후원 정보 검토', '운영자가 검토 중이에요. 확정된 조치가 아니에요', '']
   };
   function rows() {
@@ -95,7 +95,7 @@
     return [{ k: k, st: st }, { k: 'content', st: 'done' }];
   }
   function tag(st) { return st === 'on' ? '<span class="tag bad">적용 중</span>' : st === 'rev' ? '<span class="tag">검토 중</span>' : '<span class="tag ok">해제됨</span>'; }
-  function btn(i, n) { return '<button class="btn" type="button" data-d="' + i + '" aria-label="' + n + ' (대상 샘플) 상세 보기">자세히</button>'; }
+  function btn(i, n) { return '<button class="btn lnk" type="button" data-d="' + i + '" aria-label="' + n + ' (대상 샘플) 상세 보기">자세히</button>'; }
   function vis(e) { return e && e.offsetParent !== null; }
   function fl() {
     $('ap-list').innerHTML = files.map(function (f, i) { return '<li class="row" style="justify-content:space-between;border-top:1px solid var(--line)"><span style="min-width:0;overflow-wrap:anywhere">' + f.name.replace(/</g, '&lt;') + ' <span class="small muted">(' + Math.max(1, Math.round(f.size / 1024)) + 'KB)</span></span><button class="btn" type="button" data-rm="' + i + '" aria-label="' + f.name + ' 빼기">빼기</button></li>'; }).join('');

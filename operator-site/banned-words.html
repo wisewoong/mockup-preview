@@ -11,6 +11,12 @@
 /* 데스크톱 표 좁은 칸 줄바꿈 방지: 일치 방식·상태·관리 버튼은 한 줄 고정 */
 @media (min-width: 1024px) { .tbl-wrap.cards.k td.c-dot, .tbl-wrap.cards.k td.c-s, .tbl-wrap.cards.k td.c-a { white-space: nowrap; } }
 </style>
+<style>
+button.go{background:none;border:0;font:inherit;font-size:14px;cursor:pointer}
+.mn button:disabled { color: var(--muted); cursor: not-allowed; }
+.op-main ul.plain li { display: block; border: 0; padding: 2px 0; }
+@media (max-width: 1023px) { .tbl-wrap.cards.k .acts-row .more .btn { flex: none; width: 44px; padding: 0; } .tbl-wrap.cards.k .acts-row { justify-content: space-between; } }
+</style>
 </head>
 <body data-default="role:op s:normal">
 <!-- 저장 즉시 적용(적용 시작일·예약 버전 없음). 삭제 없음(비활성만). 걸린 횟수로 자동 제재하지 않는다. 단어·시각·이름은 모두 샘플이고 실제 표현을 적지 않는다. -->
@@ -140,10 +146,12 @@
         '<td class="c-s"><span class="tag ' + (x.on ? 'ok' : 'off') + '">' + (x.on ? '사용 중' : '비활성') + '</span></td>' +
         '<td class="c-w">' + (x.h[0].now ? '방금' : '샘플 시각') + ' · 샘플 운영자</td>' +
         '<td class="c-a"><div class="acts-row">' + why +
-        '<button class="btn" type="button" data-a="his" data-i="' + i + '" aria-label="' + w + ' 이력">이력</button>' +
-        (x.on ? '<button class="btn" type="button" data-a="edit" data-i="' + i + '" aria-label="' + w + ' 수정"' + dis + '>수정</button>' +
-          '<button class="btn bad" type="button" data-a="off" data-i="' + i + '" aria-label="' + w + ' 비활성">비활성</button>'
-          : '<button class="btn" type="button" data-a="on" data-i="' + i + '" aria-label="' + w + ' 다시 사용"' + dis + '>다시 사용</button>') +
+        '<button class="go" type="button" data-a="his" data-i="' + i + '" aria-label="' + w + ' 이력">이력 ›</button>' +
+        '<span class="more"><button class="btn ib" type="button" aria-label="' + w + ' 더보기" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="mn" role="menu" hidden>' +
+        (x.on ? '<button type="button" role="menuitem" data-a="edit" data-i="' + i + '"' + dis + '>수정</button>' +
+          '<button type="button" role="menuitem" class="red" data-a="off" data-i="' + i + '">비활성</button>'
+          : '<button type="button" role="menuitem" data-a="on" data-i="' + i + '"' + dis + '>다시 사용</button>') +
+        '</div></span>' +
         '</div></td></tr>';
     }).join('');
     $('cnt').textContent = n + '건';
@@ -164,7 +172,7 @@
     $(id).close(); if (D.s === 'empty') D.s = 'normal';
     window.mockRender(); $('toast').textContent = text; $('toast').hidden = false;
     // 행이 필터에서 사라졌거나 버튼이 바뀌었으면 표 제목으로
-    var t = document.querySelector('#rows [data-i="' + i + '"][data-a="' + a + '"]:not(:disabled)') || document.querySelector('#rows [data-i="' + i + '"][data-a="his"]') || $('h-list');
+    var t = document.querySelector('#rows [data-i="' + i + '"][data-a="his"]') || $('h-list');
     t.focus();
   }
   // 저장 흉내: 중복 제출 방지 → 상태 키에 따라 오류. 실패 시 입력 유지
@@ -242,14 +250,14 @@
   // 행 버튼
   $('rows').addEventListener('click', function (e) {
     var t = e.target.closest('[data-a]'); if (!t) return;
-    var i = +t.dataset.i, a = t.dataset.a, x = W[i];
-    if (a === 'edit') return form(i, t);
-    if (a !== 'his') return confirm(i, a === 'on', t);
+    var i = +t.dataset.i, a = t.dataset.a, x = W[i], op = t.closest('.more') ? t.closest('.more').firstElementChild : t;
+    if (a === 'edit') return form(i, op);
+    if (a !== 'his') return confirm(i, a === 'on', op);
     $('hd-t').innerHTML = slot(x.w) + ' 변경 이력';
     $('hd-list').innerHTML = x.h.map(function (h) {
       return '<div class="item"><p><strong>' + h.a + '</strong> · 샘플 운영자 · ' + (h.now ? '방금' : '샘플 시각') + (h.d ? '<br>' + esc(h.d) : '') + '<br><span class="muted">사유: ' + esc(h.y) + '</span></p></div>';
     }).join('');
-    open('h-dlg', t);
+    open('h-dlg', op);
   });
   window.mockRender();
 })();

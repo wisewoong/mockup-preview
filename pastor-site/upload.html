@@ -24,7 +24,7 @@
 </div></div>
 
 <main class="wrap"><div class="col stack">
-<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 관리자 이상만 쓸 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 관리자 이상만 쓸 수 있어요</strong></p><p><a class="btn lnk" href="dashboard.html">대시보드로</a></p></div></section>
 
 <div class="stack" data-show="role=owner|adm0|admall">
 <h1>영상 올리기</h1>
@@ -38,7 +38,7 @@
 </section>
 
 <section class="stack" data-show="step=2" aria-label="파일 확인과 정보">
-  <div class="item"><div class="preview" style="width:72px;height:72px;padding:0">썸네일</div><div><strong>설교_1114.mp4</strong><p class="small muted">샘플 크기 · 샘플 길이</p></div><button class="btn" type="button" data-set="step:1">다른 파일</button></div>
+  <div class="item"><div class="preview" style="width:72px;height:72px;padding:0">썸네일</div><div><strong>설교_1114.mp4</strong><p class="small muted">샘플 크기 · 샘플 길이</p></div><button class="btn lnk" type="button" data-set="step:1">다른 파일</button></div>
   <p class="err" role="alert" data-show="s=badfile">이 파일은 올릴 수 없어요. 형식·크기·길이를 확인해 주세요.</p>
   <form class="stack" onsubmit="return false">
     <label class="field"><span class="label">제목 (필수)</span><input class="input" id="ttl" value="설교_1114" aria-describedby="why"></label>
@@ -51,26 +51,26 @@
 </section>
 
 <section class="stack" data-show="step=3" aria-label="올리는 중">
-  <div class="notice danger" role="alert" data-show="s=paused"><strong>업로드가 중단되었어요. 진행률 42%</strong><p class="row" style="margin-top:8px"><button class="btn" type="button">이어서 올리기 <span class="slot">미정</span></button><button class="btn" type="button" data-set="step:2">처음부터</button></p></div>
-  <div class="notice danger" role="alert" data-show="s=fail"><strong>올리지 못했어요</strong><p>네트워크 연결이 끊겼어요. 제목과 카테고리는 그대로 남아 있어요.</p><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">재시도</button></p></div>
+  <div class="notice danger" role="alert" data-show="s=paused"><strong>업로드가 중단되었어요. 진행률 42%</strong><p class="row" style="margin-top:8px"><button class="btn lnk" type="button">이어서 올리기 <span class="slot">미정</span></button><button class="btn lnk" type="button" data-set="step:2">처음부터</button></p></div>
+  <div class="notice danger" role="alert" data-show="s=fail"><strong>올리지 못했어요</strong><p>네트워크 연결이 끊겼어요. 제목과 카테고리는 그대로 남아 있어요.</p><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">재시도</button></p></div>
   <p><strong>설교_1114.mp4</strong></p>
   <p><progress value="42" max="100" aria-label="업로드 진행률"></progress> <strong>42%</strong> <span class="muted small">샘플 남은 용량</span></p>
   <p class="small muted">휴대폰에서는 화면을 닫으면 멈출 수 있어요. <span class="slot">검증 후 확정</span></p>
-  <p class="row"><button class="btn" type="button">일시 정지 <span class="slot">재개 여부 미정</span></button><button class="btn" type="button" data-open="cx-dlg">취소</button><button class="btn" type="button" data-set="step:4">(목업) 완료로</button></p>
+  <p class="row"><button class="btn lnk" type="button">일시 정지 <span class="slot">재개 여부 미정</span></button><button class="btn bad" type="button" data-open="cx-dlg">취소</button><button class="btn lnk" type="button" data-set="step:4">(목업) 완료로</button></p>
 </section>
 
 <section class="stack" data-show="step=4" aria-label="처리와 권리 확인">
-  <div class="notice danger" role="alert" data-show="s=procfail"><strong>영상 처리에 실패했어요</strong><p class="row" style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep>다시 처리</button><button class="btn" type="button" data-set="step:1">다시 올리기</button></p></div>
+  <div class="notice danger" role="alert" data-show="s=procfail"><strong>영상 처리에 실패했어요</strong><p class="row" style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep>다시 처리</button><button class="btn lnk" type="button" data-set="step:1">다시 올리기</button></p></div>
   <div data-show="s=normal|reject" class="stack">
     <p><strong>업로드를 마쳤어요.</strong> <span data-show="pr=run">영상을 처리하는 중이에요.</span><span data-show="pr=done">영상 처리가 끝났어요.</span></p>
     <p><span class="tag" data-show="pr=run">처리 중</span><span class="tag" data-show="pr=done">준비 완료</span> 지금은 비공개예요. 권리 확인을 마치면 공개할 수 있어요. <span class="slot">비공개 열람 범위 확정 전</span></p>
     <div class="notice danger" role="alert" data-show="s=reject"><strong>권리 확인이 필요해서 공개할 수 없어요.</strong><p class="small">선택한 값은 그대로 남아 있어요.</p></div>
     <div class="notice" id="rc"><strong>공개하려면 권리 확인이 필요해요</strong>
-      <p class="row" style="margin-top:8px"><button class="btn primary" type="button" id="rcopen">권리 확인하기</button><button class="btn" type="button" id="rclater">나중에 하기</button></p>
+      <p class="row" style="margin-top:8px"><button class="btn lnk" type="button" id="rcopen">권리 확인하기</button><button class="btn" type="button" id="rclater">나중에 하기</button></p>
       <div class="stack" id="rcform" hidden style="margin-top:12px">
         <p><span class="slot">S10 권리 확인 본문</span></p>
         <label class="check"><input type="checkbox" id="rcchk" aria-describedby="rcwhy"><span>위 내용을 확인했고 사실과 같습니다.</span></label>
-        <p><button class="btn primary" type="button" id="rcsave" aria-describedby="rcwhy">확인하고 저장</button></p>
+        <p><button class="btn lnk" type="button" id="rcsave" aria-describedby="rcwhy">확인하고 저장</button></p>
         <p class="help" id="rcwhy"></p>
       </div>
     </div>
@@ -86,10 +86,10 @@
   <div role="status" aria-busy="true" data-show="l=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px"></div></div>
   <div data-show="l=normal|partial">
     <div class="item"><div class="preview" style="width:72px;height:72px;padding:0">썸네일</div><div><strong>샘플 설교 영상</strong><p class="small"><span class="tag">준비 완료</span>권리 확인 완료 (샘플 날짜) · 업로드</p></div></div>
-    <div class="item"><div class="preview" style="width:72px;height:72px;padding:0">썸네일</div><div><strong>샘플 찬양 영상</strong><p class="small"><span class="tag">처리 중</span>권리 확인 필요 · 업로드</p></div><a class="btn" href="videos.html?rt=need">권리 확인하기</a></div>
+    <div class="item"><div class="preview" style="width:72px;height:72px;padding:0">썸네일</div><div><strong>샘플 찬양 영상</strong><p class="small"><span class="tag">처리 중</span>권리 확인 필요 · 업로드</p></div><a class="btn lnk" href="videos.html?rt=need">권리 확인하기</a></div>
     <div class="item" data-show="l=partial"><div class="preview" style="width:72px;height:72px;padding:0">썸네일</div><div><strong>샘플 강해 영상</strong><p class="small"><span class="tag bad">실패</span>영상 처리에 실패했어요 · 업로드</p></div></div>
   </div>
-  <p data-show="l=normal|partial"><a class="btn" href="videos.html">영상 관리에서 모두 보기</a></p>
+  <p data-show="l=normal|partial"><a class="btn lnk" href="videos.html">영상 관리에서 모두 보기</a></p>
 </section>
 </div>
 </div></main>

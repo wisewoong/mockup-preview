@@ -27,7 +27,6 @@ tr.detail > td { background: var(--bg-sub); }
 /* ---- VOD 재처리·금칙어 관리 (신규 색 토큰 없음). 아래 5줄은 operator-reports.css와 같은 규칙:
    그 파일의 모바일 카드 규칙이 신고 표 전용이라 두 화면은 그 파일을 불러오지 않는다 ---- */
 .lock-row td { color: var(--muted); }
-.lock-row .tag { color: var(--text); }
 .quote { background: var(--bg-sub); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 0; }
 .radios { border: 0; padding: 0; margin: 0; }
 .radios legend { font-weight: 700; margin-bottom: 4px; }
@@ -44,7 +43,7 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: 3px solid var(--acce
 @media (max-width: 1023px) {
   .m-only { display: block; }
   .op-main .mfull { width: 100%; }
-  .op-main .filters .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .op-main .filters .chips { flex: 1 1 100%; }
   /* 카드: 1행 제목+상태 / 2행 muted 묶음(· 구분) / 3행 한 줄 / 버튼 */
   .tbl-wrap.cards.k > table > tbody > tr { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; }
   .tbl-wrap.cards.k tr > td { width: auto; }

@@ -1,45 +1,45 @@
-/* 말씀ON 사용자 사이트 목업 공통 토큰과 컴포넌트. 검토용 버리는 코드. */
+/* 말씀ON 사용자 사이트 목업 공통 토큰과 컴포넌트. 검토용 버리는 코드. 디자인: 시안 B 미드나잇(남색 면 단계 + 금색 포인트). 파일 끝 "B 레이어" 참고 */
 :root {
-  --cert: #0B5C6B; --cert-bg: #E3F0F2; --cert-line: #9CCBD3;
-  --bg: #F5F6F5;
-  --bg-sub: #ECEEED;
-  --strong: #0A0F0E;
-  --text: #3B4644;
-  --muted: #5B6563;
-  --line: #CDD3D1;
-  --accent: #1B6652;
-  --on-accent: #F5F6F5;
-  --danger: #A12B2B;
-  --danger-bg: #F3E4E3;
+  --bg: #EAEEF7; --bg-sub: #DDE4F3; --s1: #F7F8FC; --strong: #0A1230; --text: #1C2640; --muted: #465273;
+  --line: #C5CFE4; --edge: #6B7AA3; --accent: #7A5818; --on-accent: #FFFFFF; --gold-t: #F0E3C3;
+  --pri-bg: #1C2B57; --pri-fg: #FFFFFF; --blue: #2A4797; --blue-t: #DCE4F6; --ok: #1D7552;
+  --danger: #B42A1A; --danger-bg: #FBE0DC; --on-danger: #FFFFFF;
+  --cert: #7A5818; --cert-bg: #F0E3C3; --cert-line: #D8C089;
   --role-admin: #6D3FB5; --role-mgr: #1F5FBF; --role-me: #A8256F;
-  --don-bg: #FBF1D9; --don-line: #C99A2E; --don-name: #8A5300;
+  --don-bg: #F7ECD0; --don-line: #B9923A; --don-name: #7A5818;
   --live: #D91F26; --on-live: #FFFFFF;
-  --radius: 8px;
-  --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --hdr: rgba(247,248,252,.84); --glow: rgba(120,150,230,.28);
+  --radius: 12px;
+  --font: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  --disp: "Sora", "Noto Sans KR", sans-serif;
   --tap: 48px;
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --cert: #7CC4D4; --cert-bg: #1A3036; --cert-line: #2F5560;
-    --bg: #121615; --bg-sub: #1B2120; --strong: #F7FAF9; --text: #D6DDDA; --muted: #98A3A0;
-    --line: #343C3A; --accent: #6FC4AA; --on-accent: #0E1513;
-    --danger: #F29B9B; --danger-bg: #3A2323;
-    --role-admin: #C4A7F5; --role-mgr: #8DB8FF; --role-me: #F49AC6;
-    --don-bg: #2E2612; --don-line: #6B551F; --don-name: #F0C660;
-    --live: #D91F26; --on-live: #FFFFFF;
+  --bg: #0A1022; --bg-sub: #1A2547; --s1: #111A33; --strong: #F6F3EA; --text: #E4E3DD; --muted: #9AA5C3;
+  --line: #2A3560; --edge: #5D6CA0; --accent: #DCBE86; --on-accent: #241A06; --gold-t: #2A2A36;
+  --pri-bg: #DCBE86; --pri-fg: #241A06; --blue: #93B3F7; --blue-t: #1A2543; --ok: #7ED3B0;
+  --danger: #FF8A80; --danger-bg: #301A26; --on-danger: #1A0A0A;
+  --cert: #DCBE86; --cert-bg: #2A2A36; --cert-line: #5A5648;
+  --role-admin: #C4A7F5; --role-mgr: #8DB8FF; --role-me: #F49AC6;
+  --don-bg: #272238; --don-line: #8A7040; --don-name: #E9CD94;
+  --live: #D91F26; --on-live: #FFFFFF;
+  --hdr: rgba(12,19,42,.78); --glow: rgba(60,90,190,.22);
   }
 }
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --cert: #7CC4D4; --cert-bg: #1A3036; --cert-line: #2F5560;
-  --bg: #121615; --bg-sub: #1B2120; --strong: #F7FAF9; --text: #D6DDDA; --muted: #98A3A0;
-  --line: #343C3A; --accent: #6FC4AA; --on-accent: #0E1513;
-  --danger: #F29B9B; --danger-bg: #3A2323;
+  --bg: #0A1022; --bg-sub: #1A2547; --s1: #111A33; --strong: #F6F3EA; --text: #E4E3DD; --muted: #9AA5C3;
+  --line: #2A3560; --edge: #5D6CA0; --accent: #DCBE86; --on-accent: #241A06; --gold-t: #2A2A36;
+  --pri-bg: #DCBE86; --pri-fg: #241A06; --blue: #93B3F7; --blue-t: #1A2543; --ok: #7ED3B0;
+  --danger: #FF8A80; --danger-bg: #301A26; --on-danger: #1A0A0A;
+  --cert: #DCBE86; --cert-bg: #2A2A36; --cert-line: #5A5648;
   --role-admin: #C4A7F5; --role-mgr: #8DB8FF; --role-me: #F49AC6;
-  --don-bg: #2E2612; --don-line: #6B551F; --don-name: #F0C660;
+  --don-bg: #272238; --don-line: #8A7040; --don-name: #E9CD94;
   --live: #D91F26; --on-live: #FFFFFF;
+  --hdr: rgba(12,19,42,.78); --glow: rgba(60,90,190,.22);
 }
 
 * { box-sizing: border-box; }
@@ -346,3 +346,121 @@ input[type="checkbox"]:not([role="switch"]):disabled, input[type="radio"]:disabl
 .bellbtn .cnt:empty { display: none; }
 @media (min-width: 768px) and (max-width: 1023px) { .topbar .nav a { padding: 0 12px; } .topbar .htools { margin-left: auto; } }
 @media (max-width: 767px) { .topbar .wrap { gap: 4px; } .topbar .brand { margin-right: auto; margin-left: 4px; } }
+
+/* ===== B 레이어 (시안 B 미드나잇): 위 컴포넌트를 전역 재정의. 클래스 이름은 그대로 ===== */
+body { background: radial-gradient(1100px 460px at 50% -120px, var(--glow), transparent 70%) no-repeat, var(--bg); background-color: var(--bg); -webkit-font-smoothing: antialiased; }
+html { background: var(--bg); }
+h1, h2, .brand, .price, .bal strong { font-family: var(--disp); letter-spacing: -.02em; }
+:focus-visible { outline: 2px solid var(--accent); }
+.topbar { background: var(--hdr); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); }
+.brand { font-weight: 700; }
+.nav a[aria-current="page"], .subtabs a[aria-current="page"], .tabs [role="tab"][aria-selected="true"] { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+.nav a:hover, .subtabs a:hover { background: var(--blue-t); }
+.topbar .btn.hbtn[aria-current="page"] { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+.btn.hbtn:hover, .btn.hbtn[aria-expanded="true"] { background: var(--blue-t); }
+.bellbtn .cnt { background: var(--accent); color: var(--on-accent); }
+.section { border-top-color: var(--line); }
+
+/* 버튼: 기본은 테두리 없는 글자형, 채움은 .primary(화면당 1개)만 */
+.btn { border: 0; background: transparent; color: var(--accent); font-weight: 700; border-radius: 999px; transition: background .2s, color .2s; }
+.btn:hover { background: var(--gold-t); }
+.btn.primary { background: var(--pri-bg); color: var(--pri-fg); }
+.btn.primary:hover { background: var(--pri-bg); filter: brightness(1.1); }
+.btn.toggle[aria-pressed="true"], .btn.primary.toggle[aria-pressed="true"] { background: var(--gold-t); color: var(--accent); filter: none; }
+.btn.bad { color: var(--danger); }
+.btn.bad:hover { background: var(--danger-bg); }
+.btn.bad.solid { background: var(--danger); color: var(--on-danger); }
+.btn:disabled, .btn[aria-disabled="true"] { background: var(--bg-sub); color: var(--muted); border: 0; opacity: .8; }
+.btn.ib { border-radius: 12px; color: var(--text); }
+.btn.ib:hover { background: var(--blue-t); }
+.vstage .btn, .vstage .btn:hover { background: #E7EBE9; color: #1C2120; }
+.btn.primary .slot { border-color: currentColor; }
+.hbtn, .btn.hbtn { border-radius: 12px; }
+
+/* 칩 = 밑줄 탭 */
+.chips { gap: 0 24px; border-bottom: 1px solid var(--line); }
+.chip { border: 0; background: transparent; border-radius: 0; padding: 0 2px; color: var(--muted); font-weight: 500; box-shadow: none; }
+.chip:hover { background: transparent; color: var(--text); }
+.chip[aria-pressed="true"] { background: transparent; color: var(--accent); font-weight: 700; box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* 카드 */
+.card .thumb, .pstage, .stage, .vstage { border-radius: 14px; }
+.card:hover h3 { text-decoration: none; color: var(--accent); }
+.badge { border-radius: 6px; }
+.badge.plain { background: var(--bg-sub); color: var(--text); border: 0; }
+.badge.plain.bad, .tag.bad { background: var(--danger-bg); color: var(--danger); border: 0; }
+.badge.newb { background: var(--accent); color: var(--on-accent); }
+.tag { border: 0; background: var(--bg-sub); color: var(--text); border-radius: 6px; padding: 0 8px; font-weight: 600; }
+.vbadge { border-color: var(--cert-line); }
+
+/* 안내·빈 상태·입력·대화상자 */
+.notice { background: var(--blue-t); border: 1px solid var(--blue); border-radius: 12px; }
+.notice strong:first-child { color: var(--blue); }
+.notice.danger { background: var(--danger-bg); border-color: var(--danger); }
+.notice.danger strong:first-child { color: var(--danger); }
+.empty { border-radius: 14px; }
+.input, .textarea { background: var(--s1); border: 1px solid var(--edge); border-radius: 12px; }
+.input:focus, .textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.hs-box { background: var(--s1); border-radius: 999px; padding-left: 4px; }
+.hs-box .input { background: transparent; }
+select { appearance: none; -webkit-appearance: none; min-height: var(--tap); padding: 0 22px 0 0; border: 0; border-bottom: 1px solid var(--edge); border-radius: 0; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%239aa5c3' stroke-width='1.6'%3E%3Cpath d='m1 1 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 2px center; color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
+select:hover { color: var(--accent); }
+select option { background: var(--s1); color: var(--text); }
+dialog { background: var(--s1); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 16px 40px rgba(0,0,0,.28); }
+dialog.drawer { border-radius: 0; }
+dialog::backdrop { background: rgba(5,8,20,.6); }
+@media (min-width: 768px) { dialog.drawer { border-radius: 14px; } }
+.drawer a[aria-current="page"] { color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.item { border-top-color: var(--line); }
+.panel { background: var(--s1); border-radius: 14px; }
+.bubble { border-radius: 12px; }
+.fsbtn, .pbar .btn.ib { background: rgba(8,12,28,.62); }
+
+/* 체크·라디오: 선택은 금색 채움 */
+input[type="checkbox"]:not([role="switch"]), input[type="radio"] { border-color: var(--edge); background: var(--s1); }
+input[type="checkbox"]:not([role="switch"]):checked, input[type="radio"]:checked { background: var(--accent); border-color: var(--accent); }
+input[type="radio"]:checked { box-shadow: inset 0 0 0 4px var(--s1); }
+input[type="checkbox"]:not([role="switch"]):checked::after { border-color: var(--on-accent); }
+body .prod:has(input:checked) { border-color: var(--accent); background: var(--gold-t); }
+.prod { background: var(--s1); }
+.prod, .prod:has(input:checked) { border-radius: 14px; }
+
+/* 하단 탭 */
+@media (max-width: 767px) {
+  .bottombar { background: var(--hdr); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+  .bottombar a[aria-current="page"] { color: var(--accent); box-shadow: inset 0 2px 0 var(--accent); }
+  .tabs-m button[aria-pressed="true"] { box-shadow: inset 0 -2px 0 var(--accent); }
+}
+
+/* 목업 도구 막대는 실제 화면이 아니라 선택 표시만 금색 */
+.mockbar button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+/* ===== 메인·목록 카드 언어 (pages1b): 큰 대표 카드, 인기 면 띠, 오늘의 말씀 카드 ===== */
+.card.hero { position: relative; border-radius: 18px; overflow: hidden; min-height: 440px; background: var(--bg-sub); }
+.card.hero .thumb { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; }
+.card.hero .thumb img { transition: transform .9s cubic-bezier(.16,1,.3,1); }
+.card.hero:hover .thumb img { transform: scale(1.03); }
+.card.hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,12,28,0) 35%, rgba(8,12,28,.92)); pointer-events: none; }
+.card.hero h3, .card.hero .meta, .card.hero .viewers { position: absolute; z-index: 1; }
+.card.hero h3 { left: 28px; right: 40%; bottom: 62px; margin: 0; font-family: var(--disp); font-size: clamp(1.5rem, 2.6vw, 2.1rem); line-height: 1.2; letter-spacing: -.025em; color: #F6F3EA; }
+.card.hero:hover h3 { color: #F6F3EA; }
+.card.hero .meta { left: 28px; right: 40%; bottom: 24px; color: #DCDAD3; font-size: .95rem; }
+.card.hero .meta .vbadge { background: rgba(8,12,28,.55); color: #ECD197; border-color: rgba(236,209,151,.5); }
+.card.hero .viewers { right: 28px; bottom: 22px; padding: 0; background: none; color: #D2D0C9; font-size: .85rem; text-align: right; }
+.card.hero .viewers b { display: block; font: 700 clamp(2.2rem, 4vw, 3.6rem)/1 var(--disp); letter-spacing: -.04em; color: #E6C98F; }
+.card.hero .badges { left: 20px; top: 20px; z-index: 1; }
+.top2 .word { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(165deg, var(--bg-sub), var(--s1)); padding: 28px; }
+.top2 .word::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--accent); }
+.top2 .word h2 { font-size: .8rem; letter-spacing: .14em; color: var(--accent); }
+#popsec { background: var(--s1); border: 1px solid var(--line); border-radius: 22px; padding: 28px; margin-top: 16px; }
+#popsec .section-head a { color: var(--accent); text-decoration: none; font-weight: 700; }
+#popsec .viewers b, .card .viewers b { font-weight: 700; }
+@media (max-width: 767px) {
+  .top2 > div { align-self: stretch; }
+  .card.hero { min-height: 300px; border-radius: 14px; }
+  .card.hero h3 { left: 16px; right: 16px; bottom: 78px; font-size: 1.25rem; }
+  .card.hero .meta { left: 16px; right: 110px; bottom: 14px; line-height: 1.7; }
+  .card.hero .viewers { right: 16px; bottom: 14px; font-size: .75rem; }
+  .card.hero .viewers b { font-size: 1.6rem; }
+  .card.hero .badges { left: 12px; top: 12px; }
+}

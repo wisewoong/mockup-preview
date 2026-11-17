@@ -26,16 +26,16 @@
 <main class="wrap"><div class="col">
 <section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 관리자 이상만 쓸 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
 
-<section class="notice" role="alert" data-show="role=adm0"><strong>권한이 없어요</strong><p class="small">라이브 시작과 스트림 키는 소유자가 권한을 주면 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn" href="dashboard.html">대시보드로 가기</a></p></section>
+<section class="notice" role="alert" data-show="role=adm0"><strong>권한이 없어요</strong><p class="small">라이브 시작과 스트림 키는 소유자가 권한을 주면 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn lnk" href="dashboard.html">대시보드로 가기</a></p></section>
 <section data-show="role=owner|admall s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:200px"></div></section>
 
-<section data-show="role=owner|admall s=mobile"><div class="notice"><p><span class="slot">휴대폰 라이브 안내 문구 확정 필요</span></p><p style="margin-top:8px"><a class="btn primary" href="upload.html">영상 올리기</a></p></div></section>
+<section data-show="role=owner|admall s=mobile"><div class="notice"><p><span class="slot">휴대폰 라이브 안내 문구 확정 필요</span></p><p style="margin-top:8px"><a class="btn lnk" href="upload.html">영상 올리기</a></p></div></section>
 
 <div class="stack" data-show="role=owner|admall s=normal|denied|nocam|keyerr|limited|suspended|closed|unsupported|titlerej">
 <div class="notice statusline" role="status">
   <strong data-show="sig=before">방송 전</strong><strong data-show="sig=wait">송출 신호를 기다리는 중</strong><strong data-show="sig=got">신호를 받았어요 (서버 확인)</strong><strong data-show="sig=starting">서버 확인 중</strong><strong data-show="sig=startfail">방송을 시작하지 못했어요</strong><strong data-show="sig=timeout">서버 확인이 오래 걸려요</strong><strong data-show="sig=on">방송 중</strong><strong data-show="sig=cut">끊겼어요</strong><strong data-show="sig=recon">다시 연결하는 중</strong>
   <span class="small muted" data-show="sig=starting">서버가 확인한 뒤에 "방송 중"으로 바뀌어요.</span>
-  <span class="small" data-show="sig=startfail|timeout"><button class="btn" type="button" id="retry-start" data-icon="retry" data-keep>다시 시도</button></span>
+  <span class="small" data-show="sig=startfail|timeout"><button class="btn lnk" type="button" id="retry-start" data-icon="retry" data-keep>다시 시도</button></span>
   <span class="small" data-show="sig=cut">연결을 확인하고 다시 송출해 주세요.</span>
   <span class="small muted" data-show="sig=recon">잠시 기다려 주세요. 연결되면 방송 중으로 돌아가요.</span>
 </div>
@@ -71,17 +71,17 @@
     </fieldset>
     <div class="stack" data-show="send=browser s=normal|limited|keyerr|suspended|closed|titlerej">
       <p>카메라와 마이크를 사용해요. [계속]을 누르면 허용 창이 떠요.</p>
-      <p data-show="cont=0"><button class="btn" type="button" id="cont">계속</button></p>
+      <p data-show="cont=0"><button class="btn lnk" type="button" id="cont">계속</button></p>
       <div id="pv" hidden class="stack" data-show="cont=1"><div class="preview"><p>카메라 미리보기<br><span class="small">아직 방송 전이에요. 시청자에게 보이지 않아요.</span></p></div>
         <p>마이크 <progress value="60" max="100" aria-label="마이크 소리 크기"></progress> <strong>소리가 들어와요</strong> <span class="muted small">(안 들어오면 "소리가 안 들어와요"로 표시돼요)</span></p>
         <div class="row"><label class="field"><span class="label">카메라</span><select class="input"><option>기본 카메라</option></select></label><label class="field"><span class="label">마이크</span><select class="input"><option>기본 마이크</option></select></label></div></div>
     </div>
-    <div class="notice danger" role="alert" data-show="send=browser s=denied"><strong>카메라와 마이크 권한이 필요해요</strong><p>브라우저 주소창의 자물쇠에서 허용으로 바꾼 뒤 다시 시도해 주세요.</p><p class="row" style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button><button class="btn" data-set="send:obs">OBS로 송출</button></p></div>
-    <div class="notice danger" role="alert" data-show="send=browser s=unsupported"><strong>이 브라우저에서는 바로 방송할 수 없어요</strong><p>다른 브라우저를 쓰거나 OBS 등 외부 프로그램으로 송출해 주세요.</p><p style="margin-top:8px"><button class="btn" data-set="send:obs">OBS로 송출</button></p></div>
-    <div class="notice danger" role="alert" data-show="send=browser s=nocam"><strong>카메라를 찾을 수 없어요</strong><p>다른 앱이 쓰고 있는지 확인해 주세요.</p><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <div class="notice danger" role="alert" data-show="send=browser s=denied"><strong>카메라와 마이크 권한이 필요해요</strong><p>브라우저 주소창의 자물쇠에서 허용으로 바꾼 뒤 다시 시도해 주세요.</p><p class="row" style="margin-top:8px"><button class="btn lnk" data-icon="retry" data-keep>다시 시도</button><button class="btn lnk" data-set="send:obs">OBS로 송출</button></p></div>
+    <div class="notice danger" role="alert" data-show="send=browser s=unsupported"><strong>이 브라우저에서는 바로 방송할 수 없어요</strong><p>다른 브라우저를 쓰거나 OBS 등 외부 프로그램으로 송출해 주세요.</p><p style="margin-top:8px"><button class="btn lnk" data-set="send:obs">OBS로 송출</button></p></div>
+    <div class="notice danger" role="alert" data-show="send=browser s=nocam"><strong>카메라를 찾을 수 없어요</strong><p>다른 앱이 쓰고 있는지 확인해 주세요.</p><p style="margin-top:8px"><button class="btn lnk" data-icon="retry" data-keep>다시 시도</button></p></div>
     <div class="stack" data-show="send=obs s=normal|denied|nocam|limited|suspended|closed|unsupported|titlerej">
       <label class="field"><span class="label">서버 주소</span><span class="row"><input class="input" style="flex:1" readonly value="rtmp://sample.example/live"><button class="btn" type="button" data-icon="copy" data-label="서버 주소 복사"></button></span></label>
-      <div class="field"><span class="label" id="kl">스트림 키</span><span class="row"><input class="input" style="flex:1" id="key" type="password" readonly value="샘플키값" aria-labelledby="kl"><button class="btn" type="button" id="keyshow" data-keyok>보기</button><button class="btn" type="button" data-keyok id="keycopy" data-icon="copy" data-label="스트림 키 복사"></button><button class="btn" type="button" data-keyok data-open="rk-dlg">재발급</button></span>
+      <div class="field"><span class="label" id="kl">스트림 키</span><span class="row"><input class="input" style="flex:1" id="key" type="password" readonly value="샘플키값" aria-labelledby="kl"><button class="btn lnk" type="button" id="keyshow" data-keyok>보기</button><button class="btn" type="button" data-keyok id="keycopy" data-icon="copy" data-label="스트림 키 복사"></button><button class="btn bad" type="button" data-keyok data-open="rk-dlg">재발급</button></span>
         <p class="help">키가 노출되면 다른 사람이 방송할 수 있어요. 남에게 보여 주지 마세요.</p>
         <p class="help" data-show="sig=on|cut|recon">방송 중에는 재발급할 수 없어요.</p>
         <p class="help" role="status" data-show="k=ok">새 키를 만들었어요. 이전 키는 더 이상 쓸 수 없어요. OBS 설정을 바꿔 주세요.</p>
@@ -89,23 +89,23 @@
         <p class="help" role="status" data-show="k=copied">복사했어요.</p>
         <p class="help" data-show="role=adm0">소유자만 사용할 수 있어요</p></div>
     </div>
-    <div class="notice danger" role="alert" data-show="send=obs s=keyerr"><strong>스트림 키를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
+    <div class="notice danger" role="alert" data-show="send=obs s=keyerr"><strong>스트림 키를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" data-icon="retry" data-keep>다시 시도</button></p></div>
   </div>
 </div>
 <div class="sticky-bar">
   <p class="muted small" id="sum" aria-live="polite"></p>
-  <p class="row"><button class="btn primary" type="button" id="start" aria-describedby="why">방송 시작</button><button class="btn" type="button" id="stop" hidden>방송 종료</button></p>
+  <p class="row"><button class="btn primary" type="button" id="start" aria-describedby="why">방송 시작</button><button class="btn bad" type="button" id="stop" hidden>방송 종료</button></p>
   <p class="help" id="why"></p>
 </div>
 </div>
 </div></main>
 <dialog id="rk-dlg" aria-labelledby="rk-t"><h2 id="rk-t">스트림 키 재발급</h2>
   <p style="margin-top:8px">재발급하면 이전 키로는 방송할 수 없어요. OBS의 설정도 바꿔야 해요.</p>
-  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>취소</button><button class="btn" type="button" id="rk-ok" data-close>재발급</button></div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>취소</button><button class="btn bad" type="button" id="rk-ok" data-close>재발급</button></div>
 </dialog>
 <dialog id="end-dlg" aria-labelledby="end-t"><h2 id="end-t">방송을 종료할까요?</h2>
   <p style="margin-top:8px">종료하면 시청자 화면에서 방송이 끝나요. 자동 녹화 영상은 처리 뒤 권리 확인을 마쳐야 공개할 수 있어요.</p>
-  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>계속 방송</button><button class="btn" type="button" id="end-ok" data-close>방송 종료</button></div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn primary" type="button" data-close autofocus>계속 방송</button><button class="btn bad" type="button" id="end-ok" data-close>방송 종료</button></div>
 </dialog>
 <script src="mock.js"></script>
 <script>

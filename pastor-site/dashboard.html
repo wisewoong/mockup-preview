@@ -27,7 +27,7 @@
   <h1>내 역할</h1>
   <p style="margin-top:8px">샘플 방송국 <span class="tag mgr">매니저</span></p>
   <p class="muted" style="margin-top:8px">매니저는 방송 중 채팅 관리만 도와요. 방송 시작, 영상, 후원 설정은 쓸 수 없어요.</p>
-  <p style="margin-top:16px"><a class="btn primary" href="dashboard.html">채팅 관리</a></p>
+  <p style="margin-top:16px"><a class="btn primary" href="live-control.html">채팅 관리</a></p>
 </section>
 
 <section data-show="role=owner|adm0|admall s=loading" role="status" aria-busy="true">
@@ -43,21 +43,21 @@
   <div class="notice danger" role="alert" data-show="s=limited"><strong>방송국 일부 기능이 제한되어 있어요</strong><p>제한 중 방송할 수 있는지는 <span class="slot">정책 확정 전</span>이에요.</p></div>
   <div class="notice danger" role="alert" data-show="s=suspended"><strong>방송국이 정지되었어요</strong><p>사유와 이의제기 방법은 알림에서 볼 수 있어요.</p></div>
   <div class="notice danger" role="alert" data-show="s=closed"><strong>방송국이 폐쇄되었어요</strong><p>폐쇄된 방송국에서는 방송과 영상 올리기를 할 수 없어요.</p></div>
-  <div class="notice" data-show="role=owner|admall adj=on"><strong>후원 설정이 조정되었어요</strong><p>운영사 한도가 바뀌어 설정이 자동으로 조정됐어요.</p><p style="margin-top:8px"><a class="btn" href="donation-settings.html?adj=on">후원 설정 보기</a></p></div>
+  <div class="notice" data-show="role=owner|admall adj=on"><strong>후원 설정이 조정되었어요</strong><p>운영사 한도가 바뀌어 설정이 자동으로 조정됐어요.</p><p style="margin-top:8px"><a class="btn lnk" href="donation-settings.html?adj=on">후원 설정 보기</a></p></div>
   <section class="panel todo" aria-labelledby="h-todo">
     <h2 id="h-todo">오늘 할 일</h2>
     <div data-show="s=normal|limited|suspended|closed|error">
-      <div class="item" data-show="role=owner|admall"><p><strong>예정 방송을 시작할 시간이에요</strong><br><span class="muted small">샘플 예정 방송 제목</span></p><a class="btn primary" href="live-start.html" data-show="role=owner|admall s=normal|error">라이브 시작</a><span data-show="role=owner|admall s=limited|suspended|closed"><button class="btn" disabled aria-describedby="why-t2">라이브 시작</button><span class="help" id="why-t2">방송국 상태 때문에 지금은 쓸 수 없어요</span></span></div>
-      <div class="item"><p><strong>권리 확인이 필요한 영상 2개</strong><br><span class="muted small">확인 전에는 공개할 수 없어요</span></p><a class="btn" href="videos.html?rt=need">확인하기</a></div>
-      <div class="item" data-show="auth=review|rejected|revoked"><p><strong>인증 결과를 확인해 주세요</strong></p><a class="btn" href="#h-auth">보기</a></div>
-      <div class="item" data-show="role=owner|admall adj=on"><p><strong>후원 설정 조정 알림을 확인해 주세요</strong></p><a class="btn" href="donation-settings.html?adj=on">확인하기</a></div>
+      <div class="item" data-show="role=owner|admall"><p><strong>예정 방송을 시작할 시간이에요</strong><br><span class="muted small">샘플 예정 방송 제목</span></p><a class="btn lnk" href="live-start.html" data-show="role=owner|admall s=normal|error">라이브 시작</a><span data-show="role=owner|admall s=limited|suspended|closed"><button class="btn" disabled aria-describedby="why-t2">라이브 시작</button><span class="help" id="why-t2">방송국 상태 때문에 지금은 쓸 수 없어요</span></span></div>
+      <div class="item"><p><strong>권리 확인이 필요한 영상 2개</strong><br><span class="muted small">확인 전에는 공개할 수 없어요</span></p><a class="btn lnk" href="videos.html?rt=need">확인하기</a></div>
+      <div class="item" data-show="auth=review|rejected|revoked"><p><strong>인증 결과를 확인해 주세요</strong></p><a class="btn lnk" href="#h-auth">보기</a></div>
+      <div class="item" data-show="role=owner|admall adj=on"><p><strong>후원 설정 조정 알림을 확인해 주세요</strong></p><a class="btn lnk" href="donation-settings.html?adj=on">확인하기</a></div>
     </div>
     <div class="empty" data-show="s=new"><p><strong>오늘 할 일이 없어요</strong></p></div>
   </section>
-  <section class="panel" data-show="s=new"><h2>첫 방송을 준비해 보세요</h2><div class="row" style="margin-top:8px"><a class="btn primary" href="live-start.html" data-show="role=owner|admall">라이브 시작</a><a class="btn" href="upload.html">영상 올리기</a></div></section>
+  <section class="panel" data-show="s=new"><h2>첫 방송을 준비해 보세요</h2><div class="row" style="margin-top:8px"><a class="btn lnk" href="live-start.html" data-show="role=owner|admall">라이브 시작</a><a class="btn lnk" href="upload.html">영상 올리기</a></div></section>
   <section class="panel" aria-labelledby="h-live" data-show="role=owner|admall s=normal|new|limited|suspended|closed">
     <h2 id="h-live">방송 상태</h2>
-    <div data-show="live=on role=owner|admall"><p><strong>방송 중</strong> · 경과 <strong>1시간 12분</strong> · 시청자 <strong>128명</strong></p><p style="margin-top:8px"><a class="btn" href="live-control.html">방송 관리</a></p></div>
+    <div data-show="live=on role=owner|admall"><p><strong>방송 중</strong> · 경과 <strong>1시간 12분</strong> · 시청자 <strong>128명</strong></p><p style="margin-top:8px"><a class="btn lnk" href="live-control.html">방송 관리</a></p></div>
     <div data-show="live=off role=owner|admall">
       <p>지금은 방송하지 않아요.</p>
       <p style="margin-top:8px"><a class="btn primary" href="live-start.html" data-show="role=owner|admall s=normal|new|error">라이브 시작</a><button class="btn" disabled aria-describedby="why-l" data-show="role=owner|admall s=limited|suspended|closed">라이브 시작</button></p>
@@ -84,7 +84,7 @@
     <div class="notice danger" data-show="auth=rejected"><strong>인증이 반려되었어요</strong><p>사유 <span class="slot">반려 사유</span> · 재신청 <span class="slot">가능 여부</span></p></div>
     <div class="notice danger" data-show="auth=revoked"><strong>인증이 해제되었어요</strong><p>사유 <span class="slot">사유</span> · <a href="sanctions.html">이의제기 하기</a></p></div>
     <p data-show="auth=transfer">인증이 이전되지 않았어요. 인증이 필요하면 신청해 주세요.</p>
-    <p style="margin-top:12px" data-show="role=owner auth=none|rejected|transfer"><a class="btn primary" href="verification.html">인증 신청</a></p>
+    <p style="margin-top:12px" data-show="role=owner auth=none|rejected|transfer"><a class="btn lnk" href="verification.html">인증 신청</a></p>
     <p class="help" data-show="role=adm0|admall auth=none|rejected|transfer">인증 신청은 소유자만 할 수 있어요. <span class="slot">사용자 결정 전</span></p>
   </section>
 </div>

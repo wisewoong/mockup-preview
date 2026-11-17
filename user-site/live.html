@@ -26,12 +26,12 @@
   .panel { border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; min-height: 0; }
   .panel > h2 { font-size: 1rem; padding: 10px 16px; border-bottom: 1px solid var(--line); }
   .panel .body { padding: 12px 16px; overflow: auto; }
-  #p-don { flex: none; max-height: 220px; } #p-don .body { background: var(--bg-sub); }
+  #p-don { flex: none; max-height: 280px; } #p-don .body { background: transparent; }
   #p-chat { flex: 1; } #p-chat .list { flex: 1; min-height: 160px; }
-  .bubble { background: var(--don-bg); border: 1px solid var(--don-line); border-left-width: 4px; border-radius: var(--radius); padding: 8px 12px; color: var(--strong); }
+  .bubble { background: var(--gold-t); border: 0; border-radius: 12px; padding: 10px 14px; color: var(--strong); }
   .bubble + .bubble { margin-top: 8px; }
   .bubble .who { font-weight: 700; color: var(--don-name); } .bubble p + p { margin-top: 2px; }
-  .tag.don { color: var(--don-name); border-color: var(--don-name); background: transparent; }
+  .tag.don { color: var(--don-name); background: transparent; padding: 0; }
   .tag.don svg { width: 12px; height: 12px; margin-right: 3px; vertical-align: -1px; }
   .msg { padding: 0; font-size: 1rem; line-height: 1.5; color: var(--strong); font-weight: 400; } .msg + .msg { margin-top: 12px; }
   .msg .who { display: block; margin-bottom: 2px; color: var(--muted); font-size: .85rem; font-weight: 700; line-height: 1.4; }
@@ -40,9 +40,10 @@
   .msg.admin .who { color: var(--role-admin); } .msg.mgr .who { color: var(--role-mgr); }
   .msg .tag { font-size: .75rem; margin: 0 0 0 6px; background: transparent; } .msg .who .muted { margin-left: 6px; font-weight: 400; }
   .msg .tag.host { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-  .msg .tag.admin { color: var(--role-admin); border-color: var(--role-admin); }
-  .msg .tag.mgr { color: var(--role-mgr); border-color: var(--role-mgr); }
-  .msg .tag.me { color: var(--role-me); border-color: var(--role-me); }
+  .msg .tag.admin, .msg .tag.mgr, .msg .tag.me { padding: 0; }
+  .msg .tag.admin { color: var(--role-admin); }
+  .msg .tag.mgr { color: var(--role-mgr); }
+  .msg .tag.me { color: var(--role-me); }
   .sys { margin: 8px 0; }
   .composer { padding: 12px 16px; border-top: 1px solid var(--line); }
   .composer .r { display: flex; gap: 8px; } .composer .r .input { flex: 1; }

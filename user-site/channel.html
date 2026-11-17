@@ -11,7 +11,12 @@
   .ch-head h1 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
   .ch-head .vbadge.lg { margin-left: 0; }
   .ch-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
-  .ch-actions .btn { min-width: 120px; }
+  .ch-actions { align-items: center; gap: 4px 8px; }
+  .ch-actions .btn { min-width: 0; padding: 0 16px; }
+  .ch-actions .btn:not(.primary):not([href]) { color: var(--text); font-weight: 600; }
+  .ch-actions .btn.btn[data-report] { color: var(--muted); font-weight: 500; }
+  .ch-actions a.btn, .ch-actions .btn[disabled] { margin-left: 8px; }
+  .ch-actions a.btn { color: var(--accent); background: var(--gold-t); }
   .pane { padding: 24px 0 64px; }
   .upcoming { list-style: none; padding: 0; margin: 0; }
   .upcoming li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); }
@@ -20,7 +25,9 @@
     .ch-head { grid-template-columns: 72px 1fr; padding: 20px 0 16px; }
     .ch-head img { width: 72px; height: 72px; }
     .ch-actions { grid-column: 1 / -1; justify-content: stretch; }
-    .ch-actions .btn { flex: 1; }
+    .ch-actions .btn { flex: 0 1 auto; }
+    .ch-actions .btn.primary { flex: 1; }
+    .ch-actions a.btn { margin-left: 0; }
     .live-now { grid-template-columns: 1fr; }
     .upcoming li { flex-wrap: wrap; }
     .tabs [role="tab"] { flex: 1; padding: 0 8px; }

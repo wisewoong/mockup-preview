@@ -8,6 +8,7 @@
 <style>
   .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
   .terms { list-style: none; margin: 0; padding: 0; }
+  #go.btn.bad.solid:disabled { background: var(--bg-sub); color: var(--muted); }
   .terms li { padding: 12px 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
   .terms .k { color: var(--muted); font-size: .92rem; }
 </style>
@@ -42,7 +43,7 @@
     <label class="check" style="margin-top:16px"><input type="checkbox" id="ack"><span>위 내용을 확인했어요 (필수)</span></label>
     <p class="help" id="ack-h">내용을 확인해 주세요</p>
     <p style="margin-top:12px">
-      <button class="btn bad block" id="go" type="button" disabled aria-describedby="ack-h">탈퇴하기</button>
+      <button class="btn bad solid block" id="go" type="button" disabled aria-describedby="ack-h">탈퇴하기</button>
       <button class="btn block" type="button" id="busy" disabled aria-busy="true" hidden>탈퇴하는 중</button>
     </p>
     <p style="margin-top:12px;text-align:center"><a href="my.html">돌아가기</a></p>

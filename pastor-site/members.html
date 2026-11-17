@@ -30,7 +30,7 @@
 <div class="notice danger" role="alert" data-show="s=conflict"><strong>권한이 바뀌어서 작업하지 못했어요</strong><p>화면을 새로 불러올게요.</p></div>
 
 <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
-<div class="notice danger" role="alert" data-show="s=loaderr"><strong>불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
 <div class="empty" data-show="s=empty"><p><strong>아직 구성원이 없어요</strong></p><p>매니저를 초대해 방송 중 채팅을 함께 관리해 보세요.</p><p><button class="btn primary" type="button" data-open="inv-dlg" id="inv2">구성원 초대</button></p></div>
 
 <section data-show="s=normal|conflict" aria-label="구성원 목록">
@@ -84,15 +84,15 @@
     var o = me() === 'owner', h = '', t = function (s) { return '<span class="help" style="margin:0">' + s + '</span>'; };
     if (x.r === 'owner') return t('변경할 수 없어요 · 소유자 교체는 운영사에 문의');
     if (x.st === 'd') return '<span class="sr">작업 없음</span>—';
-    if (x.st === 'x') return B('다시 보내기', '', x.id, 'resend');
-    if (x.st === 'p') return (o || x.by === '샘플관리자1') ? B('초대 취소', '', x.id, 'cancel') + B('다시 보내기', '', x.id, 'resend') : t('초대한 사람만 취소할 수 있어요');
+    var M = function (l) { return window.moreMenu('더보기', l); }, D = function (k) { return 'data-a="' + k + '" data-id="' + x.id + '"'; };
+    if (x.st === 'x') return B('다시 보내기', 'lnk', x.id, 'resend');
+    if (x.st === 'p') return (o || x.by === '샘플관리자1') ? B('다시 보내기', 'lnk', x.id, 'resend') + M([['초대 취소', '', D('cancel')]]) : t('초대한 사람만 취소할 수 있어요');
     if (x.r === 'admin') {
       if (!o) return x.id === 'a1' ? t('내 계정이에요 · 탈퇴는 <a href="dashboard.html">내 역할</a>에서') : t('소유자만 변경·해제할 수 있어요');
       var n = on[x.id].reduce(function (s, v) { return s + v; }, 0);
-      return B('역할 변경', '', x.id, 'role') + B('해제', 'bad', x.id, 'del') +
-        '<button class="btn ik" type="button" data-a="tg" data-id="' + x.id + '" aria-expanded="' + !!open[x.id] + '" aria-controls="g-' + x.id + '">권한 부여 · ' + n + '/5 켜짐 ' + (open[x.id] ? '▴' : '▾') + '</button>';
+      return '<button class="btn lnk ik" type="button" data-a="tg" data-id="' + x.id + '" aria-expanded="' + !!open[x.id] + '" aria-controls="g-' + x.id + '">권한 부여 ' + n + '/5 ' + (open[x.id] ? '▴' : '▾') + '</button>' + M([['역할 변경', '', D('role')], ['해제', 'bad', D('del')]]);
     }
-    return B('해제', 'bad', x.id, 'del');
+    return M([['해제', 'bad', D('del')]]);
   }
   function grants(x) {
     if (!(me() === 'owner' && x.r === 'admin' && open[x.id])) return '';

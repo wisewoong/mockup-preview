@@ -9,6 +9,9 @@
     ['기록·권한', [['audit', '감사 로그·운영자 권한']]]
   ];
   if (q.get('theme')) document.documentElement.dataset.theme = q.get('theme');
+  // 시안 B 글꼴(Sora 제목·숫자, Noto Sans KR 본문). 오프라인이면 시스템 글꼴로 대체
+  var fl = document.createElement('link'); fl.rel = 'stylesheet'; fl.href = 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap';
+  document.head.appendChild(fl);
   document.querySelectorAll('[data-default]').forEach(function (el) {
     el.dataset.default.split(' ').forEach(function (c) { var p = c.split(':'); b.dataset[p[0]] = p[1]; });
   });
@@ -28,7 +31,7 @@
   if (H) {
     H.className = 'topbar';
     var cur = act === 'index' ? '운영사 홈' : (NAV.reduce(function (a, g) { return a.concat(g[1]); }, []).filter(function (n) { return n[0] === act; })[0] || [0, ''])[1];
-    H.innerHTML = '<div class="wrap hd-d"><a class="brand" href="index.html">말씀ON 운영사</a><span style="flex:1"></span>' +
+    H.innerHTML = '<div class="wrap hd-d"><a class="brand" href="index.html">말씀<b>ON</b> <small>운영사</small></a><span style="flex:1"></span>' +
       '<span class="who"><strong>샘플 운영자</strong> <span class="tag role"></span></span>' +
       '<button class="btn ib hbtn" type="button" data-open="me-dlg" aria-label="내 정보" title="내 정보"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></button></div>' +
       '<div class="wrap hd-m"><button class="btn ib hbtn" type="button" id="op-menu" aria-label="메뉴 열기" title="메뉴" aria-expanded="false" aria-controls="op-drawer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>' +
@@ -82,6 +85,38 @@
     var c = e.target.closest('[data-close]');
     if (c) { var dd = c.closest('dialog'); if (dd) { dd.close(); if (dd._opener) dd._opener.focus(); } }
   });
+  // ⋯ 더보기 메뉴: .more > button[aria-haspopup] + .mn[role=menu]. 클릭으로 열고, 바깥 클릭·Esc·Tab 으로 닫고, ↑↓·Home·End 로 이동
+  function closeMenus(focusBack) {
+    document.querySelectorAll('.more > button[aria-expanded="true"]').forEach(function (btn) {
+      btn.setAttribute('aria-expanded', 'false'); btn.nextElementSibling.hidden = true; if (focusBack) btn.focus();
+    });
+  }
+  function openMenu(btn) {
+    closeMenus(); var m = btn.nextElementSibling, r = btn.getBoundingClientRect();
+    m.hidden = false; btn.setAttribute('aria-expanded', 'true');
+    m.style.top = Math.min(r.bottom + 4, innerHeight - m.offsetHeight - 8) + 'px';
+    m.style.left = Math.max(8, Math.min(r.right - m.offsetWidth, innerWidth - m.offsetWidth - 8)) + 'px';
+    var f = m.querySelector('[role=menuitem]'); if (f) f.focus();
+  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.more > button');
+    if (btn) { if (btn.getAttribute('aria-expanded') === 'true') closeMenus(true); else openMenu(btn); return; }
+    if (e.target.closest('.mn')) closeMenus(true); else closeMenus();
+  });
+  document.addEventListener('keydown', function (e) {
+    var m = e.target.closest && e.target.closest('.mn'), btn = e.target.closest && e.target.closest('.more > button');
+    if (e.key === 'Escape') { if (m || btn || document.querySelector('.more > [aria-expanded=true]')) closeMenus(true); return; }
+    if (btn && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && btn.getAttribute('aria-expanded') !== 'true') { e.preventDefault(); openMenu(btn); return; }
+    if (!m) return;
+    var it = [].slice.call(m.querySelectorAll('[role=menuitem]')), i = it.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); it[(i + 1) % it.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); it[(i - 1 + it.length) % it.length].focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); it[0].focus(); }
+    else if (e.key === 'End') { e.preventDefault(); it[it.length - 1].focus(); }
+    else if (e.key === 'Tab') closeMenus();
+  });
+  addEventListener('scroll', function () { closeMenus(); }, true);
+  addEventListener('resize', function () { closeMenus(); });
   render();
   window.mockRender = render;
 })();

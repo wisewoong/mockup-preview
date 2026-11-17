@@ -24,7 +24,7 @@
     /* 모바일: 라이브 카드 1열 전폭(대표·인기 같은 크기), 오늘의 말씀은 한 줄 띠로 */
     .grid.pop { grid-template-columns: 1fr; gap: 24px; }
     .grid.pop .card h3 { font-size: inherit; display: block; overflow: visible; }
-    #popsec { padding-top: 0; border-top: 0; }
+    #popsec { padding: 20px 16px; }
     #popsec > p.muted { display: none; }
     .top2 { display: flex; flex-direction: column; gap: 12px; }
     .top2 .word { order: -1; padding: 8px 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; overflow: hidden; }
@@ -161,7 +161,7 @@ window.mockDerive = function (b) {
   var ft = list[0], rest = list.slice(1);
   document.getElementById('cn').textContent = c;
   b.dataset.fx = ft ? 'y' : 'n'; b.dataset.pop = rest.length ? 'y' : 'n';
-  document.getElementById('feat').innerHTML = ft ? '<a class="card" href="' + ft.h + '"><div class="thumb"><img src="img/' + ft.i + '.jpg" alt="" loading="lazy"><div class="badges">' + LV + (ft.w2 ? '<span class="badge plain">예배 중</span>' : '') + '</div><span class="viewers">시청 ' + f(ft.w) + '명</span></div><h3>' + ft.t + '</h3><p class="meta"><img class="pa" src="../portraits/' + ft.a + '.jpg" alt="" loading="lazy">' + ft.n + ' ' + ft.p + ' ' + (ft.v ? V : '') + ' · ' + ft.c + '</p></a>' : '';
+  document.getElementById('feat').innerHTML = ft ? '<a class="card hero" href="' + ft.h + '"><div class="thumb"><img src="img/' + ft.i + '.jpg" alt="" loading="lazy"><div class="badges">' + LV + (ft.w2 ? '<span class="badge plain">예배 중</span>' : '') + '</div><span class="viewers"><b>' + f(ft.w) + '</b>명 시청 중</span></div><h3>' + ft.t + '</h3><p class="meta"><img class="pa" src="../portraits/' + ft.a + '.jpg" alt="" loading="lazy">' + ft.n + ' ' + ft.p + ' ' + (ft.v ? V : '') + ' · ' + ft.c + '</p></a>' : '';
   document.getElementById('pop').innerHTML = rest.map(function (x) { return '<a class="card" href="' + x.h + '"><div class="thumb"><img src="img/' + x.i + '.jpg" alt="" loading="lazy"><div class="badges">' + LV + '</div><span class="viewers">시청 ' + f(x.w) + '명</span></div><h3>' + x.t + '</h3><p class="meta"><span class="nm">' + x.n + '</span>' + (x.v ? VM : '') + '</p></a>'; }).join('');
 };
 window.mockRender();

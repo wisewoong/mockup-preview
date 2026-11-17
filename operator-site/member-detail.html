@@ -35,7 +35,7 @@
     <div class="stack" data-show="s=normal">
       <h1><span class="nick">샘플 닉네임 가</span> <span class="muted small" style="font-weight:400">회원 번호 샘플 <span class="mno">0001</span></span></h1>
       <p class="row">
-        <span class="tag" data-show="m=normal">정상</span><span class="tag" data-show="m=limited">기능 제한</span><span class="tag bad" data-show="m=suspended">정지</span><span class="tag" data-show="m=left">탈퇴</span>
+        <span class="tag ok" data-show="m=normal">정상</span><span class="tag wip" data-show="m=limited">기능 제한</span><span class="tag bad" data-show="m=suspended">정지</span><span class="tag off" data-show="m=left">탈퇴</span>
         <span class="tag" data-show="st=none|staff">회원</span><span class="tag" data-show="st=owner">목회자</span>
         <span class="tag host" data-show="st=owner m=normal|limited|suspended">소유자</span><span class="tag adm" data-show="st=staff m=normal|limited|suspended">관리자</span>
       </p>
@@ -76,9 +76,9 @@
           <section aria-labelledby="h-r"><h2 id="h-r">관련 신고 (참고 정보)</h2>
             <p style="margin-top:8px">이 회원이 대상인 신고 샘플 3건. 건수는 참고 정보이고 조치 근거가 아니에요.</p>
             <ul class="plain files rel" style="margin-top:8px">
-              <li><span>접수일 샘플 날짜 1 · <span class="tag">외부 후원 유도</span><span class="tag wip">검토 중</span></span><a class="btn" href="report-detail.html" aria-label="샘플 날짜 1 신고 상세">신고 상세</a></li>
-              <li><span>접수일 샘플 날짜 2 · <span class="tag">욕설·비방</span><span class="tag ok">처리 완료</span></span><a class="btn" href="report-detail.html?s=saved" aria-label="샘플 날짜 2 신고 상세">신고 상세</a></li>
-              <li><span>접수일 샘플 날짜 3 · <span class="tag">기타</span><span class="tag ok">처리 완료</span></span><a class="btn" href="report-detail.html?s=saved" aria-label="샘플 날짜 3 신고 상세">신고 상세</a></li>
+              <li><span>접수일 샘플 날짜 1 · <span class="tag">외부 후원 유도</span><span class="tag wip">검토 중</span></span><a class="go" href="report-detail.html" aria-label="샘플 날짜 1 신고 상세">신고 상세 ›</a></li>
+              <li><span>접수일 샘플 날짜 2 · <span class="tag">욕설·비방</span><span class="tag ok">처리 완료</span></span><a class="go" href="report-detail.html?s=saved" aria-label="샘플 날짜 2 신고 상세">신고 상세 ›</a></li>
+              <li><span>접수일 샘플 날짜 3 · <span class="tag">기타</span><span class="tag ok">처리 완료</span></span><a class="go" href="report-detail.html?s=saved" aria-label="샘플 날짜 3 신고 상세">신고 상세 ›</a></li>
             </ul>
             <p><a href="reports.html">신고 목록에서 보기</a></p></section>
 
@@ -121,8 +121,8 @@
             <span class="err" id="f-ev-e" style="display:block" hidden>증거를 1개 이상 첨부해 주세요.</span>
             <p class="help" id="f-ev-h">(목업) 샘플 첨부 파일을 모두 삭제하면 증거 필수 오류를 볼 수 있어요. 조치와 관계없는 다른 사람의 얼굴, 연락처, 계좌번호, 주소가 보이면 가려서 올려 주세요. <span class="slot">보관 기간·열람 범위 안내 문구 법무 확인 전</span></p>
             <ul class="plain files" id="f-files" aria-label="첨부한 증거">
-              <li data-ev="ok"><span>샘플 캡처 1.png <span class="muted small">샘플 크기</span> · 첨부됨</span><span class="f-acts"><button class="btn" type="button" data-del aria-label="샘플 캡처 1.png 삭제">삭제</button></span></li>
-              <li data-ev="fail"><span>샘플 캡처 2.png <span class="muted small">샘플 크기</span> · <span class="err">올리지 못했어요</span></span><span class="f-acts"><button class="btn" type="button" data-retry aria-label="샘플 캡처 2.png 다시 올리기">다시 시도</button><button class="btn" type="button" data-del aria-label="샘플 캡처 2.png 삭제">삭제</button></span></li>
+              <li data-ev="ok"><span>샘플 캡처 1.png <span class="muted small">샘플 크기</span> · 첨부됨</span><span class="f-acts"><button class="linkbtn" type="button" data-del aria-label="샘플 캡처 1.png 삭제">삭제</button></span></li>
+              <li data-ev="fail"><span>샘플 캡처 2.png <span class="muted small">샘플 크기</span> · <span class="err">올리지 못했어요</span></span><span class="f-acts"><button class="linkbtn" type="button" data-retry aria-label="샘플 캡처 2.png 다시 올리기">다시 시도</button><button class="linkbtn" type="button" data-del aria-label="샘플 캡처 2.png 삭제">삭제</button></span></li>
             </ul>
             <p class="sr" role="status" id="f-live"></p></div>
 
@@ -185,7 +185,7 @@
   // 증거 첨부(샘플): 고른 파일은 바로 "첨부됨" 행으로
   function row(name) {
     var li = document.createElement('li'); li.dataset.ev = 'ok';
-    li.innerHTML = '<span><span class="fn"></span> <span class="muted small">샘플 크기</span> · 첨부됨</span><span class="f-acts"><button class="btn" type="button" data-del>삭제</button></span>';
+    li.innerHTML = '<span><span class="fn"></span> <span class="muted small">샘플 크기</span> · 첨부됨</span><span class="f-acts"><button class="linkbtn" type="button" data-del>삭제</button></span>';
     li.querySelector('.fn').textContent = name; li.querySelector('[data-del]').setAttribute('aria-label', name + ' 삭제');
     return li;
   }

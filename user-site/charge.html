@@ -7,23 +7,25 @@
 <link rel="stylesheet" href="styles.css">
 <style>
   .col { max-width: 680px; margin: 0 auto; padding: 32px 0 64px; }
-  .bal { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .bal { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 20px; background: var(--s1); border-radius: 14px; }
   .bal > span:first-child { font-size: .9rem; color: var(--muted); }
-  .bal strong { font-size: 1.5rem; font-weight: 700; color: var(--strong); font-variant-numeric: tabular-nums; }
+  .bal strong { font-size: 1.5rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
   fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .prods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .prod { position: relative; display: block; border: 1px solid var(--muted); border-radius: var(--radius); padding: 14px 16px 14px 48px; min-height: 96px; cursor: pointer; }
-  .prod:hover { background: var(--bg-sub); }
-  .prod input { position: absolute; left: 14px; top: 16px; width: 24px; height: 24px; accent-color: var(--strong); }
-  .prod:has(input:checked) { border: 2px solid var(--strong); background: var(--bg-sub); padding: 13px 15px 13px 47px; }
-  .prod .sel { display: none; font-size: .85rem; font-weight: 700; color: var(--strong); }
-  .prod .qty { font-size: 1rem; font-weight: 600; color: var(--text); }
+  .prod { position: relative; display: grid; gap: 4px; border: 1px solid var(--line); padding: 18px 56px 16px 18px; min-height: 96px; cursor: pointer; transition: border-color .2s, background .2s; }
+  .prod:hover { border-color: var(--edge); }
+  .prod input { position: absolute; right: 16px; top: 16px; width: 24px; height: 24px; }
+  .prod:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .prod .sel { display: none; font-size: .85rem; font-weight: 700; color: var(--accent); }
+  .prod .qty { font-size: .95rem; font-weight: 600; color: var(--text); }
   .prod:has(input:checked) .sel { display: inline; }
-  .prod .nm { font-size: .9rem; font-weight: 400; color: var(--muted); display: block; }
+  .prod .nm { font-size: .85rem; font-weight: 400; color: var(--muted); display: block; }
+  .prod .price { font-size: 1.15rem; color: var(--strong); }
+  .prod br { display: none; }
   .dl { display: grid; grid-template-columns: 96px 1fr; gap: 6px 12px; margin: 0; }
   .dl dt { font-size: .9rem; font-weight: 400; color: var(--muted); } .dl dd { margin: 0; }
-  .terms { list-style: none; margin: 0; padding: 0; } .terms li { padding: 6px 0; border-top: 1px solid var(--line); }
+  .terms { list-style: none; margin: 0; padding: 0; } .terms li { padding: 8px 0; border-top: 1px solid var(--line); }
   .terms li:first-child { border-top: 0; }
   @media (max-width: 767px) { .prods { grid-template-columns: 1fr; } .col { padding-top: 20px; } .dl { grid-template-columns: 80px 1fr; } }
 </style>
@@ -125,7 +127,7 @@
 
     <p data-show="sel=yes" role="status" style="color:var(--text)"><span class="slot">[V1 가격]</span> 원을 결제하면 <span class="slot">S1 명칭</span> <span class="slot">[V1 열매 수량]</span> 개가 충전돼요.</p>
 
-    <section aria-labelledby="h-terms" style="border:1px solid var(--muted);border-radius:var(--radius);padding:16px">
+    <section aria-labelledby="h-terms" class="panel" style="padding:16px 20px">
       <h2 id="h-terms" style="font-size:1rem;font-weight:700;color:var(--strong)">충전 전에 확인해 주세요</h2>
       <ul class="terms" style="margin-top:8px">
         <li><span class="muted small">환산 비율</span> <span class="slot">[S2 환산 비율]</span></li>

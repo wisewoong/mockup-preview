@@ -1,3 +1,48 @@
+// 시안 B 글꼴(Sora + Noto Sans KR). 오프라인이면 시스템 글꼴로 대체된다.
+(function () {
+  if (document.querySelector('link[data-bfont]')) return;
+  var l = document.createElement('link'); l.rel = 'stylesheet'; l.setAttribute('data-bfont', '');
+  l.href = 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap';
+  document.head.appendChild(l);
+})();
+
+// 공통 더보기 메뉴: <span class="more-w"><button class="btn ib more" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="menu" role="menu" hidden><button class="mi" role="menuitem">…</button></div></span>
+// 바깥 클릭·Esc 닫기, ↑↓ Home End 이동, aria-expanded 갱신. 행이 다시 그려져도 동작하도록 문서 위임.
+(function () {
+  function menuOf(b) { return b.nextElementSibling; }
+  function items(m) { return [].slice.call(m.querySelectorAll('[role="menuitem"]:not(:disabled)')); }
+  function closeAll(except) {
+    document.querySelectorAll('.more[aria-expanded="true"]').forEach(function (b) {
+      if (b === except) return;
+      b.setAttribute('aria-expanded', 'false'); var m = menuOf(b); if (m) m.hidden = true;
+    });
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.more');
+    if (b) {
+      var m = menuOf(b), was = b.getAttribute('aria-expanded') === 'true';
+      closeAll(b); b.setAttribute('aria-expanded', String(!was)); m.hidden = was;
+      if (!was && e.detail === 0) { var f = items(m)[0]; if (f) f.focus(); } // 키보드로 열면 첫 항목으로
+      return;
+    }
+    closeAll(null);
+  });
+  document.addEventListener('keydown', function (e) {
+    var open = document.querySelector('.more[aria-expanded="true"]'); if (!open) return;
+    var m = menuOf(open), it = items(m), i = it.indexOf(document.activeElement);
+    if (e.key === 'Escape') { e.preventDefault(); closeAll(null); open.focus(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); (it[i + 1] || it[0]).focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); (it[i - 1] || it[it.length - 1]).focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); it[0].focus(); }
+    else if (e.key === 'End') { e.preventDefault(); it[it.length - 1].focus(); }
+    else if (e.key === 'Tab') closeAll(null);
+  });
+  window.moreMenu = function (label, list) { // list: [[글자, 'bad'|'' , 'data-속성 문자열']]
+    return '<span class="more-w"><button class="btn ib more" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="' + label + '">⋯</button><div class="menu" role="menu" hidden>' +
+      list.map(function (x) { return '<button class="mi' + (x[1] ? ' bad' : '') + '" type="button" role="menuitem" ' + (x[2] || '') + '>' + x[0] + '</button>'; }).join('') + '</div></span>';
+  };
+})();
+
 // 목회자 사이트 목업 공통 스크립트(검토용). 시청자 mock.js에서 필요한 것만 가져왔다.
 // 아이콘: data-icon="이름" data-label="접근성 이름", data-keep 이면 글자도 남긴다.
 (function () {

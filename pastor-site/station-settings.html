@@ -34,14 +34,14 @@
 <div class="mem-head"><h1>방송국 설정</h1></div>
 
 <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:160px;margin-top:12px"></div></section>
-<div class="notice danger" role="alert" data-show="s=loaderr"><strong>방송국 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="s=loaderr"><strong>방송국 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
 
 <div class="stack" data-show="s=normal|dirty|saving|saved|saveerr|conflict">
-  <div class="notice danger" role="alert" data-show="st=suspended|closed"><strong>이 방송국은 지금 수정할 수 없어요</strong><p class="small">방송국 상태 <span class="slot">정지·폐쇄</span> · 사유 <span class="slot">사유</span></p><p style="margin-top:8px"><a class="btn" href="sanctions.html">제재 안내</a></p></div>
+  <div class="notice danger" role="alert" data-show="st=suspended|closed"><strong>이 방송국은 지금 수정할 수 없어요</strong><p class="small">방송국 상태 <span class="slot">정지·폐쇄</span> · 사유 <span class="slot">사유</span></p><p style="margin-top:8px"><a class="btn lnk" href="sanctions.html">제재 안내</a></p></div>
   <div class="notice" role="status" data-show="st=limited"><strong>방송국이 제한 중이에요</strong><p class="small">사유 <span class="slot">사유</span> · 제한 범위 <span class="slot">범위</span> · <a href="sanctions.html">제재 안내</a></p></div>
   <div class="notice" role="status" id="n-saved" tabindex="-1" data-show="s=saved"><strong>저장했어요</strong></div>
   <div class="notice danger" role="alert" data-show="s=saveerr"><strong>오류: 저장하지 못했어요. 입력한 내용은 그대로예요</strong></div>
-  <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 사람이 먼저 바꿨어요</strong><p class="small">화면을 새로 불러와 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">새로 불러오기</button></p></div>
+  <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 사람이 먼저 바꿨어요</strong><p class="small">화면을 새로 불러와 주세요.</p><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">새로 불러오기</button></p></div>
 
   <form class="stack" id="frm" novalidate aria-label="방송국 설정">
     <fieldset class="stack panel" id="fs" style="margin:0"><legend class="sr">설정 입력</legend>
@@ -58,12 +58,12 @@
       <div class="field"><label class="label" for="im">프로필 이미지</label>
         <div class="fgrid"><span class="imgprev" id="pv-p">프로필 이미지 없음</span>
           <div class="stack"><input class="input" id="im" type="file" accept="image/*" aria-describedby="im-h im-e">
-            <p><button class="btn" type="button" id="im-clr">이미지 지우기</button></p></div></div>
+            <p><button class="btn lnk" type="button" id="im-clr">이미지 지우기</button></p></div></div>
         <span class="help" id="im-h">형식 <span class="slot">형식</span> · 용량 <span class="slot">용량</span></span>
         <span class="err" id="im-e" role="alert" hidden></span></div>
       <div class="field"><label class="label" for="bg">배경 이미지</label>
         <div class="stack"><span class="imgprev wide" id="pv-b">배경 이미지 없음</span><input class="input" id="bg" type="file" accept="image/*" aria-describedby="bg-h">
-          <p><button class="btn" type="button" id="bg-clr">이미지 지우기</button></p></div>
+          <p><button class="btn lnk" type="button" id="bg-clr">이미지 지우기</button></p></div>
         <span class="help" id="bg-h">형식 <span class="slot">형식</span> · 용량 <span class="slot">용량</span></span></div>
       <p class="help" id="f-help" hidden>운영자가 검토할 수 있어요. 잘못 걸렸다고 생각하면 <a href="sanctions.html">이의제기</a>해 주세요 <span class="slot">경로 결정 전</span></p>
     </section>
@@ -86,7 +86,7 @@
       <div class="field"><label class="label" for="ur">주소</label>
         <div class="pre"><span class="px" aria-hidden="true"><span class="slot">주소 접두</span></span><input class="input" id="ur" readonly value="sample-church" aria-describedby="ur-h"></div>
         <p class="help" id="ur-h">방송국을 만들 때 정한 주소는 바꿀 수 없어요. 바꾸려면 운영팀에 문의해 주세요 <span class="slot">사용자 결정 전</span></p></div>
-      <p class="row"><button class="btn ik" type="button" id="ur-cp" data-icon="copy" data-keep>주소 복사</button><span class="help" role="status" id="ur-ok" hidden>복사했어요.</span></p>
+      <p class="row"><button class="btn lnk ik" type="button" id="ur-cp" data-icon="copy" data-keep>주소 복사</button><span class="help" role="status" id="ur-ok" hidden>복사했어요.</span></p>
     </section>
 
     <section class="panel stack" aria-labelledby="h-pv">

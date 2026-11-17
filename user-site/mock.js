@@ -1,3 +1,10 @@
+// 글꼴(시안 B): Sora + Noto Sans KR. 오프라인이면 시스템 글꼴로 대체된다.
+(function () {
+  var h = document.head;
+  if (h.querySelector('link[data-fonts]')) return;
+  var a = document.createElement('link'); a.rel = 'preconnect'; a.href = 'https://fonts.googleapis.com'; h.appendChild(a);
+  var l = document.createElement('link'); l.rel = 'stylesheet'; l.setAttribute('data-fonts', ''); l.href = 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap'; h.appendChild(l);
+})();
 // 아이콘(인라인 SVG, 24px, stroke 2.2, round). data-icon="이름" data-label="접근성 이름" 이 붙은 버튼에 주입한다. data-keep 이면 글자도 남긴다.
 // 토글(data-toggle)은 aria-pressed만 바꾸고, 모양은 CSS(.i-off/.i-on, .fillable)가 전환한다. data-lon/data-loff 가 있으면 라벨도 바꾼다.
 (function () {

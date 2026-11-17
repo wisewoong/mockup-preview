@@ -8,6 +8,15 @@
 <link rel="stylesheet" href="operator-shell.css">
 <link rel="stylesheet" href="operator-audit.css">
 <link rel="stylesheet" href="operator-verify.css">
+<style>
+.pt th[scope="row"] { background: transparent; font-size: 14px; }
+.pt .help { margin: 0 12px 0 0; display: inline; font-size: 13px; }
+@media (max-width: 1023px) {
+  .tbl-wrap.cards.v.pt > table > tbody > tr > th[scope="row"] { width: auto; flex: 1 1 0; }
+  .tbl-wrap.cards.v.pt td.c-act { display: flex; align-items: center; flex-wrap: wrap; }
+  .tbl-wrap.cards.v.pt td.c-act .btn { padding-left: 0; }
+}
+</style>
 </head>
 <body data-default="role:op s:normal">
 <header id="site-header" data-active="partners"></header>
@@ -29,7 +38,7 @@
     <div class="stack" data-show="s=normal|saveerr">
       <div class="notice danger" role="alert" data-show="s=saveerr"><strong>지정하지 못했어요</strong><p>적은 사유는 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
       <p id="msg" tabindex="-1" class="notice" role="status" hidden></p>
-      <div class="tbl-wrap cards v"><table><caption class="sr">방송국 파트너 현황 (샘플)</caption>
+      <div class="tbl-wrap cards v pt"><table><caption class="sr">방송국 파트너 현황 (샘플)</caption>
         <thead><tr><th scope="col">방송국</th><th scope="col">소유자</th><th scope="col">인증 여부</th><th scope="col">현재 상태</th><th scope="col">파트너 요율</th><th scope="col">작업</th></tr></thead>
         <tbody id="rows"></tbody></table></div>
       <p class="muted small">파트너 요율은 수수료율 화면의 파트너 값이 적용돼요. 요율 값은 이 화면에서 바꾸지 않아요.</p>
@@ -56,7 +65,7 @@
   function draw() {
     $('rows').innerHTML = R.map(function (r, i) {
       var on = r[3] === 'on';
-      return '<tr><th scope="row" class="c-title">' + r[0] + '</th><td class="c-tag"><span class="tag' + (r[3] == 'on' ? ' ok' : r[3] == 'off' ? ' off' : '') + '">' + LBL[r[3]] + '</span></td><td data-label="소유자">' + r[1] + '</td><td data-label="인증 여부">' + (r[2] ? '인증' : '미인증') + '</td>' +
+      return '<tr><th scope="row" class="c-title">' + r[0] + '</th><td data-label="소유자">' + r[1] + '</td><td data-label="인증 여부">' + (r[2] ? '인증' : '미인증') + '</td><td class="c-tag"><span class="tag' + (r[3] == 'on' ? ' ok' : ' off') + '">' + LBL[r[3]] + '</span></td>' +
         '<td data-label="파트너 요율">' + (on ? '<span class="slot">V3</span>' : '<span class="muted">—</span>') + '</td><td class="c-act">' +
         (r[2] || on ? '' : '<p class="help" id="why' + i + '">인증 목회자만 지정할 수 있어요</p>') + (on ? '<button class="btn bad" type="button" data-act="off" data-i="' + i + '">해제</button>'
           : '<button class="btn" type="button" data-act="on" data-i="' + i + '"' + (r[2] ? '' : ' disabled aria-describedby="why' + i + '"') + '>지정</button>') + '</td></tr>';

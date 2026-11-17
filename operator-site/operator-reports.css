@@ -1,8 +1,6 @@
 /* 신고 목록·상세 전용 (신규 색 토큰 없음) */
 .filters { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
-.filters .input { width: auto; min-width: 160px; }
 .lock-row td { color: var(--muted); }
-.lock-row .tag { color: var(--text); }
 .rd { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start; }
 .rd-form { position: sticky; top: 16px; }
 .quote { background: var(--bg-sub); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
@@ -22,9 +20,8 @@
 @media (max-width: 1023px) {
   .only-m { display: block; }
   .filters .input, .filters select { font-size: 1rem; min-height: var(--tap); }
-  .filters .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .filters label.row { width: 100%; }
-  .filters .input { flex: 1; }
+  .filters .chips { flex: 1 1 100%; }
+  .filters label.row { width: auto; }
   .tbl-wrap.cards tr[hidden] { display: none; }
   .tbl-wrap.cards:not(.v) tr { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
   .tbl-wrap.cards:not(.v) tr > td { width: auto; }
@@ -38,7 +35,7 @@
   .tbl-wrap.cards:not(.v) tr > td:nth-child(4)::before { display: inline !important; content: "신고 "; }
   .tbl-wrap.cards:not(.v) tr > td:nth-child(4)::after { content: "건 (참고)"; }
   .tbl-wrap.cards:not(.v) tr > td:nth-child(7) { order: 7; width: 100%; }
-  .tbl-wrap.cards:not(.v) tr > td:nth-child(7) .btn { display: flex; align-items: center; justify-content: center; }
+  
   .tbl-wrap.cards:not(.v) tr > td:nth-child(3) .small { font-weight: 400; }
   .lock-row td:nth-child(6) .small { display: block; }
 }

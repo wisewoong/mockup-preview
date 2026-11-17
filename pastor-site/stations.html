@@ -28,14 +28,14 @@
 <section data-show="state=zero"><div class="empty"><p><strong>아직 방송국이 없어요</strong></p><p class="help">방송국을 만들거나, 초대를 받으면 여기서 일할 수 있어요</p><p><a class="btn primary" href="create-station.html">방송국 만들기</a></p><p class="help">초대를 받았나요? <a href="../user-site/notifications.html">알림 확인</a></p></div></section>
 
 <div class="stack" data-show="state=list|one|many|loading|error">
-<div class="st-head"><div><h1>방송국 선택</h1><p class="help">일할 방송국을 고르세요. 역할에 따라 쓸 수 있는 메뉴가 달라요.</p></div><a class="btn" href="create-station.html">방송국 만들기</a></div>
+<div class="st-head"><div><h1>방송국 선택</h1><p class="help">일할 방송국을 고르세요. 역할에 따라 쓸 수 있는 메뉴가 달라요.</p></div><a class="btn lnk" href="create-station.html">방송국 만들기</a></div>
 <div class="field" data-show="state=many"><label class="label" for="q">방송국 검색</label><input class="input" id="q" type="search" autocomplete="off"><span class="help">여러 방송국이 있을 때 이름으로 찾아요 <span class="slot">10개 초과 기준</span></span></div>
 <p class="help" data-show="state=one">방송국이 하나뿐이에요</p>
-<div class="notice danger" role="alert" data-show="state=error"><strong>불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="state:list">다시 시도</button></p></div>
+<div class="notice danger" role="alert" data-show="state=error"><strong>불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-set="state:list">다시 시도</button></p></div>
 <div role="status" data-show="state=loading" aria-label="불러오는 중"><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px;margin-top:12px"></div><div class="skeleton" style="height:96px;margin-top:12px"></div></div>
 <ul class="plain st-cards" data-show="state=list|one|many">
 <li class="item">
-  <div><p><strong>샘플 방송국</strong> <span class="tag host">소유자</span><span class="tag" style="color:var(--live);border-color:var(--live)">LIVE</span></p>
+  <div><p><strong>샘플 방송국</strong> <span class="tag host">소유자</span><span class="tag live">LIVE</span></p>
   <p class="help"><span class="tag">마지막 사용</span> <span class="slot">날짜 시각</span></p>
   <p class="help"></p></div>
   <div class="act"><a class="btn primary" href="dashboard.html?sw=샘플 방송국" aria-label="샘플 방송국 들어가기">들어가기</a></div>
@@ -44,19 +44,19 @@
   <div><p><strong>은혜 방송국</strong> <span class="tag adm">관리자</span></p>
   <p class="help">마지막 사용 <span class="slot">날짜 시각</span></p>
   <p class="help"><span class="tag">일부 제한</span>일부 기능이 제한돼요 · <a href="sanctions.html">제재 안내</a></p></div>
-  <div class="act"><a class="btn" href="dashboard.html?sw=은혜 방송국" aria-label="은혜 방송국 들어가기">들어가기</a></div>
+  <div class="act"><a class="btn lnk" href="dashboard.html?sw=은혜 방송국" aria-label="은혜 방송국 들어가기">들어가기</a></div>
 </li>
 <li class="item" data-show="state=list|many">
   <div><p><strong>소망 방송국</strong> <span class="tag mgr">매니저</span></p>
   <p class="help">아직 들어가 본 적 없어요</p>
   <p class="help"><span class="tag bad">운영 중지</span>운영이 중지됐어요 · 보기만 할 수 있어요</p></div>
-  <div class="act"><a class="btn" href="dashboard.html?sw=소망 방송국" aria-label="소망 방송국 들어가기">들어가기</a></div>
+  <div class="act"><a class="btn lnk" href="dashboard.html?sw=소망 방송국" aria-label="소망 방송국 들어가기">들어가기</a></div>
 </li>
 <li class="item" data-show="state=list|many">
   <div><p><strong>나눔 방송국</strong> <span class="tag host">소유자</span></p>
   <p class="help">마지막 사용 <span class="slot">날짜 시각</span></p>
   <p class="help"><span class="tag bad">폐쇄</span>폐쇄된 방송국이에요 · 보기만 할 수 있어요</p></div>
-  <div class="act"><a class="btn" href="dashboard.html?sw=나눔 방송국" aria-label="나눔 방송국 들어가기">들어가기</a></div>
+  <div class="act"><a class="btn lnk" href="dashboard.html?sw=나눔 방송국" aria-label="나눔 방송국 들어가기">들어가기</a></div>
 </li>
 </ul>
 <p class="help" data-show="state=list|many">초대를 기다리는 방송국은 알림에서 수락해요 · <a href="../user-site/notifications.html">알림</a></p>
