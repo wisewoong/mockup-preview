@@ -7,6 +7,7 @@
     x: S(P('M6 6l12 12M18 6L6 18')),
     retry: S(P('M20 12a8 8 0 11-2.5-5.8M20 4v5h-5')),
     user: S('<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/>' + P('M4 21a8 8 0 0116 0')),
+    site: S(P('M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5')),
     copy: S(P('M9 9h11v11H9zM5 15V4h11'))
   };
   window.mockIcons = function (root) {
@@ -46,8 +47,8 @@
     H.className = 'topbar';
     H.innerHTML = '<div class="wrap"><a class="brand" href="dashboard.html">말씀ON 목회자</a><nav class="nav" aria-label="주 메뉴"></nav>' +
       '<span class="who"><strong>' + ST + '</strong> <span class="tag role"></span></span>' +
-      '<a class="btn hide-m" href="../user-site/main.html">사이트 이동</a>' +
-      '<button class="btn" type="button" data-open="me-dlg" data-icon="user" data-label="내 정보">내 정보</button></div>';
+      '<div class="htools"><a class="btn ib hbtn hide-m" href="../user-site/main.html" data-icon="site" data-label="시청자 사이트로 이동">사이트 이동</a>' +
+      '<button class="btn hbtn" type="button" data-open="me-dlg" data-icon="user" data-label="내 정보">내 정보</button></div></div>';
     window.mockIcons(H);
     var T = document.createElement('nav'); T.className = 'bottombar four'; T.setAttribute('aria-label', '하단 메뉴'); document.body.appendChild(T);
     meDlg = document.createElement('dialog'); meDlg.id = 'me-dlg'; meDlg.setAttribute('aria-labelledby', 'me-t');

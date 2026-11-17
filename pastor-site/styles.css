@@ -392,3 +392,9 @@ input[type="checkbox"]:not([role="switch"]):checked, input[type="radio"]:checked
 input[type="radio"]:checked { box-shadow: inset 0 0 0 4px var(--bg); }
 input[type="checkbox"]:not([role="switch"]):checked::after { content: ""; position: absolute; left: 30%; top: 12%; width: 28%; height: 52%; border: solid var(--bg); border-width: 0 3px 3px 0; transform: rotate(45deg); }
 input[type="checkbox"]:not([role="switch"]):disabled, input[type="radio"]:disabled { opacity: .5; }
+
+/* 헤더 정리(시청자 HEADER-DESIGN 적용): 오른쪽 도구는 테두리 없는 아이콘 버튼 */
+.htools { display: flex; align-items: center; gap: 4px; }
+.btn.hbtn { border: 0; background: transparent; padding: 0; width: var(--tap); }
+.btn.hbtn:hover, .btn.hbtn[aria-expanded="true"] { background: var(--bg-sub); }
+.topbar .who { margin-right: 12px; }

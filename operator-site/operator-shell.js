@@ -30,8 +30,8 @@
     var cur = act === 'index' ? '운영사 홈' : (NAV.reduce(function (a, g) { return a.concat(g[1]); }, []).filter(function (n) { return n[0] === act; })[0] || [0, ''])[1];
     H.innerHTML = '<div class="wrap hd-d"><a class="brand" href="index.html">말씀ON 운영사</a><span style="flex:1"></span>' +
       '<span class="who"><strong>샘플 운영자</strong> <span class="tag role"></span></span>' +
-      '<button class="btn" type="button" data-open="me-dlg">내 정보</button></div>' +
-      '<div class="wrap hd-m"><button class="btn ib" type="button" id="op-menu" aria-label="메뉴 열기" aria-expanded="false" aria-controls="op-drawer">☰</button>' +
+      '<button class="btn ib hbtn" type="button" data-open="me-dlg" aria-label="내 정보" title="내 정보"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></button></div>' +
+      '<div class="wrap hd-m"><button class="btn ib hbtn" type="button" id="op-menu" aria-label="메뉴 열기" title="메뉴" aria-expanded="false" aria-controls="op-drawer"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>' +
       '<strong class="hd-title">' + cur + '</strong><span class="tag role"></span></div>';
     var d = document.createElement('dialog'); d.id = 'me-dlg'; d.setAttribute('aria-labelledby', 'me-t');
     d.innerHTML = '<h2 id="me-t">내 정보</h2><p class="muted small" style="margin-top:4px">샘플 운영자 · <span class="role"></span></p>' +
@@ -39,8 +39,8 @@
     document.body.appendChild(d);
     var dr = document.createElement('dialog'); dr.id = 'op-drawer'; dr.className = 'drawer'; dr.setAttribute('aria-label', '운영사 메뉴');
     dr.innerHTML = '<div class="dr-top"><div><strong>샘플 운영자</strong> <span class="tag role"></span></div>' +
-      '<button class="btn" type="button" data-open="me-dlg">내 정보</button>' +
-      '<button class="btn ib" type="button" data-close aria-label="닫기">✕</button></div><nav class="op-nav" aria-label="운영사 메뉴"></nav>';
+      '<button class="btn ib hbtn" type="button" data-open="me-dlg" aria-label="내 정보" title="내 정보"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></button>' +
+      '<button class="btn ib hbtn" type="button" data-close aria-label="닫기" title="닫기"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><nav class="op-nav" aria-label="운영사 메뉴"></nav>';
     document.body.appendChild(dr);
     var mb = document.getElementById('op-menu');
     mb.addEventListener('click', function () { dr._opener = mb; mb.setAttribute('aria-expanded', 'true'); dr.showModal(); });

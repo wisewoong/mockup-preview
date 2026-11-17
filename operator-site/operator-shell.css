@@ -67,3 +67,9 @@ ul.plain li { padding: 6px 0; }
   .op-main .item > .btn, .op-main .item > .linkbtn { width: 100%; }
   .op-main .btn.danger { width: 100%; }
 }
+
+/* 상단 도구: 테두리 없는 48px 아이콘 버튼(사용자 사이트 HEADER-DESIGN 원칙) */
+.btn.hbtn { border: 0; background: transparent; padding: 0; width: var(--tap); color: var(--text); }
+.btn.hbtn:hover, .btn.hbtn[aria-expanded="true"] { background: var(--bg-sub); }
+.topbar .hd-d { gap: 16px; }
+.topbar .who { margin-left: 0; }
