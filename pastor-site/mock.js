@@ -42,22 +42,33 @@
   if (!b.dataset.role) b.dataset.role = 'owner';
   q.forEach(function (v, k) { if (k !== 'theme') b.dataset[k] = v; });
 
-  var meDlg;
+  var meDlg, multi = (b.dataset.stations || '3') !== '1';
   if (H) {
     H.className = 'topbar';
     H.innerHTML = '<div class="wrap"><a class="brand" href="dashboard.html">말씀ON 목회자</a><nav class="nav" aria-label="주 메뉴"></nav>' +
-      '<span class="who"><strong>' + ST + '</strong> <span class="tag role"></span></span>' +
+      (multi ? '<button class="btn who" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="st-dlg" data-open="st-dlg"><strong>' + ST + '</strong><span class="tag role"></span><span class="caret" aria-hidden="true">▾</span></button>'
+        : '<span class="who"><strong>' + ST + '</strong> <span class="tag role"></span></span>') +
       '<div class="htools"><a class="btn ib hbtn hide-m" href="../user-site/main.html" data-icon="site" data-label="시청자 사이트로 이동">사이트 이동</a>' +
       '<button class="btn hbtn" type="button" data-open="me-dlg" data-icon="user" data-label="내 정보">내 정보</button></div></div>';
     window.mockIcons(H);
     var T = document.createElement('nav'); T.className = 'bottombar four'; T.setAttribute('aria-label', '하단 메뉴'); document.body.appendChild(T);
     meDlg = document.createElement('dialog'); meDlg.id = 'me-dlg'; meDlg.setAttribute('aria-labelledby', 'me-t');
     meDlg.innerHTML = '<h2 id="me-t">내 정보</h2><p class="muted small" style="margin-top:4px">' + ST + ' · <span class="role"></span></p>' +
-      '<ul class="plain" style="margin-top:12px"><li id="me-donation"><a href="donation-settings.html">후원 설정</a></li><li id="me-settle"><a href="settlements.html">정산 내역</a></li><li id="me-members"><a href="members.html">구성원</a></li><li id="me-station"><a href="station-settings.html">방송국 설정</a></li><li id="me-sanc"><a href="sanctions.html">제재 안내</a></li><li id="me-verify"><a href="verification.html">목사 인증</a></li><li><a href="create-station.html">새 방송국 만들기</a></li><li><a href="../user-site/main.html">사이트 이동 (시청자 사이트)</a></li><li><a href="../user-site/history.html">내 정보 (시청자 사이트)</a></li></ul>' +
+      '<ul class="plain" style="margin-top:12px"><li id="me-donation"><a href="donation-settings.html">후원 설정</a></li><li id="me-settle"><a href="settlements.html">정산 내역</a></li><li id="me-members"><a href="members.html">구성원</a></li><li id="me-station"><a href="station-settings.html">방송국 설정</a></li><li id="me-sanc"><a href="sanctions.html">제재 안내</a></li><li id="me-verify"><a href="verification.html">목사 인증</a></li><li id="me-stations"><a href="stations.html">방송국 선택</a></li><li><a href="create-station.html">새 방송국 만들기</a></li><li><a href="../user-site/main.html">사이트 이동 (시청자 사이트)</a></li><li><a href="../user-site/history.html">내 정보 (시청자 사이트)</a></li></ul>' +
       '<div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close>닫기</button></div>';
     document.body.appendChild(meDlg);
     // Esc·닫기 어느 쪽으로 닫아도 열었던 버튼으로 포커스 복귀(close 이벤트 한 곳에서만)
-    meDlg.addEventListener('close', function () { var o = meDlg._opener; if (o && document.contains(o) && o.offsetParent !== null) o.focus(); });
+    function back(d) { return function () { var o = d._opener; if (o) o.setAttribute('aria-expanded', 'false'); if (o && document.contains(o) && o.offsetParent !== null) o.focus(); }; }
+    meDlg.addEventListener('close', back(meDlg));
+    // 방송국 전환 메뉴(샘플 3개: 현재 / 일부 제한 / 운영 중지는 맨 아래). 행을 누르면 대시보드로 가서 알림 1회
+    var stDlg = document.createElement('dialog'); stDlg.id = 'st-dlg'; stDlg.className = 'sheet'; stDlg.setAttribute('aria-labelledby', 'st-t');
+    function row(n, cur, tag, st) { return '<li><a href="dashboard.html?sw=' + encodeURIComponent(n) + '"' + (cur ? ' aria-current="true" autofocus' : '') + '><strong>' + n + '</strong>' + tag + (st || '') + (cur ? '<span class="muted small">현재</span>' : '') + '</a></li>'; }
+    stDlg.innerHTML = '<h2 id="st-t">방송국 전환</h2><ul class="plain st-list" style="margin-top:8px">' +
+      row(ST, true, '<span class="tag role"></span>') + row('은혜 방송국', false, '<span class="tag adm">관리자</span>', '<span class="tag">일부 제한</span>') + row('소망 방송국', false, '<span class="tag mgr">매니저</span>', '<span class="tag bad">운영 중지</span>') +
+      '</ul><ul class="plain" style="margin-top:8px"><li><a href="stations.html">모든 방송국 보기</a></li><li><a href="create-station.html">새 방송국 만들기</a></li></ul>' +
+      '<div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close>닫기</button></div>';
+    document.body.appendChild(stDlg);
+    stDlg.addEventListener('close', back(stDlg));
   }
   // 역할 그룹(mockbar의 [data-rolebar] 안에 주입)
   document.querySelectorAll('[data-rolebar]').forEach(function (g) {
@@ -70,7 +81,7 @@
     if (H) {
       H.querySelector('.nav').innerHTML = nav(role, a);
       document.querySelector('.bottombar').innerHTML = nav(role, a, true);
-      [['me-members', role === 'mgr'], ['me-station', role === 'mgr'], ['me-sanc', role === 'mgr'], ['me-verify', role === 'mgr'], ['me-donation', role === 'mgr' || role === 'adm0'], ['me-settle', role !== 'owner']].forEach(function (x) { var l = document.getElementById(x[0]); if (l) l.hidden = x[1]; });
+      [['me-members', role === 'mgr'], ['me-station', role === 'mgr'], ['me-sanc', role === 'mgr'], ['me-verify', role === 'mgr'], ['me-stations', !multi], ['me-donation', role === 'mgr' || role === 'adm0'], ['me-settle', role !== 'owner']].forEach(function (x) { var l = document.getElementById(x[0]); if (l) l.hidden = x[1]; });
       document.querySelector('.bottombar').style.gridTemplateColumns = 'repeat(' + (role === 'mgr' ? 1 : 4) + ',1fr)';
       document.querySelectorAll('.role').forEach(function (r) { r.textContent = ROLE[role] || role; r.classList.remove('host', 'adm', 'mgr'); r.classList.add(role === 'owner' ? 'host' : role === 'mgr' ? 'mgr' : 'adm'); });
     }
@@ -88,10 +99,11 @@
     var t = e.target.closest('[data-set]');
     if (t) { var p = t.dataset.set.split(':'); b.dataset[p[0]] = p[1]; render(); }
     var o = e.target.closest('[data-open]');
-    if (o) { var d = document.getElementById(o.dataset.open); if (d) { d._opener = o; d.showModal(); var f = d.querySelector('[autofocus]') || d.querySelector('h2'); if (f) { f.tabIndex = -1; if (!d.querySelector('[autofocus]')) f.focus(); } } }
+    if (o) { var d = document.getElementById(o.dataset.open); if (d) { d._opener = o; d.showModal(); if (o.hasAttribute('aria-expanded')) o.setAttribute('aria-expanded', 'true'); var f = d.querySelector('[autofocus]') || d.querySelector('h2'); if (f) { f.tabIndex = -1; if (!d.querySelector('[autofocus]')) f.focus(); } } }
     var c = e.target.closest('[data-close]');
     if (c) { var dd = c.closest('dialog'); if (dd) { dd.close(); if (dd._opener && dd !== meDlg) dd._opener.focus(); } }
   });
+  if (q.get('sw')) { var col = document.querySelector('main .col'); if (col) col.insertAdjacentHTML('afterbegin', '<div class="notice" role="status"><strong></strong></div>'); col.firstChild.firstChild.textContent = q.get('sw') + '으로 바꿨어요'; }
   render();
   window.mockRender = render;
 })();

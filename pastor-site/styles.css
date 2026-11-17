@@ -398,3 +398,13 @@ input[type="checkbox"]:not([role="switch"]):disabled, input[type="radio"]:disabl
 .btn.hbtn { border: 0; background: transparent; padding: 0; width: var(--tap); }
 .btn.hbtn:hover, .btn.hbtn[aria-expanded="true"] { background: var(--bg-sub); }
 .topbar .who { margin-right: 12px; }
+
+/* ===== 방송국 전환(stations): 기존 토큰만 ===== */
+.topbar .btn.who { min-height: var(--tap); padding: 0 10px; max-width: 40vw; overflow: hidden; border: 0; background: transparent; gap: 4px; }
+.topbar .btn.who:hover, .topbar .btn.who[aria-expanded="true"] { background: var(--bg-sub); }
+.btn.who strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.btn.who .tag { flex: none; }
+#st-dlg .st-list li a, #st-dlg ul.plain li a { gap: 8px; flex-wrap: wrap; }
+#st-dlg ul.plain li a .tag { margin: 0; }
+#st-dlg ul.plain li a[aria-current="true"] { background: var(--bg-sub); }
+@media (min-width: 768px) { #st-dlg { margin: 64px 24px auto auto; width: 320px; } }
