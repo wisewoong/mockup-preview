@@ -107,11 +107,11 @@
     var rows = b.dataset.s === 'empty' ? [] : ROW.slice();
     if (b.dataset.dlg === 'ok') rows.push({ id: 'm6', n: '새로 초대한 닉네임', r: 'mgr', st: 'p', by: me() === 'owner' ? '샘플소유' : '샘플관리자1' });
     $('tb').innerHTML = rows.map(function (x) {
-      return '<tr><th scope="row" style="color:var(--strong)">' + x.n + (x.id === 'a1' && me() !== 'owner' ? ' (나)' : '') + '</th><td><span class="tag ' + ({ owner: 'host', admin: 'adm', mgr: 'mgr' })[x.r] + '">' + RN[x.r] + '</span></td><td>' + ST[x.st] + '</td><td>' + x.by + '</td><td>' + date(x) + '</td><td><div class="mem-acts">' + acts(x) + '</div></td></tr>' +
+      return '<tr><th scope="row" style="color:var(--strong)">' + x.n + (x.id === 'a1' && me() !== 'owner' ? ' <span class="me">(나)</span>' : '') + '</th><td><span class="tag ' + ({ owner: 'host', admin: 'adm', mgr: 'mgr' })[x.r] + '">' + RN[x.r] + '</span></td><td' + (x.st === 'a' ? ' class="ok"' : x.st === 'd' ? ' class="err"' : '') + '>' + ST[x.st] + '</td><td>' + x.by + '</td><td>' + date(x) + '</td><td><div class="mem-acts">' + acts(x) + '</div></td></tr>' +
         (grants(x) ? '<tr class="sub"><td colspan="6">' + grants(x) + '</td></tr>' : '');
     }).join('');
     $('cards').innerHTML = rows.map(function (x) {
-      return '<div class="mc"><p><strong>' + x.n + (x.id === 'a1' && me() !== 'owner' ? ' (나)' : '') + '</strong> <span class="tag ' + ({ owner: 'host', admin: 'adm', mgr: 'mgr' })[x.r] + '">' + RN[x.r] + '</span></p><p class="help" style="margin:0">' + ST[x.st] + ' · ' + date(x) + '</p>' +
+      return '<div class="mc"><p><strong>' + x.n + (x.id === 'a1' && me() !== 'owner' ? ' <span class="me">(나)</span>' : '') + '</strong> <span class="tag ' + ({ owner: 'host', admin: 'adm', mgr: 'mgr' })[x.r] + '">' + RN[x.r] + '</span></p><p class="help" style="margin:0">' + ST[x.st] + ' · ' + date(x) + '</p>' +
         (x.by !== '—' ? '<p class="small">초대: ' + x.by + '</p>' : '') + '<div class="mem-acts">' + acts(x) + '</div>' + grants(x) + '</div>';
     }).join('');
   }

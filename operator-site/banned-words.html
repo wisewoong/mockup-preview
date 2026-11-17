@@ -137,7 +137,7 @@
       return '<tr' + (x.on ? '' : ' class="off-row"') + '><th scope="row" class="c-t">' + slot(x.w) + '</th>' +
         '<td class="c-m">' + x.t.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</td>' +
         '<td class="c-m c-dot">' + x.m + '</td>' +
-        '<td class="c-s"><span class="tag">' + (x.on ? '사용 중' : '비활성') + '</span></td>' +
+        '<td class="c-s"><span class="tag ' + (x.on ? 'ok' : 'off') + '">' + (x.on ? '사용 중' : '비활성') + '</span></td>' +
         '<td class="c-w">' + (x.h[0].now ? '방금' : '샘플 시각') + ' · 샘플 운영자</td>' +
         '<td class="c-a"><div class="acts-row">' + why +
         '<button class="btn" type="button" data-a="his" data-i="' + i + '" aria-label="' + w + ' 이력">이력</button>' +

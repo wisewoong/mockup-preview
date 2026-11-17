@@ -11,7 +11,7 @@
   --danger: #A12B2B;
   --danger-bg: #F3E4E3;
   --cert: #0B5C6B; --cert-bg: #E3F0F2; --cert-line: #9CCBD3;
-  --role-admin: #6D3FB5; --role-mgr: #1F5FBF;
+  --role-admin: #6D3FB5; --role-mgr: #1F5FBF; --role-me: #A8256F;
   --live: #D91F26; --on-live: #FFFFFF;
   --radius: 8px;
   --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
@@ -24,7 +24,7 @@
     --line: #343C3A; --accent: #6FC4AA; --on-accent: #0E1513;
     --danger: #F29B9B; --danger-bg: #3A2323;
     --cert: #7CC4D4; --cert-bg: #1A3036; --cert-line: #2F5560;
-    --role-admin: #C4A7F5; --role-mgr: #8DB8FF;
+    --role-admin: #C4A7F5; --role-mgr: #8DB8FF; --role-me: #F49AC6;
     --live: #D91F26; --on-live: #FFFFFF;
   }
 }
@@ -35,7 +35,7 @@
   --line: #343C3A; --accent: #6FC4AA; --on-accent: #0E1513;
   --danger: #F29B9B; --danger-bg: #3A2323;
   --cert: #7CC4D4; --cert-bg: #1A3036; --cert-line: #2F5560;
-  --role-admin: #C4A7F5; --role-mgr: #8DB8FF;
+  --role-admin: #C4A7F5; --role-mgr: #8DB8FF; --role-me: #F49AC6;
   --live: #D91F26; --on-live: #FFFFFF;
 }
 
@@ -408,3 +408,15 @@ input[type="checkbox"]:not([role="switch"]):disabled, input[type="radio"]:disabl
 #st-dlg ul.plain li a .tag { margin: 0; }
 #st-dlg ul.plain li a[aria-current="true"] { background: var(--bg-sub); }
 @media (min-width: 768px) { #st-dlg { margin: 64px 24px auto auto; width: 320px; } }
+
+/* ===== 글자색 위계 보강 (user-site와 동일 규칙, 글자 + 색 함께) ===== */
+.ok { color: var(--strong); font-weight: 700; }
+.ok::before { content: "✓ "; }
+.me { color: var(--role-me); font-weight: 700; }
+.tag.ok { color: var(--strong); border-color: var(--strong); background: var(--bg-sub); }
+.tag.wip { color: var(--strong); border-color: var(--muted); }
+.tag.off { color: var(--muted); border-color: var(--line); font-weight: 600; }
+.tag.bad { background: var(--danger-bg); }
+table th[scope="row"] { color: var(--strong); font-weight: 700; }
+table.mem td:nth-child(4), table.mem td:nth-child(5), table.hist td:nth-child(n+3) { color: var(--muted); }
+.nm-link, a.btn.bad { font-weight: 600; }

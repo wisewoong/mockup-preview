@@ -157,9 +157,9 @@
     var all = rows(), r = all.filter(pass), norm = d.s === 'normal' || d.s === 'partial';
     if (d.s === 'partial') r = r.slice(0, 3);
     put($('tb'), r.map(function (x) {
-      return '<tr><th scope="row"><span class="vtitle"><span class="preview vthumb">썸네일</span><span>' + x.n + '</span></span></th><td>' + SL[x.src] + '</td><td><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : '') + '">' + lab(x) + '</span></td><td>' + VL[x.vis] + '</td><td>' + (x.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '필요') + '</td><td>' + btn(x) + '</td></tr>'; }).join(''));
+      return '<tr><th scope="row"><span class="vtitle"><span class="preview vthumb">썸네일</span><span>' + x.n + '</span></span></th><td>' + SL[x.src] + '</td><td><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : x.pr === 'ready' ? ' ok' : '') + '">' + lab(x) + '</span></td><td>' + VL[x.vis] + '</td><td>' + (x.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '필요') + '</td><td>' + btn(x) + '</td></tr>'; }).join(''));
     put($('cards'), r.map(function (x) {
-      return '<div class="mc"><p class="vtitle"><span class="preview vthumb">썸네일</span><strong>' + x.n + '</strong></p><p class="small"><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : '') + '">' + lab(x) + '</span>' + VL[x.vis] + ' · ' + SL[x.src] + '</p><p class="small muted">권리 확인 ' + (x.rt === 'done' ? '완료' : '필요') + '</p><div class="mem-acts">' + btn(x) + '</div></div>'; }).join(''));
+      return '<div class="mc"><p class="vtitle"><span class="preview vthumb">썸네일</span><strong>' + x.n + '</strong></p><p class="small"><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : x.pr === 'ready' ? ' ok' : '') + '">' + lab(x) + '</span>' + VL[x.vis] + ' · ' + SL[x.src] + '</p><p class="small muted">권리 확인 ' + (x.rt === 'done' ? '완료' : '필요') + '</p><div class="mem-acts">' + btn(x) + '</div></div>'; }).join(''));
     $('f0').hidden = !(norm && !r.length);
     $('listbox').hidden = !norm || !r.length;
     var run = all.filter(function (x) { return GRP[x.pr] === 'run'; }).length, bad = all.filter(function (x) { return !GRP[x.pr]; }).length, n = $('proc-note');

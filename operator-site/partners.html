@@ -56,7 +56,7 @@
   function draw() {
     $('rows').innerHTML = R.map(function (r, i) {
       var on = r[3] === 'on';
-      return '<tr><th scope="row" class="c-title">' + r[0] + '</th><td class="c-tag"><span class="tag">' + LBL[r[3]] + '</span></td><td data-label="소유자">' + r[1] + '</td><td data-label="인증 여부">' + (r[2] ? '인증' : '미인증') + '</td>' +
+      return '<tr><th scope="row" class="c-title">' + r[0] + '</th><td class="c-tag"><span class="tag' + (r[3] == 'on' ? ' ok' : r[3] == 'off' ? ' off' : '') + '">' + LBL[r[3]] + '</span></td><td data-label="소유자">' + r[1] + '</td><td data-label="인증 여부">' + (r[2] ? '인증' : '미인증') + '</td>' +
         '<td data-label="파트너 요율">' + (on ? '<span class="slot">V3</span>' : '<span class="muted">—</span>') + '</td><td class="c-act">' +
         (r[2] || on ? '' : '<p class="help" id="why' + i + '">인증 목회자만 지정할 수 있어요</p>') + (on ? '<button class="btn bad" type="button" data-act="off" data-i="' + i + '">해제</button>'
           : '<button class="btn" type="button" data-act="on" data-i="' + i + '"' + (r[2] ? '' : ' disabled aria-describedby="why' + i + '"') + '>지정</button>') + '</td></tr>';
