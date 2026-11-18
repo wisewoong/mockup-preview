@@ -1,25 +1,45 @@
-/* 말씀ON 운영사 사이트 공통 토큰과 컴포넌트. 시안 B 미드나잇(남색 면 + 금색 포인트). 검토용 버리는 코드.
-   토큰 3곳: :root(라이트 기본) / 시스템 다크 / [data-theme=dark]. 기존 토큰 이름은 유지하고 B 토큰을 추가했다. */
+/* 말씀ON 운영사 사이트 공통 토큰과 컴포넌트. 팔레트 3 Emerald(중립 배경 + 깊은 초록 한 색). 검토용 버리는 코드.
+   토큰 3곳: :root(라이트 기본) / 시스템 다크 / [data-theme=dark]. */
 :root {
-  --bg: #eaeef7;          /* 바탕 */
-  --s1: #f7f8fc;          /* 표면 1단: 카드·표·툴바 */
-  --bg-sub: #dde4f3;      /* 표면 2단: 표 머리·인용·호버 면 */
-  --strong: #0b1226;
-  --text: #1f2a47;
-  --muted: #465273;
-  --line: #c5cfe4;
-  --accent: #7a5818;      /* 금(라이트는 짙은 황동) */
-  --on-accent: #ffffff;
-  --gold: #7a5818; --gold-t: #f0e3c3;
-  --blue: #2a4797; --blue-t: #e3e6f2;
-  --ok: #1d7552; --ok-t: #d9eee5;
-  --danger: #b32b1b; --danger-bg: #fbe0dc; --on-danger: #ffffff;
-  --pri-bg: #1c2b57; --pri-fg: #ffffff;   /* 라이트의 주 버튼은 금색 대신 짙은 남색 */
-  --cert: #0b5c6b; --cert-bg: #e3f0f2; --cert-line: #9ccbd3;
-  --role-admin: #7a5818; --role-mgr: #2a4797;
-  --live: #c9301f; --on-live: #ffffff;
-  --hdr: rgba(247,248,252,.84); --glow: rgba(120,150,230,.28);
-  --shadow: 0 12px 32px rgba(18,26,48,.18);
+  --bg:#FAF8F3;
+  --s1:#FFFFFF;
+  --s2:#F1EEE6;
+  --bg-sub:#F1EEE6;
+  --strong:#141412;
+  --text:#2A2926;
+  --muted:#625F57;
+  --line:#E2DED3;
+  --edge:#9A9586;
+  --accent:#0F6B4A;
+  --gold:#0A5439;
+  --on-accent:#FFFFFF;
+  --gold-t:#E9F2EF;
+  --pri-bg:#0F6B4A;
+  --pri-fg:#FFFFFF;
+  --blue:#0F6B4A;
+  --blue-t:#E9F2EF;
+  --ok:#0F6B4A;
+  --ok-t:#E9F2EF;
+  --danger:#B3261E;
+  --danger-bg:#F8EBEB;
+  --on-danger:#FFFFFF;
+  --cert:#0A5439;
+  --cert-bg:#E9F2EF;
+  --cert-line:#9FC4B7;
+  --role-admin:#0F6B4A;
+  --role-mgr:#0F6B4A;
+  --role-me:#141412;
+  --don-bg:#E9F2EF;
+  --don-line:#93BCAE;
+  --don-name:#0A5439;
+  --live:#D42B30;
+  --on-live:#FFFFFF;
+  --live-t:#FBECEC;
+  --warn:#8A5A00;
+  --warn-bg:#F4F0E8;
+  --hdr:rgba(250,248,243,.86);
+  --glow:rgba(0,0,0,0);
+  --shadow:0 12px 32px rgba(0,0,0,.10);
   --radius: 10px; --r: 14px;
   --font: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", system-ui, sans-serif;
   --disp: "Sora", "Noto Sans KR", sans-serif;
@@ -28,29 +48,89 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0a1022; --s1: #111a33; --bg-sub: #1a2547; --strong: #f6f4ee; --text: #ebe9e2; --muted: #9aa5c3;
-    --line: #2a3560; --accent: #dcbe86; --on-accent: #241a06;
-    --gold: #dcbe86; --gold-t: #2d313f; --blue: #93b3f7; --blue-t: #202e51; --ok: #7ed3b0; --ok-t: #16302f;
-    --danger: #ff7a6e; --danger-bg: #311d2a; --on-danger: #2a0a07;
-    --pri-bg: #dcbe86; --pri-fg: #241a06;
-    --cert: #7cc4d4; --cert-bg: #1a3036; --cert-line: #2f5560;
-    --role-admin: #dcbe86; --role-mgr: #93b3f7;
-    --live: #ff5f52; --on-live: #2a0a07;
-    --hdr: rgba(12,19,42,.78); --glow: rgba(60,90,190,.22); --shadow: 0 12px 32px rgba(0,0,0,.4);
+    --bg:#0B0B0C;
+    --s1:#141415;
+    --s2:#1D1D1F;
+    --bg-sub:#1D1D1F;
+    --strong:#F5F4F1;
+    --text:#E4E3DF;
+    --muted:#A2A19C;
+    --line:#2C2C2F;
+    --edge:#5A5A60;
+    --accent:#5FD39E;
+    --gold:#8DE3B9;
+    --on-accent:#04170E;
+    --gold-t:#1E2F28;
+    --pri-bg:#5FD39E;
+    --pri-fg:#04170E;
+    --blue:#5FD39E;
+    --blue-t:#1E2F28;
+    --ok:#5FD39E;
+    --ok-t:#1E2F28;
+    --danger:#FF8A80;
+    --danger-bg:#352524;
+    --on-danger:#1A0A0A;
+    --cert:#8DE3B9;
+    --cert-bg:#1E2F28;
+    --cert-line:#32604C;
+    --role-admin:#5FD39E;
+    --role-mgr:#5FD39E;
+    --role-me:#F5F4F1;
+    --don-bg:#1E2F28;
+    --don-line:#366A53;
+    --don-name:#8DE3B9;
+    --live:#D42B30;
+    --on-live:#FFFFFF;
+    --live-t:#2F1719;
+    --warn:#E8B64C;
+    --warn-bg:#322B1D;
+    --hdr:rgba(11,11,12,.86);
+    --glow:rgba(0,0,0,0);
+    --shadow:0 12px 32px rgba(0,0,0,.5);
   }
 }
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0a1022; --s1: #111a33; --bg-sub: #1a2547; --strong: #f6f4ee; --text: #ebe9e2; --muted: #9aa5c3;
-  --line: #2a3560; --accent: #dcbe86; --on-accent: #241a06;
-  --gold: #dcbe86; --gold-t: #2d313f; --blue: #93b3f7; --blue-t: #202e51; --ok: #7ed3b0; --ok-t: #16302f;
-  --danger: #ff7a6e; --danger-bg: #311d2a; --on-danger: #2a0a07;
-  --pri-bg: #dcbe86; --pri-fg: #241a06;
-  --cert: #7cc4d4; --cert-bg: #1a3036; --cert-line: #2f5560;
-  --role-admin: #dcbe86; --role-mgr: #93b3f7;
-  --live: #ff5f52; --on-live: #2a0a07;
-  --hdr: rgba(12,19,42,.78); --glow: rgba(60,90,190,.22); --shadow: 0 12px 32px rgba(0,0,0,.4);
+  --bg:#0B0B0C;
+  --s1:#141415;
+  --s2:#1D1D1F;
+  --bg-sub:#1D1D1F;
+  --strong:#F5F4F1;
+  --text:#E4E3DF;
+  --muted:#A2A19C;
+  --line:#2C2C2F;
+  --edge:#5A5A60;
+  --accent:#5FD39E;
+  --gold:#8DE3B9;
+  --on-accent:#04170E;
+  --gold-t:#1E2F28;
+  --pri-bg:#5FD39E;
+  --pri-fg:#04170E;
+  --blue:#5FD39E;
+  --blue-t:#1E2F28;
+  --ok:#5FD39E;
+  --ok-t:#1E2F28;
+  --danger:#FF8A80;
+  --danger-bg:#352524;
+  --on-danger:#1A0A0A;
+  --cert:#8DE3B9;
+  --cert-bg:#1E2F28;
+  --cert-line:#32604C;
+  --role-admin:#5FD39E;
+  --role-mgr:#5FD39E;
+  --role-me:#F5F4F1;
+  --don-bg:#1E2F28;
+  --don-line:#366A53;
+  --don-name:#8DE3B9;
+  --live:#D42B30;
+  --on-live:#FFFFFF;
+  --live-t:#2F1719;
+  --warn:#E8B64C;
+  --warn-bg:#322B1D;
+  --hdr:rgba(11,11,12,.86);
+  --glow:rgba(0,0,0,0);
+  --shadow:0 12px 32px rgba(0,0,0,.5);
 }
 
 * { box-sizing: border-box; }
@@ -184,7 +264,7 @@ a { color: inherit; }
 .hsearch .input { width: 200px; }
 .hide-d { display: none; }
 .tag { display: inline-block; font-size: .8rem; font-weight: 700; padding: 0 6px; border: 1px solid var(--muted); border-radius: var(--radius); color: var(--text); margin-right: 6px; line-height: 1.5; vertical-align: 1px; }
-.vstage { aspect-ratio: 16 / 9; background: #1B2120; color: #E7EBE9; border-radius: var(--radius); display: grid; place-items: center; text-align: center; padding: 16px; }
+.vstage { aspect-ratio: 16 / 9; background: #161816; color: #E7EBE9; border-radius: var(--radius); display: grid; place-items: center; text-align: center; padding: 16px; }
 .vstage p + p, .vstage p + .btn, .vstage p + a { margin-top: 8px; }
 .vstage .btn { background: #E7EBE9; color: #1C2120; border-color: #E7EBE9; }
 .item { display: grid; grid-template-columns: 72px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-top: 1px solid var(--line); }
@@ -211,9 +291,9 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); }
 .ch-head img, .item img.av { object-fit: cover; }
 
 /* 영상 영역 사진 + 전체화면 버튼 */
-.pstage { position: relative; aspect-ratio: 16 / 9; background: #1B2120; border-radius: var(--radius); overflow: hidden; }
+.pstage { position: relative; aspect-ratio: 16 / 9; background: #161816; border-radius: var(--radius); overflow: hidden; }
 .pstage img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.fsbtn { position: absolute; right: 10px; bottom: 10px; min-width: 44px; min-height: 44px; padding: 0 14px; border: 1px solid #E7EBE9; border-radius: var(--radius); background: rgba(27,33,32,.82); color: #E7EBE9; font: inherit; font-weight: 600; cursor: pointer; z-index: 2; }
+.fsbtn { position: absolute; right: 10px; bottom: 10px; min-width: 44px; min-height: 44px; padding: 0 14px; border: 1px solid #E7EBE9; border-radius: var(--radius); background: rgba(22,24,22,.82); color: #E7EBE9; font: inherit; font-weight: 600; cursor: pointer; z-index: 2; }
 .fsbtn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .stage:fullscreen, .pstage:fullscreen { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; background: #000; }
 .stage:fullscreen img, .pstage:fullscreen img { object-fit: contain; }
@@ -306,7 +386,7 @@ ul.plain li a { display: flex; align-items: center; min-height: var(--tap); }
 .pick .t { display: block; font-weight: 700; color: var(--strong); }
 .pick label:has(input:disabled) { cursor: not-allowed; border-style: dashed; }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
-.preview { aspect-ratio: 16 / 9; background: #1B2120; color: #E7EBE9; border-radius: var(--radius); display: grid; place-items: center; text-align: center; padding: 16px; }
+.preview { aspect-ratio: 16 / 9; background: #161816; color: #E7EBE9; border-radius: var(--radius); display: grid; place-items: center; text-align: center; padding: 16px; }
 .sticky-bar { background: var(--bg); border-top: 1px solid var(--line); padding: 12px 0; margin-top: 24px; } /* PC는 내용을 가리지 않게 흐름 안에 둔다 */
 .statusline { position: sticky; top: 64px; z-index: 3; }
 .unit { display: flex; gap: 8px; align-items: center; }
