@@ -9,7 +9,7 @@
   .col { max-width: 680px; margin: 0 auto; padding: 32px 0 64px; }
   .bal { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 20px; background: var(--s1); border-radius: 14px; }
   .bal > span:first-child { font-size: .9rem; color: var(--muted); }
-  .bal strong { font-size: 1.5rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .bal strong { font-size: 1.5rem; font-weight: 700; color: var(--warn); font-variant-numeric: tabular-nums; }
   fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
   legend { font-weight: 700; padding: 0; margin-bottom: 8px; }
   .prods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -162,7 +162,7 @@
   <dl class="dl">
     <dt>후원 대상</dt><dd><strong>샘물교회 이정훈 목사</strong> (라이브 방송 후원)</dd>
     <dt>방송</dt><dd><strong>로마서 8장 강해 12회</strong></dd>
-    <dt>내 잔액</dt><dd><strong>3,500 <span class="slot">S1 명칭</span></strong> <span class="muted small">(샘플)</span></dd>
+    <dt>내 잔액</dt><dd><strong class="bal-w">3,500 <span class="slot">S1 명칭</span></strong> <span class="muted small">(샘플)</span></dd>
   </dl>
 
   <form id="f-don" data-show="ds=normal|belowmin|nobalance|filtered|processing|checking|ended|dup|error|success|limit" onsubmit="return false" class="stack" style="border-top:1px solid var(--line);padding-top:20px">

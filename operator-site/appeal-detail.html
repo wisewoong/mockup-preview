@@ -174,6 +174,7 @@
   var b = document.body, $ = function (i) { return document.getElementById(i); };
   var all = function (s) { return [].slice.call(document.querySelectorAll(s)); };
   var KIND = { 'station-l': '방송국 제한', 'station-s': '방송국 정지', 'station-c': '방송국 폐쇄', content: '영상 공개 제한', settle: '정산 보류', ext: '외부 후원 정보 검토' };
+  var SCLS = { sent: 'wait', resub: 'wait', review: 'wip', more: 'wait', ok: 'ok', no: 'bad' };
   var ST = { sent: '접수', resub: '보완 제출됨', review: '검토 중', more: '보완 요청 중', ok: '인용', no: '기각' };
   var RES = { ok: ['인용', '인용으로 저장할까요?', '인용 사유'], no: ['기각', '기각으로 저장할까요?', '기각 사유'], more: ['보완 요청', '보완을 요청할까요?', '요청 내용'] };
   var OFF = { locked: '읽기 전용이라 저장할 수 없어요', self: '내가 내린 조치라 처리할 수 없어요' };
@@ -226,7 +227,7 @@
     all('.k-name').forEach(function (x) { x.textContent = KIND[k] || k; });
     all('.k-target').forEach(function (x) { x.textContent = k === 'content' ? '샘플 설교 영상 제목' : '샘플 방송국'; });
     all('.k-rel').forEach(function (x) { x.textContent = rel(); });
-    $('st-tag').textContent = ST[b.dataset.st] || '';
+    $('st-tag').textContent = ST[b.dataset.st] || ''; $('st-tag').className = 'tag ' + (SCLS[b.dataset.st] || '');
     if (s === 'noreason' && c) { document.querySelector('input[name=res][value=no]').checked = true; $('why').value = ''; sync(); check(); }
     if (s === 'noreason' && !c) { $('op').value = ''; check(); }
     if (!c) all('input[name=res]').forEach(function (x) { x.checked = false; });

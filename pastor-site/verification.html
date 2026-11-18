@@ -90,7 +90,7 @@
     if (d.role === 'mgr') return;
     var si = { review: 1, more: 1, ok: 2, no: 2 }[d.v] || 0;
     document.querySelectorAll('#vsteps li').forEach(function (li, n) { li.className = n < si ? 'done' : n === si ? 'now' : ''; });
-    $('v-st').innerHTML = '<span class="tag' + (d.v === 'no' ? ' bad' : '') + '">' + ST[d.v] + '</span>';
+    $('v-st').innerHTML = '<span class="tag' + (d.v === 'no' ? ' bad' : d.v === 'ok' ? ' ok' : d.v === 'review' || d.v === 'more' ? ' wait' : '') + '">' + ST[d.v] + '</span>';
     err('fl-e', $('fl'), d.v === 'filebad' ? '이 파일은 올릴 수 없어요. 형식과 용량을 확인해 주세요' : '');
     list();
     var m = $('cancel-dlg');

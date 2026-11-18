@@ -40,11 +40,11 @@
       <div class="tbl-wrap cards v" id="list"><table><caption class="sr">심사 신청 목록 (샘플)</caption>
         <thead><tr><th scope="col">신청일</th><th scope="col">신청자 닉네임</th><th scope="col">상태</th><th scope="col">담당자</th><th scope="col"><span class="sr">검토</span></th></tr></thead>
         <tbody>
-          <tr data-st="검토 대기"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임A</td><td class="c-tag"><span class="tag wip">검토 대기</span></td><td class="c-meta">— <span class="sr">담당자 없음</span></td><td class="c-act"><a class="go" href="#detail" data-set="v:wait" aria-label="샘플닉네임A 신청 검토">검토 ›</a></td></tr>
-          <tr data-st="재제출됨"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임B</td><td class="c-tag"><span class="tag wip">재제출됨</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="go" href="#detail" data-set="v:resub" aria-label="샘플닉네임B 신청 검토">검토 ›</a></td></tr>
-          <tr data-st="보완 요청 중"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임C</td><td class="c-tag"><span class="tag wip">보완 요청 중</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="go" href="#detail" data-set="v:more" aria-label="샘플닉네임C 신청 검토">검토 ›</a></td></tr>
+          <tr data-st="검토 대기"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임A</td><td class="c-tag"><span class="tag wait">검토 대기</span></td><td class="c-meta">— <span class="sr">담당자 없음</span></td><td class="c-act"><a class="go" href="#detail" data-set="v:wait" aria-label="샘플닉네임A 신청 검토">검토 ›</a></td></tr>
+          <tr data-st="재제출됨"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임B</td><td class="c-tag"><span class="tag wait">재제출됨</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="go" href="#detail" data-set="v:resub" aria-label="샘플닉네임B 신청 검토">검토 ›</a></td></tr>
+          <tr data-st="보완 요청 중"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임C</td><td class="c-tag"><span class="tag wait">보완 요청 중</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="go" href="#detail" data-set="v:more" aria-label="샘플닉네임C 신청 검토">검토 ›</a></td></tr>
           <tr data-st="승인"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임D</td><td class="c-tag"><span class="tag ok">승인</span></td><td class="c-meta">샘플 운영자2</td><td class="c-act"><a class="go" href="#detail" data-set="v:ok" aria-label="샘플닉네임D 신청 보기">보기 ›</a></td></tr>
-          <tr data-st="반려"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임E</td><td class="c-tag"><span class="tag off">반려</span></td><td class="c-meta">샘플 운영자2</td><td class="c-act"><a class="go" href="#detail" data-set="v:no" aria-label="샘플닉네임E 신청 보기">보기 ›</a></td></tr>
+          <tr data-st="반려"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임E</td><td class="c-tag"><span class="tag bad">반려</span></td><td class="c-meta">샘플 운영자2</td><td class="c-act"><a class="go" href="#detail" data-set="v:no" aria-label="샘플닉네임E 신청 보기">보기 ›</a></td></tr>
           <tr data-st="신청자 취소"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임F</td><td class="c-tag"><span class="tag off">신청자 취소</span></td><td class="c-meta">— <span class="sr">담당자 없음</span></td><td class="c-act"><a class="go" href="#detail" data-set="v:cancel" aria-label="샘플닉네임F 신청 보기">보기 ›</a></td></tr>
         </tbody></table></div>
 
@@ -144,6 +144,7 @@
 <script>
 (function () {
   var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var TCLS = { wait: 'wait', resub: 'wait', more: 'wait', ok: 'ok', no: 'bad', cancel: 'off' };
   var TAG = { wait: '검토 대기', resub: '재제출됨', more: '보완 요청 중', ok: '승인', no: '반려', cancel: '신청자 취소' };
   var RES = { ok: ['승인', '승인으로 저장할까요?', '메모 <span class="muted">선택</span>', '신청자에게 보이지 않아요', ''],
     more: ['보완 요청', '보완을 요청할까요?', '요청 내용 <span class="muted">필수</span>', "신청자 화면 '요청 내용'에 그대로 보여요", '요청 내용을 입력해 주세요'],
@@ -174,7 +175,7 @@
   }
   window.mockAfter = function () {
     var s = b.dataset.s, why = b.dataset.v === 'more' ? '신청자가 보완해 보내면 다시 검토할 수 있어요' : OFF[s];
-    $('v-tag').textContent = TAG[b.dataset.v] || '';
+    $('v-tag').textContent = TAG[b.dataset.v] || ''; $('v-tag').className = 'tag ' + (TCLS[b.dataset.v] || '');
     document.querySelectorAll('.open-doc').forEach(function (x) { x.disabled = s === 'noperm'; });
     if (s === 'gone') $('frm').reset();
     if (s === 'noreason') { document.querySelector('input[name=res][value=no]').checked = true; $('why').value = ''; lab(); check(); }

@@ -8,7 +8,7 @@
 <style>
   .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
   .bal { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .bal strong { font-size: 1.5rem; }
+  .bal strong { color: var(--warn); font-size: 1.5rem; }
   ul.lg { list-style: none; margin: 8px 0 0; padding: 0; }
   .led { padding: 14px 0; border-top: 1px solid var(--line); }
   .l1, .l2 { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
@@ -52,25 +52,25 @@
         <li class="led" data-kind="donate" data-show="f=all|donate">
           <div aria-hidden="true">
             <div class="l1"><span><strong>후원</strong> 샘물교회 이정훈 목사 · 로마서 8장 강해 12회</span><span class="amt">−500 <span class="slot">S1 명칭</span></span></div>
-            <div class="l2 muted small"><span><time>11월 13일 20:41</time> <span class="badge plain">완료</span></span><span>잔액 3,500</span></div>
+            <div class="l2 muted small"><span><time>11월 13일 20:41</time> <span class="badge plain ok">완료</span></span><span>잔액 3,500</span></div>
           </div><span class="sr">후원, 11월 13일, 500 열매 줄어듦, 완료, 잔액 3,500</span>
         </li>
         <li class="led" data-kind="charge" data-show="f=all|charge">
           <div aria-hidden="true">
             <div class="l1"><span><strong>충전</strong> <span class="slot">[V1 상품명]</span> · 결제 <span class="slot">[V1 가격]</span>원</span><span class="amt">+3,000 <span class="slot">S1 명칭</span></span></div>
-            <div class="l2 muted small"><span><time>11월 12일 09:10</time> <span class="badge plain">완료</span></span><span>잔액 4,000</span></div>
+            <div class="l2 muted small"><span><time>11월 12일 09:10</time> <span class="badge plain ok">완료</span></span><span>잔액 4,000</span></div>
           </div><span class="sr">충전, 11월 12일, 3,000 열매 늘어남, 완료, 잔액 4,000</span>
         </li>
         <li class="led" data-kind="donate" data-show="f=all|donate">
           <div aria-hidden="true">
             <div class="l1"><span><strong>후원</strong> 은혜교회 박성민 목사 · 익명으로 후원</span><span class="amt">−1,000 <span class="slot">S1 명칭</span></span></div>
-            <div class="l2 muted small"><span><time>11월 10일 19:02</time> <span class="badge plain">완료</span></span><span>잔액 1,000</span></div>
+            <div class="l2 muted small"><span><time>11월 10일 19:02</time> <span class="badge plain ok">완료</span></span><span>잔액 1,000</span></div>
           </div><span class="sr">후원, 11월 10일, 1,000 열매 줄어듦, 익명으로 후원, 완료, 잔액 1,000</span>
         </li>
         <li class="led" data-kind="charge" data-show="f=all|charge">
           <div aria-hidden="true">
             <div class="l1"><span><strong>충전</strong> <span class="slot">[V1 상품명]</span> · 결제 <span class="slot">[V1 가격]</span>원</span><span class="amt">+3,000 <span class="slot">S1 명칭</span> (반영 전)</span></div>
-            <div class="l2 muted small"><span><time>11월 9일 22:15</time> <span class="badge plain">확인 중</span></span><span></span></div>
+            <div class="l2 muted small"><span><time>11월 9일 22:15</time> <span class="badge plain wip">확인 중</span></span><span></span></div>
             <p class="small"><a href="inquiry.html">결제가 이상하면 문의하기</a></p>
           </div><span class="sr">충전, 11월 9일, 결제 결과를 확인하는 중, 아직 반영되지 않음</span>
         </li>
@@ -84,19 +84,19 @@
         <li class="led" data-kind="charge" data-show="f=all|charge">
           <div aria-hidden="true">
             <div class="l1"><span><strong>충전</strong> <span class="slot">[V1 상품명]</span> · 결제 <span class="slot">[V1 가격]</span>원</span><span class="amt">충전되지 않았어요</span></div>
-            <div class="l2 muted small"><span><time>11월 7일 12:00</time> <span class="badge plain bad">취소</span></span><span></span></div>
+            <div class="l2 muted small"><span><time>11월 7일 12:00</time> <span class="badge plain off">취소</span></span><span></span></div>
           </div><span class="sr">충전, 11월 7일, 충전되지 않음, 취소</span>
         </li>
         <li class="led" data-kind="adj" data-show="f=all|adj">
           <div aria-hidden="true">
             <div class="l1"><span><strong>조정</strong> 결제 오류로 운영자가 조정했어요</span><span class="amt">+500 <span class="slot">S1 명칭</span></span></div>
-            <div class="l2 muted small"><span><time>11월 5일 10:20</time> <span class="badge plain">완료</span></span><span>잔액 2,000</span></div>
+            <div class="l2 muted small"><span><time>11월 5일 10:20</time> <span class="badge plain ok">완료</span></span><span>잔액 2,000</span></div>
           </div><span class="sr">조정, 11월 5일, 500 열매 늘어남, 결제 오류로 운영자가 조정함, 완료, 잔액 2,000</span>
         </li>
         <li class="led" data-kind="adj" data-show="f=all|adj">
           <div aria-hidden="true">
             <div class="l1"><span><strong>환불</strong> <span class="slot">S2 환불 처리</span> · 미사용분 <span class="slot">S2 환불 요건</span></span><span class="amt">−2,000 <span class="slot">S1 명칭</span></span></div>
-            <div class="l2 muted small"><span><time>11월 3일 14:00</time> <span class="badge plain">완료</span></span><span>잔액 1,500</span></div>
+            <div class="l2 muted small"><span><time>11월 3일 14:00</time> <span class="badge plain ok">완료</span></span><span>잔액 1,500</span></div>
           </div><span class="sr">환불, 11월 3일, 2,000 열매 줄어듦, 완료, 잔액 1,500</span>
         </li>
       </ul>
@@ -105,7 +105,7 @@
       <p style="margin-top:16px;text-align:center"><button class="btn" type="button">더 보기</button></p>
     </div>
 
-    <div data-show="s=empty" class="empty" style="margin-top:16px"><p><strong>아직 충전·후원 내역이 없어요</strong></p><p><a class="btn primary" href="charge.html"><span class="slot">S1 명칭</span> 충전하기</a></p></div>
+    <div data-show="s=empty" class="empty" style="margin-top:16px"><p><strong>아직 충전·후원 내역이 없어요</strong></p><p><a class="btn" href="charge.html"><span class="slot">S1 명칭</span> 충전하기</a></p></div>
     <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:16px"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px;margin-top:12px"></div><div class="skeleton" style="height:56px;margin-top:12px"></div><div class="skeleton" style="height:56px;margin-top:12px"></div></div>
     <div class="notice danger" role="alert" data-show="s=error" style="margin-top:16px"><strong>내역을 불러오지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>
 

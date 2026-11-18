@@ -26,7 +26,7 @@ tr.detail > td { background: var(--bg-sub); }
 
 /* ---- VOD 재처리·금칙어 관리 (신규 색 토큰 없음). 아래 5줄은 operator-reports.css와 같은 규칙:
    그 파일의 모바일 카드 규칙이 신고 표 전용이라 두 화면은 그 파일을 불러오지 않는다 ---- */
-.lock-row td { color: var(--muted); }
+.lock-row td { color: var(--text); }
 .quote { background: var(--bg-sub); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 0; }
 .radios { border: 0; padding: 0; margin: 0; }
 .radios legend { font-weight: 700; margin-bottom: 4px; }

@@ -52,7 +52,7 @@
     <section class="stack" aria-labelledby="ap-h2" id="ap" data-show="role=owner">
       <h3 id="ap-h2">이의제기</h3>
       <p class="help" id="ap-closed" hidden>이 방송국은 더 쓸 수 없어요. 문의는 <span class="slot">운영팀 문의 경로</span>로 해 주세요.</p>
-      <div class="notice" role="status" id="n-sent" tabindex="-1" data-show="appeal=sent|review"><strong>이의제기를 접수했어요. 결과는 알림으로 알려 드려요</strong><p class="small"><span class="tag" data-show="appeal=review">검토 중</span></p></div>
+      <div class="notice" role="status" id="n-sent" tabindex="-1" data-show="appeal=sent|review"><strong>이의제기를 접수했어요. 결과는 알림으로 알려 드려요</strong><p class="small"><span class="tag wait" data-show="appeal=review">검토 중</span></p></div>
       <div class="notice" role="status" data-show="appeal=ok"><strong><span class="tag ok">받아들여짐</span> 조치를 풀었어요</strong><p class="small">해제 시각 <span class="slot">시각</span></p></div>
       <div class="notice" role="status" data-show="appeal=no"><strong><span class="tag bad">받아들여지지 않음</span></strong><p class="small">사유 <span class="slot">사유</span></p><p class="small">다른 의견이 있으면 <span class="slot">추가 이의제기 가능 여부</span></p></div>
       <div class="notice" role="status" data-show="appeal=more"><strong>내용을 더 보내 주세요</strong><p class="small">요청 내용 <span class="slot">요청 내용</span></p></div>
@@ -94,7 +94,7 @@
     var k = d.kind, st = d.appeal === 'ok' ? 'done' : k === 'ext' ? 'rev' : 'on';
     return [{ k: k, st: st }, { k: 'content', st: 'done' }];
   }
-  function tag(st) { return st === 'on' ? '<span class="tag bad">적용 중</span>' : st === 'rev' ? '<span class="tag">검토 중</span>' : '<span class="tag ok">해제됨</span>'; }
+  function tag(st) { return st === 'on' ? '<span class="tag bad">적용 중</span>' : st === 'rev' ? '<span class="tag wait">검토 중</span>' : '<span class="tag ok">해제됨</span>'; }
   function btn(i, n) { return '<button class="btn lnk" type="button" data-d="' + i + '" aria-label="' + n + ' (대상 샘플) 상세 보기">자세히</button>'; }
   function vis(e) { return e && e.offsetParent !== null; }
   function fl() {

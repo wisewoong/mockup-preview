@@ -77,7 +77,7 @@
     return [{ st: d.st, hold: d.hold === 'on', fail: d.pay === 'fail', adj: d.adj === 'on' }, { st: 'paid', adj: false }, { st: 'paid', adj: false }];
   }
   function label(x) { return x.hold ? '정산 보류' : x.fail ? '지급 실패' : SL[x.st]; }
-  function tag(x) { return '<span class="tag' + (x.hold || x.fail ? ' bad' : x.st === 'paid' ? ' ok' : '') + '">' + label(x) + '</span>' + (x.adj ? '<span class="tag">조정 있음</span>' : ''); }
+  function tag(x) { return '<span class="tag' + (x.hold || x.fail ? ' bad' : x.st === 'paid' ? ' ok' : x.st === 'payready' ? ' wait' : x.st === 'collecting' ? ' wip' : '') + '">' + label(x) + '</span>' + (x.adj ? '<span class="tag">조정 있음</span>' : ''); }
   function a(x) { return x.st === 'collecting' ? WAIT : AMT; }
   function btn(i) { return '<button class="btn lnk" type="button" data-d="' + i + '" aria-label="정산 상세 보기">상세</button>'; }
   function vis(e) { return e && e.offsetParent !== null; }

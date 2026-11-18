@@ -1,6 +1,6 @@
 /* 신고 목록·상세 전용 (신규 색 토큰 없음) */
 .filters { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
-.lock-row td { color: var(--muted); }
+.lock-row td { color: var(--text); }
 .rd { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start; }
 .rd-form { position: sticky; top: 16px; }
 .quote { background: var(--bg-sub); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
