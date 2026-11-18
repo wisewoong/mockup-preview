@@ -6,7 +6,7 @@
 <title>방송 관리 - 말씀ON 목회자</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body data-default="role:owner s:normal sig:ok mode:normal send:browser chat:open tts:on don:some end:none dlg:closed">
+<body data-default="role:owner s:normal sig:ok mode:normal send:browser chat:open tts:on don:some end:none dlg:closed msgs:some act:ok">
 <!-- 송출 중·채팅 관리(DESIGN-REMAINING). 후원 금액은 어느 역할에도 표시하지 않는다. 예배 중 후원 메시지 표시 방식은 슬롯(S3). 시간·간격 숫자는 슬롯 -->
 <header id="site-header" data-active="live"></header>
 
@@ -18,6 +18,7 @@
   <div class="group"><b>TTS</b><button data-set="tts:on">정상</button><button data-set="tts:muted">긴급 음소거</button><button data-set="tts:fail">공급자 장애</button><b>후원 메시지</b><button data-set="don:some">있음</button><button data-set="don:none">0건</button></div>
   <div class="group"><b>종료</b><button data-set="end:none">방송 중</button><button data-set="end:confirm">종료 확인</button><button data-set="end:wait">서버 확인 대기</button><button data-set="end:fail">종료 실패</button><button data-set="end:done">종료 후 요약</button></div>
   <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:msg">메시지 관리</button><button data-set="dlg:ban">전체 차단 확인</button><button data-set="dlg:mode">예배 전환 확인</button></div>
+  <div class="group"><b>모바일</b><button data-set="msgs:some">채팅 목록 있음</button><button data-set="msgs:none">0건</button><b>조치 적용</b><button data-set="act:ok">정상</button><button data-set="act:fail">실패</button><button data-set="act:stale">이미 바뀜</button><button type="button" id="m-sim">새 항목 도착</button><button type="button" id="m-99">후원 배지 99+</button></div>
   <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 채팅·후원 메시지·닉네임은 모두 샘플이에요. 사용자 결정 전: 예배 중 후원 메시지 표시 방식, 재연결 실패 시간, 관리자 부분 부여.</p>
 </div></div>
 
@@ -39,16 +40,22 @@
 </section>
 
 <div data-show="s=normal end=none|confirm|wait|fail" id="main">
-<div class="notice statusline" role="status" id="sl">
+<div class="notice statusline" role="status" id="sl" data-sig="ok">
   <div class="sl-row">
-    <div class="sl-info"><strong id="sl-t"></strong><span class="small muted">경과 <span class="slot">시간</span></span><span class="small muted">시청자 <strong>12</strong>명 (샘플)</span><span class="small" id="sl-x"></span></div>
+    <div class="sl-info"><strong id="sl-t"></strong><span class="small muted">경과 <span class="slot">시간</span></span><span class="small muted">시청자 <strong>12</strong>명 (샘플)</span><span class="tag m-only" id="sl-mode"></span><span class="small" id="sl-x"></span></div>
     <button class="btn bad" type="button" id="end" aria-describedby="end-why">방송 종료</button>
+    <button class="btn ib toggle m-only" type="button" id="sl-mute" aria-pressed="false" aria-label="긴급 음소거" title="긴급 음소거: 방송 PC의 TTS를 멈춰요"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/><path class="x" d="M17 9l4 6M21 9l-4 6"/></svg></button>
   </div>
+  <p class="help m-only" data-show="role=owner|admall">방송 종료와 모드 전환은 방송 중인 컴퓨터에서 해요</p>
+  <p class="help m-only" id="sl-why" hidden></p>
+  <p class="err m-only" id="sl-err" role="alert" hidden>긴급 음소거를 적용하지 못했어요. 다시 시도해 주세요.</p>
+  <p class="help m-only" id="sl-stale" role="status" hidden>이미 바뀌었어요. 최신 상태로 보여 드려요.</p>
   <p class="help" id="end-why" hidden></p>
 </div>
 <div class="notice danger" role="alert" data-show="end=fail" style="margin-top:16px"><strong>방송을 종료하지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" id="end-retry" data-icon="retry" data-keep>다시 시도</button></p></div>
 <div class="notice danger" role="alert" data-show="sig=reconfail" style="margin-top:16px"><strong>서버가 방송을 종료했어요</strong><p class="small">연결이 <span class="slot">재연결 대기 시간</span> 안에 돌아오지 않았어요. 다시 방송하려면 라이브 시작에서 새로 시작해 주세요.</p><p class="row" style="margin-top:8px"><button class="btn lnk" type="button" data-set="end:done">요약 보기</button><a class="btn lnk" href="live-start.html">라이브 시작</a></p></div>
 
+<p class="m-only mv-copy"><button class="btn lnk ik" type="button" id="lcopy-m" data-icon="copy" data-keep>방송 링크 복사</button><span class="help" id="lok-m" role="status" hidden>복사했어요.</span></p>
 <div class="tabs mtabs" role="tablist" aria-label="화면 선택" style="margin-top:16px">
   <button class="" role="tab" type="button" id="mt-mine" aria-selected="true" aria-controls="p-mine" data-mt="mine">내 방송</button>
   <button role="tab" type="button" id="mt-view" aria-selected="false" aria-controls="p-view" data-mt="view" tabindex="-1">시청자 화면</button>
@@ -82,9 +89,11 @@
     <p class="help" data-show="role=adm0">후원 메시지 확인은 소유자가 권한을 주면 쓸 수 있어요</p>
     <p class="help" data-show="role=mgr">후원 메시지는 관리자 이상만 볼 수 있어요</p>
     <p class="help" data-show="mode=worship">예배 중 후원 메시지 표시: <span class="slot">방송 설정에서 확정 예정</span></p>
+    <p class="help m-only" data-show="role=owner|admall mode=normal">후원 메시지는 채팅에도 함께 보여요</p>
     <fieldset id="fs-don" style="border:0;padding:0;margin:0"><legend class="sr">후원 메시지 목록</legend>
       <div class="empty" data-show="don=none"><p>아직 후원 메시지가 없어요</p></div>
       <ul class="msg-list" data-show="don=some"><li><span><strong>샘플닉네임3</strong><br>샘플 후원 메시지예요</span></li><li><span><strong>샘플닉네임4</strong><br>샘플 응원 메시지예요</span></li></ul>
+      <div class="mv-wrap m-only" data-show="don=some"><div class="mv-scroll" id="d-scroll" tabindex="0" role="region" aria-label="후원 메시지 목록"><ul class="mv-list" id="d-list"></ul></div></div>
     </fieldset>
     <p class="help" id="don-no" hidden>후원 메시지는 권한이 있는 관리자 이상만 볼 수 있어요.</p>
     <p class="help">후원 금액은 여기에 보이지 않아요.</p>
@@ -93,7 +102,11 @@
   <section class="panel stack" id="p-chat" role="tabpanel" aria-labelledby="st-chat" aria-label="채팅 관리">
     <h2>채팅 관리</h2>
     <div class="row"><span class="tag" id="chat-t"></span><button class="btn lnk" type="button" id="chat-tg"></button><button class="tg" type="button" id="slow" aria-pressed="false"><i></i>느린 모드 <span class="slot">간격</span></button></div>
+    <div class="mv-head m-only"><span class="tag" id="m-chat-t"></span><button class="btn ib" type="button" id="m-more" aria-label="채팅 설정" aria-haspopup="dialog" data-open="chat-dlg">⋯</button></div>
     <div class="empty" data-show="chat=closed"><p>채팅이 닫혀 있어요</p></div>
+    <div class="empty m-only" data-show="chat=closed"><p>채팅이 닫혀 있어요</p><p class="small muted" data-show="mode=worship">예배 중에는 기본으로 닫혀 있어요. 열면 느린 모드로 시작해요</p><p><button class="btn lnk" type="button" id="m-reopen">채팅 열기</button></p><p class="err" id="re-err" role="alert" hidden>채팅을 열지 못했어요. 다시 시도해 주세요.</p></div>
+    <div class="empty m-only" data-show="chat=open|slow msgs=none"><p>아직 채팅이 없어요</p></div>
+    <div class="mv-wrap m-only" data-show="chat=open|slow msgs=some"><div class="mv-scroll" id="c-scroll" tabindex="0" role="region" aria-label="채팅 목록"><ul class="mv-list" id="c-list"></ul></div><div role="status" id="m-new-w"><button class="btn" type="button" id="m-new" hidden></button></div></div>
     <ul class="msg-list" data-show="chat=open|slow" id="chat-list">
       <li><span><strong>샘플닉네임1</strong> <span class="tag" id="s-m1" hidden></span><br>안녕하세요, 샘플 채팅이에요</span><button class="btn lnk" type="button" data-m="m1" aria-label="샘플닉네임1 메시지 관리">관리</button></li>
       <li><span><strong>샘플닉네임2</strong> <span class="tag" id="s-m2" hidden></span><br>샘플 채팅 메시지예요</span><button class="btn lnk" type="button" data-m="m2" aria-label="샘플닉네임2 메시지 관리">관리</button></li>
@@ -112,6 +125,7 @@
       <p class="row"><button class="btn lnk" type="button">읽기 중지</button><button class="btn lnk" type="button">건너뛰기</button><button class="btn toggle bad" type="button" id="tts-mute" aria-pressed="false">긴급 음소거</button></p>
       <p class="small muted" style="margin-top:12px">대기열 <strong>2</strong>건 (샘플)</p>
     </fieldset>
+    <p class="help m-only" data-show="mode=normal role=owner|admall">이 화면에서는 TTS 소리가 나오지 않아요. 소리는 방송하는 컴퓨터에서 나와요</p>
   </section>
 </div>
 </div>
@@ -125,10 +139,23 @@
   <fieldset class="pick" style="border:0;padding:0;margin:16px 0 0;grid-template-columns:1fr"><legend class="label" style="font-weight:700;margin-bottom:6px">처리 방법</legend>
     <label><input type="radio" name="act" value="hide" checked><span><span class="t">숨기기</span><span class="small muted">이 메시지만 시청자 화면에서 가려요</span></span></label>
     <label><input type="radio" name="act" value="show"><span><span class="t">이번 방송만 차단</span><span class="small muted">이번 방송에서 이 사용자의 채팅을 막아요</span></span></label>
+    <label id="lb-undo" style="display:none"><input type="radio" name="act" value="undo" aria-describedby="undo-why"><span><span class="t">해제</span><span class="small muted">숨김·차단을 풀어요</span></span></label>
     <label><input type="radio" name="act" value="all" id="act-all" aria-describedby="all-why"><span><span class="t">방송국 전체 차단</span><span class="small muted">이 방송국의 모든 방송에서 막아요</span></span></label>
   </fieldset>
   <p class="help" id="all-why" hidden>방송국 전체 차단은 소유자·관리자만 할 수 있어요</p>
+  <p class="help" id="undo-why" hidden>숨긴 사람 또는 상위 역할만 해제할 수 있어요</p>
+  <p class="err" id="msg-err" role="alert" hidden>적용하지 못했어요. 잠시 뒤 다시 시도해 주세요.</p>
   <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="msg-ok">적용</button></div>
+</dialog>
+<dialog class="sheet" id="chat-dlg" aria-labelledby="cs-t"><h2 id="cs-t">채팅 설정</h2>
+  <div class="stack" style="margin-top:8px">
+    <div><button class="tg" type="button" id="m-slow" aria-pressed="false" aria-describedby="m-slow-why"><i></i>느린 모드 <span class="slot">간격</span></button><p class="help" id="m-slow-why" hidden>채팅이 닫혀 있어서 바꿀 수 없어요</p></div>
+    <div><button class="btn lnk" type="button" id="m-chat-tg"></button></div>
+    <div class="notice" id="m-ask" role="group" aria-label="채팅 닫기 확인" hidden><p>시청자는 채팅을 쓸 수 없게 돼요</p><div class="m-ask-a"><button class="btn" type="button" id="m-ask-no">취소</button><button class="btn bad" type="button" id="m-ask-ok">채팅 닫기</button></div></div>
+    <p class="err" id="cs-err" role="alert" hidden>적용하지 못했어요. 잠시 뒤 다시 시도해 주세요.</p>
+    <p class="help" id="cs-stale" role="status" hidden>이미 바뀌었어요. 최신 상태로 보여 드려요.</p>
+  </div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close>닫기</button></div>
 </dialog>
 <dialog id="ban-dlg" aria-labelledby="ban-t"><h2 id="ban-t">방송국 전체에서 차단할까요?</h2>
   <p style="margin-top:8px">이 사용자는 이 방송국의 모든 방송 채팅에서 차단돼요.</p>
@@ -146,10 +173,31 @@
 <script src="mock.js"></script>
 <script>
 (function () {
-  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); }, cur = 'm1', tm, done = false, mt = 'mine', st = 'chat', busy = false;
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); }, cur = 'm1', tm, done = false, mt = 'mine', st = d.tab || 'chat', busy = false, cnt = { don: 3, chat: 0, tts: 0 }, BY = {}, seq = 0, unread = 0, lastSt = '';
   var MSG = { m1: ['샘플닉네임1', '안녕하세요, 샘플 채팅이에요'], m2: ['샘플닉네임2', '샘플 채팅 메시지예요'] };
   var SIG = { ok: ['방송 중 · 송출 정상', ''], unstable: ['방송 중 · 송출이 불안정해요', '네트워크를 확인해 주세요'], cut: ['끊겼어요', '연결을 확인하고 다시 송출해 주세요'], recon: ['다시 연결하는 중', '연결되면 방송 중으로 돌아가요'], reconfail: ['재연결에 실패했어요', ''] };
   var DLG = { 'msg-dlg': ['dlg', ['msg', 'ban'], 'closed'], 'ban-dlg': ['dlg', ['ban'], 'closed'], 'mode-dlg': ['dlg', ['mode'], 'closed'], 'end-dlg': ['end', ['confirm'], 'none'] };
+  // 모바일 목록 샘플(닉네임·본문 모두 가상). [닉네임, 역할(host/adm/mgr/me/''), 본문, 후원 여부]
+  var ROLEL = { host: '방송자', adm: '관리자', mgr: '매니저', me: '나' };
+  var CH = [['샘플닉네임1', '', '안녕하세요, 샘플 채팅이에요'], ['샘플목회자', 'host', '오늘 샘플 말씀을 함께해요'], ['아주아주긴샘플닉네임을가진시청자입니다', '', '닉네임이 길어도 한 줄에서 말줄임이 되고 본문은 줄바꿈이 잘 되는지 보는 긴 샘플 채팅 메시지예요'], ['샘플닉네임3', '', '샘플 후원 메시지예요', 1], ['샘플매니저1', 'mgr', '샘플 매니저 메시지예요'], ['샘플관리자1', 'adm', '샘플 관리자 안내예요'], ['샘플내닉네임', 'me', '내가 쓴 샘플 채팅이에요'], ['샘플닉네임5', '', 'https-샘플-아주긴-문자열-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 0, ['숨김', 'adm']], ['샘플닉네임4', '', '샘플 응원 메시지예요', 1], ['샘플닉네임6', '', '마지막 샘플 채팅이에요', 0, ['이번 방송 차단', 'mgr']]];
+  var DN = [['샘플닉네임3', '샘플 후원 메시지예요'], ['샘플닉네임4', '샘플 응원 메시지예요'], ['샘플닉네임7', '샘플 감사 메시지예요'], ['샘플닉네임8', '긴 샘플 후원 메시지가 두세 줄로 이어질 때 어떻게 보이는지 확인하는 문장이에요'], ['샘플닉네임9', '샘플 기도 요청이에요'], ['샘플닉네임10', '샘플 축복 메시지예요'], ['샘플닉네임11', '샘플 격려 메시지예요'], ['샘플닉네임12', '샘플 인사 메시지예요'], ['샘플닉네임13', '샘플 응원 메시지예요']];
+  function chatRow(m, i) { // m[4]=[상태 글자, 처리한 사람 mgr|adm]: 이미 숨김·차단된 샘플
+    var id = 'c' + i, don = m[3], r = m[1], z = m[4]; MSG[id] = [m[0], m[2]]; if (z) BY[id] = z[1];
+    return '<li class="' + (don ? 'don' : '') + (z ? ' dim' : '') + '"><div class="mc-b"><div class="mc-n"><strong class="nm ' + (r ? 'r-' + r : '') + '">' + m[0] + '</strong>' + (r ? '<span class="tag">' + ROLEL[r] + '</span>' : '') + (don ? '<span class="tag dn">후원</span>' : '') + '<span class="tag" id="s-' + id + '"' + (z ? '>' + z[0] : ' hidden>') + '</span></div><p class="mc-t">' + m[2] + '</p></div>' +
+      '<button class="btn ib mm' + (r && r !== 'me' ? ' staff' : '') + '" type="button" data-m="' + id + '"' + (r === 'me' ? ' data-me="1"' : '') + ' aria-label="' + m[0] + ' 메시지 관리">⋯</button></li>';
+  }
+  function donRow(m, i) {
+    var id = 'd' + i; MSG[id] = [m[0], m[1]];
+    return '<li class="don"><div class="mc-b"><div class="mc-n"><strong class="nm">' + m[0] + '</strong><span class="tag dn">후원</span></div><p class="mc-t">' + m[1] + '</p></div><span class="slot ck-w"><button class="btn ck" type="button" aria-label="' + m[0] + ' 후원 메시지 확인">확인</button></span></li>'; // 예배 모드에서만 보임(S3 확정 전)
+  }
+  $('c-list').innerHTML = CH.map(chatRow).join(''); $('d-list').innerHTML = DN.map(donRow).join('');
+  function fit() { // 모바일: 상태 줄 높이(하위 탭 sticky 위치)와 목록 높이(화면 − 위쪽 요소 − 하단 탭 56px)
+    document.documentElement.style.setProperty('--slh', $('sl').offsetHeight + 'px');
+    ['c', 'd'].forEach(function (k) { var e = $(k + '-scroll'); if (e.offsetParent) e.style.setProperty('--lcf', Math.max(240, window.innerHeight - (e.getBoundingClientRect().top + window.scrollY) - 56) + 'px'); });
+  }
+  function note(err, stale) { // 목업 act:fail → 오류 줄, act:stale → '이미 바뀌었어요' 줄(동작은 그대로 적용)
+    $(err).hidden = d.act !== 'fail'; if (stale) $(stale).hidden = d.act !== 'stale'; return d.act !== 'fail';
+  }
   function can() { return d.role === 'owner' || d.role === 'admall'; }
   window.mockAfter = function () {
     var c = can(), w = d.mode === 'worship', mgr = d.role === 'mgr', ending = d.end === 'wait';
@@ -167,11 +215,29 @@
     var cl = d.chat === 'closed';
     $('chat-t').textContent = cl ? '채팅 닫힘' : d.chat === 'slow' ? '채팅 열림 · 느린 모드' : '채팅 열림';
     $('chat-tg').textContent = cl ? '채팅 열기' : '채팅 닫기'; $('slow').disabled = cl; $('slow').setAttribute('aria-pressed', String(d.chat === 'slow'));
+    // 모바일 보기(767px 이하 CSS가 보이게 함)
+    $('sl-mode').textContent = w ? '예배 방송' : '일반 방송'; $('sl-why').textContent = why; $('sl-why').hidden = !why;
+    if (d.act === 'ok') ['sl-err', 'sl-stale', 'cs-err', 'cs-stale', 're-err'].forEach(function (i) { $(i).hidden = true; });
+    $('sl').dataset.sig = d.sig; $('sl-mute').hidden = !(c && !w); $('sl-mute').setAttribute('aria-pressed', String(d.tts === 'muted'));
+    if (d.tts === 'muted' && !w && !ending) $('sl-x').textContent = (sg[1] ? sg[1] + ' · ' : '') + '긴급 음소거 중';
+    $('m-chat-t').textContent = $('chat-t').textContent; $('m-chat-t').className = 'tag ' + (cl ? 'off' : d.chat === 'slow' ? 'wait' : 'ok');
+    $('m-slow').disabled = cl; $('m-slow').setAttribute('aria-pressed', String(d.chat === 'slow')); $('m-slow-why').hidden = !cl;
+    $('m-chat-tg').textContent = cl ? '채팅 열기' : '채팅 닫기';
     // 전체 차단은 소유자·관리자만
     $('act-all').disabled = mgr; $('all-why').hidden = !mgr;
     // 모바일 탭
     ['mine', 'view'].forEach(function (k) { $('p-' + k).classList.toggle('off-m', mt !== k); $('mt-' + k).setAttribute('aria-selected', String(mt === k)); $('mt-' + k).tabIndex = mt === k ? 0 : -1; });
     ['don', 'chat', 'tts'].forEach(function (k) { $('p-' + k).classList.toggle('off-m', st !== k); $('st-' + k).setAttribute('aria-selected', String(st === k)); $('st-' + k).tabIndex = st === k ? 0 : -1; });
+    // 탭 새 항목 숫자(보는 탭은 0)
+    cnt[st] = 0;
+    ['don', 'chat', 'tts'].forEach(function (k) {
+      var t = $('st-' + k), p = t.querySelector('.pill'), n = k === 'don' && !c ? 0 : cnt[k], lb = { don: '후원 메시지', chat: '채팅 관리', tts: 'TTS 제어' }[k];
+      if (!n) { if (p) p.remove(); t.removeAttribute('aria-label'); return; }
+      if (!p) { p = document.createElement('span'); p.className = 'pill'; p.setAttribute('aria-hidden', 'true'); t.appendChild(p); }
+      p.textContent = n > 99 ? '99+' : n; t.setAttribute('aria-label', lb + ', 새 항목 ' + (n > 99 ? '99개 이상' : n + '개'));
+    });
+    if (lastSt !== st) { lastSt = st; unread = 0; $('m-new').hidden = true; ['c', 'd'].forEach(function (k) { var b = $(k + '-scroll'); requestAnimationFrame(function () { b.scrollTop = b.scrollHeight; }); }); }
+    fit();
     if (d.end === 'done' && !done) { done = true; var h = document.querySelector('[aria-label="방송 요약"] h1'); h.tabIndex = -1; h.focus(); }
     // 대화상자
     Object.keys(DLG).forEach(function (id) {
@@ -192,13 +258,22 @@
   function open(id, key, val, op) { $(id)._opener = op; d[key] = val; window.mockRender(); }
   $('end').onclick = function () { open('end-dlg', 'end', 'confirm', this); };
   $('md-btn').onclick = function () { open('mode-dlg', 'dlg', 'mode', this); };
-  document.querySelectorAll('[data-m]').forEach(function (x) { x.onclick = function () { cur = x.dataset.m; $('msg-nick').textContent = MSG[cur][0]; $('msg-body').textContent = MSG[cur][1]; $('ban-dlg')._opener = null; open('msg-dlg', 'dlg', 'msg', x); }; });
+  function R(v) { return document.querySelector('input[name=act][value=' + v + ']'); }
+  function openMsg(x) {
+    cur = x.dataset.m; var li = x.closest('li'), mob = x.classList.contains('mm'), dim = mob && li.classList.contains('dim'), me = x.dataset.me === '1', okU = d.role !== 'mgr' || BY[cur] === 'mgr';
+    ['show', 'all'].forEach(function (v) { R(v).closest('label').style.display = me ? 'none' : ''; }); // 내 메시지는 차단 선택지 없음
+    $('lb-undo').style.display = dim ? '' : 'none'; R('undo').disabled = !okU; $('undo-why').hidden = !(dim && !okU);
+    (dim && okU ? R('undo') : R('hide')).checked = true;
+    $('msg-nick').textContent = MSG[cur][0]; $('msg-body').textContent = MSG[cur][1]; $('msg-err').hidden = true; $('ban-dlg')._opener = null; open('msg-dlg', 'dlg', 'msg', x);
+  }
+  document.addEventListener('click', function (e) { var x = e.target.closest('[data-m]'); if (x) openMsg(x); });
   $('msg-ok').onclick = function () {
     var a = document.querySelector('input[name=act]:checked').value;
+    if (d.act === 'fail') { $('msg-err').hidden = false; return; }
     if (a === 'all') { $('ban-dlg')._opener = this; d.dlg = 'ban'; window.mockRender(); return; }
     tag(a); d.dlg = 'closed'; $('msg-dlg').close(); window.mockRender();
   };
-  function tag(a) { var t = $('s-' + cur); t.textContent = { hide: '숨김', show: '이번 방송 차단', all: '방송국 전체 차단' }[a]; t.hidden = false; }
+  function tag(a) { var t = $('s-' + cur); t.textContent = { hide: '숨김', show: '이번 방송 차단', all: '방송국 전체 차단' }[a] || ''; t.hidden = a === 'undo'; if (t.closest('li')) t.closest('li').classList.toggle('dim', a !== 'undo'); if (a === 'undo') delete BY[cur]; else BY[cur] = d.role === 'mgr' ? 'mgr' : 'adm'; }
   $('ban-ok').onclick = function () { tag('all'); busy = true; d.dlg = 'closed'; $('ban-dlg').close(); $('msg-dlg').close(); busy = false; window.mockRender(); };
   $('end-ok').onclick = function () {
     d.end = 'wait'; busy = true; $('end-dlg').close(); busy = false; window.mockRender();
@@ -212,6 +287,29 @@
   $('tts-mute').onclick = function () { d.tts = d.tts === 'muted' ? 'on' : 'muted'; window.mockRender(); };
   ['mic', 'cam'].forEach(function (i) { $(i).onclick = function () { var p = this.getAttribute('aria-pressed') === 'true'; this.setAttribute('aria-pressed', String(!p)); this.textContent = (i === 'mic' ? '마이크 ' : '카메라 ') + (p ? '켜짐' : '꺼짐'); }; });
   $('mute').onclick = function () { var m = $('mute-t').textContent === '음소거 중'; $('mute-t').textContent = m ? '소리 켜짐' : '음소거 중'; this.textContent = m ? '음소거' : '소리 켜기'; };
+  $('sl-mute').onclick = function () { if (!note('sl-err', 'sl-stale')) return; d.tts = d.tts === 'muted' ? 'on' : 'muted'; window.mockRender(); };
+  $('lcopy-m').onclick = function () { $('lok-m').hidden = false; };
+  $('m-reopen').onclick = function () { if (!note('re-err')) return; d.chat = d.mode === 'worship' ? 'slow' : 'open'; window.mockRender(); }; // 예배 모드는 느린 모드로 열기(§22-15)
+  $('m-slow').onclick = function () { if (!note('cs-err', 'cs-stale')) return; d.chat = d.chat === 'slow' ? 'open' : 'slow'; window.mockRender(); };
+  $('m-chat-tg').onclick = function () { if (d.chat === 'closed') { if (!note('cs-err', 'cs-stale')) return; d.chat = d.mode === 'worship' ? 'slow' : 'open'; window.mockRender(); } else { $('m-ask').hidden = false; $('m-ask-no').focus(); } }; // 열기는 즉시, 닫기는 한 줄 확인
+  $('m-ask-no').onclick = function () { $('m-ask').hidden = true; $('m-chat-tg').focus(); };
+  $('m-ask-ok').onclick = function () { if (!note('cs-err', 'cs-stale')) return; $('m-ask').hidden = true; d.chat = 'closed'; window.mockRender(); $('m-chat-tg').focus(); };
+  $('chat-dlg').addEventListener('close', function () { $('m-ask').hidden = true; $('cs-err').hidden = $('cs-stale').hidden = true; if (this._opener && document.contains(this._opener)) this._opener.focus(); });
+  $('d-list').addEventListener('click', function (e) { var b = e.target.closest('.ck'); if (!b) return; var li = b.closest('li'), t = document.createElement('span'); t.className = 'ck-done'; t.textContent = '확인함'; b.replaceWith(t); li.tabIndex = -1; li.focus(); }); // 목업: 확인 방식은 S3 확정 전
+  var cs = $('c-scroll');
+  function atEnd() { return cs.scrollHeight - cs.scrollTop - cs.clientHeight < 40; }
+  cs.addEventListener('scroll', function () { if (atEnd()) { unread = 0; $('m-new').hidden = true; } });
+  $('m-new').onclick = function () { cs.scrollTop = cs.scrollHeight; };
+  $('m-sim').onclick = function () { // 새 채팅·후원 메시지 한 건씩 도착
+    seq++; var i = 100 + seq, was = atEnd();
+    $('c-list').insertAdjacentHTML('beforeend', chatRow(['샘플신규' + seq, '', '새로 도착한 샘플 채팅이에요 ' + seq], i));
+    $('d-list').insertAdjacentHTML('beforeend', donRow(['샘플신규후원' + seq, '새로 도착한 샘플 후원 메시지예요'], i));
+    if (st !== 'chat') cnt.chat++; else if (was) cs.scrollTop = cs.scrollHeight; else { unread++; $('m-new').textContent = '새 채팅 ' + unread + '개 ↓'; $('m-new').hidden = false; }
+    if (st !== 'don' && can()) cnt.don++;
+    window.mockRender();
+  };
+  $('m-99').onclick = function () { if (st !== 'don' && can()) { cnt.don = 120; window.mockRender(); } };
+  window.addEventListener('resize', fit);
   $('lcopy').onclick = function () { $('lok').hidden = false; };
   // 모바일 탭(좌우 화살표 포함)
   function tabs(sel, set) {

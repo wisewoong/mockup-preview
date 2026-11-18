@@ -13,10 +13,11 @@
   .ch-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
   .ch-actions { align-items: center; gap: 4px 8px; }
   .ch-actions .btn { min-width: 0; padding: 0 16px; }
-  .ch-actions .btn:not(.primary):not([href]) { color: var(--text); font-weight: 600; }
+  .ch-actions .btn:not(.primary):not([href]):not(.toggle) { color: var(--text); font-weight: 600; }
+  .ch-actions .btn.toggle[aria-pressed="true"] { background: var(--bg-sub); color: var(--strong); }
   .ch-actions .btn.btn[data-report] { color: var(--muted); font-weight: 500; }
   .ch-actions a.btn, .ch-actions .btn[disabled] { margin-left: 8px; }
-  .ch-actions a.btn { color: var(--info); background: var(--info-bg); }
+  .ch-actions a.btn:not(.primary) { color: var(--info); background: var(--info-bg); }
   .pane { padding: 24px 0 64px; }
   .upcoming { list-style: none; padding: 0; margin: 0; }
   .upcoming li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); }
@@ -62,11 +63,11 @@
     </div>
     <div class="ch-actions" data-show="status=active|limited">
       <!-- 구독이 첫 번째, 후원은 그다음 -->
-      <button class="btn primary toggle" data-toggle aria-pressed="false" data-on="구독 중" data-off="구독">구독</button>
+      <button class="btn toggle" data-toggle aria-pressed="false" data-on="구독 중 ✓" data-off="구독">구독</button>
       <button class="btn" data-icon="share" data-keep data-share="샘물교회 이정훈 목사 방송국">공유</button>
       <button class="btn" data-report="샘물교회 이정훈 목사 방송국">신고</button>
-      <a class="btn" href="charge.html?view=donate" data-show="status=active">후원하기</a>
-      <a class="btn" href="charge.html?view=donate" data-show="status=limited lp=yes" aria-describedby="lim-d">후원하기</a>
+      <a class="btn primary" href="charge.html?view=donate" data-show="status=active">후원하기</a>
+      <a class="btn primary" href="charge.html?view=donate" data-show="status=limited lp=yes" aria-describedby="lim-d">후원하기</a>
       <button class="btn" disabled aria-disabled="true" aria-describedby="lim-why lim-d" data-show="status=limited lp=no">후원하기</button>
       <p class="help" id="lim-d" data-show="status=limited" style="flex-basis:100%">일부 기능이 제한돼요. 후원 가능 여부: <span class="slot">LIMITED 후원 가능 여부</span></p>
     </div>

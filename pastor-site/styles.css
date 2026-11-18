@@ -705,3 +705,94 @@ td .tag.wait, td .tag.ok, td .tag.wip, td .tag.off, td .tag.bad { margin-right: 
 .btn.primary:disabled { color: var(--text); opacity: .5; }
 .mc .mem-acts > .help { margin-left: 14px !important; text-align: left; } /* 버튼용 -14px 보정이 글자 안내를 화면 밖으로 밀지 않게 */
 @media (max-width: 767px) { .item > .preview { width: 56px !important; height: 56px !important; } .item > .btn { grid-column: 2; justify-self: start; } } /* 업로드 목록: 썸네일 규격·링크 줄 위치 */
+
+/* ===== live-control 모바일 채팅 관리 보기(767px 이하 전용). PC는 .m-only 요소를 숨기기만 한다. 기존 토큰만 사용 ===== */
+.m-only { display: none; }
+body[data-bar="off"] .mockbar { display: none; } /* 캡처용: ?bar=off */
+@media (max-width: 767px) {
+  .m-only:not([hidden]) { display: block; }
+  .btn.m-only:not([hidden]) { display: inline-flex; }
+  /* 상태 줄: 맨 위 고정(이 화면은 상단 바를 흐름 안에 둔다) */
+  body:has(#sl) .topbar { position: static; }
+  #sl { top: 0; z-index: 4; margin: 0 -16px; padding: 8px 16px; border-width: 0 0 1px; border-radius: 0; }
+  #sl .sl-row { flex-wrap: nowrap; gap: 8px; }
+  #sl .sl-info { flex: 1; min-width: 0; gap: 0 12px; }
+  #sl #sl-t { flex-basis: 100%; }
+  #sl #sl-t::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--ok); margin-right: 8px; }
+  #sl[data-sig="unstable"] #sl-t::before { background: var(--warn); }
+  #sl[data-sig="cut"] #sl-t::before, #sl[data-sig="reconfail"] #sl-t::before { background: var(--danger); }
+  #sl[data-sig="recon"] #sl-t::before { background: var(--info); }
+  #sl #end, #sl #end-why { display: none; }
+  #sl #sl-mute { flex: none; width: var(--tap); height: var(--tap); }
+  #sl #sl-mute .x, #sl #sl-mute[aria-pressed="true"] .w { display: none; }
+  #sl #sl-mute[aria-pressed="true"] .x { display: inline; }
+  #sl #sl-mute[aria-pressed="true"] { color: var(--danger); }
+  #sl > .help { margin-top: 2px; }
+  .mv-copy { margin: 8px 0 0; }
+  .mv-copy .help { margin: 0 0 0 8px; display: inline; }
+  .mv-copy .btn { padding: 0 8px; margin-left: -8px; }
+  /* 상위 탭·미리보기는 숨김, 하위 탭은 상태 줄 아래 고정 */
+  .mtabs, .two { display: none !important; }
+  .stabs { position: sticky; top: var(--slh, 0px); z-index: 3; background: var(--bg); margin-top: 8px !important; }
+  .stabs [role="tab"] { min-height: var(--tap); padding: 0 4px; font-size: .95rem; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .tabs.stabs [role="tab"][aria-selected="true"] { box-shadow: inset 0 -2px 0 var(--strong); color: var(--strong); }
+  .stabs .pill { min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--s2); color: var(--strong); font-size: .75rem; font-weight: 700; line-height: 20px; text-align: center; }
+  .lc-grid { margin-top: 0; }
+  .lc-grid .panel { border: 0; background: none; padding: 12px 0 0; }
+  .lc-grid .panel > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .lc-grid .btn { min-height: var(--tap); }
+  /* PC용 목록·머리는 모바일에서 새 구조로 대체 */
+  #p-chat > .row:not(.m-only), #p-chat > ul.msg-list, #p-chat > .empty:not(.m-only), #fs-don > ul.msg-list, #don-no { display: none; }
+  .mv-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .mv-head .btn { width: var(--tap); height: var(--tap); font-size: 1.4rem; color: var(--text); }
+  .mv-wrap { position: relative; }
+  .mv-scroll { overflow-y: auto; overscroll-behavior: contain; height: calc(var(--lcf, 400px) - env(safe-area-inset-bottom)); min-height: 240px; padding: 4px 4px env(safe-area-inset-bottom); margin: 0 -4px; } /* --lcf: 화면 높이에서 위쪽 요소·하단 탭을 뺀 값(JS가 계산) */
+  .mv-list { list-style: none; margin: 0; padding: 0; }
+  .mv-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 4px; padding: 8px 0 8px 0; border-top: 1px solid var(--line); }
+  .mv-list li:first-child { border-top: 0; }
+  .mc-b { min-width: 0; }
+  .mc-n { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .mc-n .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--strong); font-weight: 700; }
+  .mc-n .tag { flex: none; margin: 0; }
+  .nm.r-host { color: var(--don-name); }
+  .nm.r-adm { color: var(--role-admin); }
+  .nm.r-mgr { color: var(--role-mgr); }
+  .nm.r-me { color: var(--role-me); }
+  .mc-t { margin: 2px 0 0; overflow-wrap: anywhere; }
+  .mv-list li.don { background: var(--don-bg); border: 1px solid var(--don-line); border-radius: var(--radius); padding: 8px 4px 8px 12px; margin: 6px 0; }
+  .mv-list li.don .nm { color: var(--don-name); }
+  .tag.dn { background: none; border: 1px solid var(--don-line); color: var(--don-name); }
+  .mv-list li.dim .mc-b > * { opacity: .55; }
+  .mv-list li.dim .mc-n .tag:last-child { opacity: 1; }
+  .mv-list .btn.mm, .mv-list .btn.ck { width: auto; min-width: var(--tap); }
+  .mv-list .btn.mm { width: var(--tap); color: var(--text); font-size: 1.4rem; }
+  .mv-list .btn.ck { padding: 0 14px; color: var(--info); font-weight: 700; }
+  .mv-list .ck-done { min-height: var(--tap); padding: 0 14px; display: inline-flex; align-items: center; font-weight: 700; color: var(--strong); }
+  .mv-list .ck-done::before { content: "✓ "; white-space: pre; }
+  #m-new-w { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; pointer-events: none; }
+  #m-new { pointer-events: auto; background: var(--s2); border: 1px solid var(--line); border-radius: 999px; color: var(--strong); box-shadow: var(--shadow); }
+  /* TTS */
+  #fs-tts .row { gap: 12px; }
+  body[data-mode="worship"] #tts-mute, body[data-mode="worship"] #sl-mute { display: none; }
+  body[data-role="mgr"] #fs-tts, body[data-role="adm0"] #fs-tts { display: none; }
+  /* 채팅 설정 시트 */
+  #chat-dlg .tg { min-height: var(--tap); }
+  #m-slow:disabled { opacity: .5; cursor: not-allowed; }
+  #m-ask p { margin: 0; }
+  .m-ask-a { display: flex; gap: 12px; margin-top: 8px; }
+  .m-ask-a .btn { flex: 1; }
+  /* 하단 스페이서: 하단 탭 + 안전 영역 */
+  main.wrap > div[style*="height:96px"] { height: calc(16px + env(safe-area-inset-bottom)) !important; }
+}
+@media (max-width: 767px) { .lc-grid .panel.stack > h2 + * { margin-top: 0; } }
+/* live-control 모바일 보강: 권한·모드별 표시 */
+@media (max-width: 767px) {
+  body[data-mode="worship"] #c-list li.don, body[data-role="mgr"] #c-list li.don, body[data-role="adm0"] #c-list li.don { display: none; } /* 예배 모드(S3 미확정)·후원 권한 없음: 채팅 안 후원 카드 숨김 */
+  body:not([data-mode="worship"]) #d-list .ck-w { display: none; } /* 확인 버튼은 예배 모드에서만(S3 slot) */
+  .mv-list .ck-w { display: inline-flex; align-items: center; padding: 0 2px; }
+  .mv-list .ck-w .btn.ck { padding: 0 10px; }
+  body:not([data-role="owner"]) .mv-list .btn.mm.staff { display: none; } /* 방송자·관리자·매니저 행의 관리는 소유자만 */
+  #sl-mode { margin: 0; }
+  #sl .err, #sl .help { margin-top: 2px; }
+}
+@media (max-width: 767px) { #msg-body { overflow-wrap: anywhere; } }

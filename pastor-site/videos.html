@@ -159,9 +159,9 @@
     var all = rows(), r = all.filter(pass), norm = d.s === 'normal' || d.s === 'partial';
     if (d.s === 'partial') r = r.slice(0, 3);
     put($('tb'), r.map(function (x) {
-      return '<tr><th scope="row"><span class="vtitle"><span class="preview vthumb">썸네일</span><span>' + x.n + '</span></span></th><td>' + SL[x.src] + '</td><td><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : x.pr === 'ready' ? ' ok' : /^(run|retrying|opproc)$/.test(x.pr) ? ' wip' : '') + '">' + lab(x) + '</span></td><td>' + VL[x.vis] + '</td><td>' + (x.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '필요') + '</td><td>' + btn(x) + '</td></tr>'; }).join(''));
+      return '<tr><th scope="row"><span class="vtitle"><span class="preview vthumb">썸네일</span><span>' + x.n + '</span></span></th><td>' + SL[x.src] + '</td><td><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : x.pr === 'ready' ? ' ok' : /^(run|retrying|opproc)$/.test(x.pr) ? ' wip' : '') + '">' + lab(x) + '</span></td><td>' + VL[x.vis] + '</td><td>' + (x.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '<span class="tag wait">확인 필요</span>') + '</td><td>' + btn(x) + '</td></tr>'; }).join(''));
     put($('cards'), r.map(function (x) {
-      return '<div class="mc"><p class="vtitle"><span class="preview vthumb">썸네일</span><strong>' + x.n + '</strong></p><p class="small"><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : x.pr === 'ready' ? ' ok' : /^(run|retrying|opproc)$/.test(x.pr) ? ' wip' : '') + '">' + lab(x) + '</span>' + VL[x.vis] + ' · ' + SL[x.src] + '</p><p class="small muted">권리 확인 ' + (x.rt === 'done' ? '완료' : '필요') + '</p><div class="mem-acts">' + btn(x) + '</div></div>'; }).join(''));
+      return '<div class="mc"><p class="vtitle"><span class="preview vthumb">썸네일</span><strong>' + x.n + '</strong></p><p class="small"><span class="tag' + (/failed|opfail/.test(x.pr) || x.op === 'blocked' ? ' bad' : x.pr === 'ready' ? ' ok' : /^(run|retrying|opproc)$/.test(x.pr) ? ' wip' : '') + '">' + lab(x) + '</span>' + VL[x.vis] + ' · ' + SL[x.src] + '</p><p class="small"><span class="muted">권리 확인</span> ' + (x.rt === 'done' ? '완료' : '<span class="tag wait">확인 필요</span>') + '</p><div class="mem-acts">' + btn(x) + '</div></div>'; }).join(''));
     $('f0').hidden = !(norm && !r.length);
     $('listbox').hidden = !norm || !r.length;
     var run = all.filter(function (x) { return GRP[x.pr] === 'run'; }).length, bad = all.filter(function (x) { return !GRP[x.pr]; }).length, n = $('proc-note');
@@ -172,7 +172,7 @@
     var owner = d.role === 'owner', blocked = d.op === 'blocked';
     $('v-src').textContent = SL[d.src];
     $('a-pr').textContent = PL[d.pr]; $('a-vis').textContent = VL[d.vis]; $('a-op').textContent = blocked ? '차단됨 · 공개 불가' : '없음';
-    $('a-rt').innerHTML = d.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '필요';
+    $('a-rt').innerHTML = d.rt === 'done' ? '완료 (<span class="slot">날짜</span>)' : '<span class="tag wait">확인 필요</span>';
     var noPub = blocked || /^(failed|retrying|failedagain|reqsent|opproc|opfail)$/.test(d.pr);
     document.querySelectorAll('input[name=vis]').forEach(function (r) { r.checked = r.value === d.vis; r.disabled = noPub; });
     var w = blocked ? '운영 조치로 공개 범위를 바꿀 수 없어요' : noPub ? '처리가 끝나야 공개 범위를 바꿀 수 있어요' : d.pr === 'run' ? '처리가 끝날 때까지 공개는 대기해요. 지금 선택해 두면 처리 뒤 적용돼요' : '';
