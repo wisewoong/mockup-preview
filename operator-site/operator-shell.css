@@ -22,8 +22,6 @@
 details.add > summary { min-height: var(--tap); display: inline-flex; align-items: center; cursor: pointer; font-weight: 700; padding: 0 16px; border: 1px solid var(--muted); border-radius: var(--radius); }
 details.add[open] > summary { background: var(--bg-sub); }
 details.add > .stack { margin-top: 16px; }
-.btn.danger { background: var(--danger); border-color: var(--danger); color: var(--bg); }
-.btn.danger:disabled { background: var(--bg-sub); border-color: var(--line); color: var(--muted); }
 dialog .tbl-wrap table { min-width: 0; }
 @media (max-width: 1023px) {
   .hd-d { display: none !important; }
@@ -87,11 +85,11 @@ h1 { scroll-margin-top: 88px; }
 /* ================= 시안 B 미드나잇: 공통 컴포넌트 규칙 =================
    원칙: 채움 버튼은 화면당 1개(.btn.primary), 나머지는 글자·고스트·아이콘. 테두리 박스 나열 금지.
    상태는 점+글자, 분류 태그는 옅은 면색. 필터는 밑줄 탭·글자형 셀렉트. */
-body { background: radial-gradient(1100px 460px at 50% -120px, var(--glow), transparent 70%) no-repeat, var(--bg); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+body { background: radial-gradient(1100px 460px at 50% -120px, var(--glow), transparent 70%) no-repeat, var(--bg); font-size: 0.9375rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 html { background: var(--bg); }
-h1 { font: 700 28px/1.25 var(--disp); letter-spacing: -.025em; }
-h2 { font: 700 19px/1.35 var(--disp); letter-spacing: -.02em; }
-h3 { font-size: 16px; }
+h1 { font: 700 1.75rem/1.25 var(--disp); letter-spacing: -.025em; }
+h2 { font: 700 1.1875rem/1.35 var(--disp); letter-spacing: -.02em; }
+h3 { font-size: 1rem; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .mockbar { background: var(--s1); border-bottom: 1px dashed var(--muted); }
 .mockbar button { border-radius: 8px; background: transparent; color: var(--muted); border-color: var(--line); min-height: 36px; }
@@ -99,14 +97,14 @@ h3 { font-size: 16px; }
 
 /* 상단 바 */
 .topbar { background: var(--hdr); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border-bottom: 1px solid var(--line); }
-.brand { font: 700 20px/1 var(--disp); letter-spacing: -.02em; color: var(--strong); gap: 0; }
+.brand { font: 700 1.25rem/1 var(--disp); letter-spacing: -.02em; color: var(--strong); gap: 0; }
 .brand b { color: var(--accent); }
-.brand small { margin-left: 8px; font: 500 13px var(--font); color: var(--muted); letter-spacing: 0; }
+.brand small { margin-left: 8px; font: 500 0.8125rem var(--font); color: var(--muted); letter-spacing: 0; }
 .btn.hbtn { border-radius: 10px; color: var(--muted); }
 .btn.hbtn:hover, .btn.hbtn[aria-expanded="true"] { background: var(--s2); color: var(--text); }
 
 /* 버튼: 기본형은 글자(포인트색), 호버 때만 면. 채움은 .primary 1개 */
-.btn { min-height: 40px; min-width: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: var(--info); font-weight: 700; font-size: 14px; transition: .2s; }
+.btn { min-height: var(--tap); min-width: var(--tap); padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: var(--info); font-weight: 700; font-size: 0.875rem; transition: .2s; }
 .btn:hover { background: var(--info-bg); }
 .btn:active { transform: none; }
 .btn.primary { padding: 0 20px; border-radius: 999px; background: var(--pri-bg); color: var(--pri-fg); }
@@ -121,7 +119,7 @@ h3 { font-size: 16px; }
 .btn.ib:hover { color: var(--text); background: var(--s2); }
 .linkbtn { color: var(--info); text-decoration: none; font-weight: 700; border-radius: 8px; padding: 0 12px; transition: .2s; }
 .linkbtn:hover:not(:disabled) { background: var(--info-bg); }
-.go { color: var(--muted); font-weight: 500; font-size: 14px; padding: 7px 10px; border-radius: 8px; text-decoration: none; white-space: nowrap; transition: .2s; display: inline-block; }
+.go { color: var(--muted); font-weight: 500; font-size: 0.875rem; padding: 7px 10px; border-radius: 8px; text-decoration: none; white-space: nowrap; transition: .2s; display: inline-block; }
 .go:hover { color: var(--text); background: var(--s2); }
 details.add > summary { border: 0; color: var(--info); border-radius: 10px; }
 details.add > summary:hover, details.add[open] > summary { background: var(--info-bg); }
@@ -129,10 +127,10 @@ p a:not(.btn):not(.card), .help a { color: var(--info); }
 
 /* 필터: 칩 → 밑줄 탭 */
 .chips { gap: 4px 24px; border-bottom: 1px solid var(--line); overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
-.chip { flex: none; min-height: 42px; padding: 0 2px; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--muted); font-weight: 500; transition: .2s; }
+.chip { font: inherit; cursor: pointer; display: inline-flex; align-items: center; flex: none; min-height: 42px; padding: 0 2px; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--muted); font-weight: 500; transition: .2s; }
 .chip:hover { background: transparent; color: var(--text); }
 .chip[aria-pressed="true"] { background: transparent; color: var(--strong); border-bottom-color: var(--strong); font-weight: 700; }
-select, select.input { appearance: none; -webkit-appearance: none; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%238b96b6' stroke-width='1.6'%3E%3Cpath d='m1 1 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center; color: var(--text); font: 600 14px var(--font); cursor: pointer; }
+select, select.input { appearance: none; -webkit-appearance: none; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%238b96b6' stroke-width='1.6'%3E%3Cpath d='m1 1 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center; color: var(--text); font: 600 0.875rem var(--font); cursor: pointer; }
 select option { background: var(--s1); color: var(--text); }
 .filters select.input, .filters select { width: auto; min-width: 0; min-height: 38px; padding: 0 22px 0 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background-position: right 2px center; font-weight: 700; }
 .filters select:hover { color: var(--strong); }
@@ -148,20 +146,20 @@ input[type="checkbox"]:not([role="switch"]), input[type="radio"] { border-color:
 input[type="checkbox"]:not([role="switch"]):checked, input[type="radio"]:checked { background: var(--accent); border-color: var(--accent); }
 input[type="radio"]:checked { box-shadow: inset 0 0 0 4px var(--s1); }
 input[type="checkbox"]:not([role="switch"]):checked::after { border-color: var(--on-accent); }
-.field > .label { font-weight: 600; font-size: 13px; color: var(--muted); }
+.field > .label { font-weight: 600; font-size: 0.8125rem; color: var(--muted); }
 
 /* 표: 머리는 한 단 진한 면, 행 세로 가운데, 호버 틴트 */
 .tbl-wrap { background: var(--s1); border-radius: var(--r); }
 .tbl-wrap th, .tbl-wrap td { padding: 14px 18px; vertical-align: middle; border-bottom: 1px solid var(--line); }
-.tbl-wrap th { background: var(--bg-sub); font: 600 12px/1.2 var(--font); letter-spacing: .04em; height: 44px; padding-top: 0; padding-bottom: 0; }
+.tbl-wrap th { background: var(--bg-sub); font: 600 0.75rem/1.2 var(--font); letter-spacing: .04em; height: 44px; padding-top: 0; padding-bottom: 0; }
 .tbl-wrap tbody tr { transition: background .2s; }
 .tbl-wrap tbody tr:hover, .tbl-wrap tbody tr:focus-within { background: var(--s2); }
 .tbl-wrap td:last-child { text-align: right; white-space: nowrap; }
 .tbl-wrap th:last-child { text-align: right; }
 
 /* 태그: 상태는 점+글자(면 없음), 분류는 옅은 면색 */
-.tag { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; padding: 2px 9px; border: 0; border-radius: 6px; background: var(--bg-sub); color: var(--muted); margin-right: 6px; line-height: 1.6; vertical-align: 1px; white-space: nowrap; }
-.tag.wait, .tag.wip, .tag.ok, .tag.off, .tag.bad { background: transparent; padding: 0; font-size: 14px; }
+.tag { display: inline-flex; align-items: center; gap: 7px; font-size: 0.75rem; font-weight: 600; padding: 2px 9px; border: 0; border-radius: 6px; background: var(--bg-sub); color: var(--muted); margin-right: 6px; line-height: 1.6; vertical-align: 1px; white-space: nowrap; }
+.tag.wait, .tag.wip, .tag.ok, .tag.off, .tag.bad { background: transparent; padding: 0; font-size: 0.875rem; }
 .tag.wait::before, .tag.wip::before, .tag.ok::before, .tag.off::before, .tag.bad::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
 .tag.wip { color: var(--info); }
 .tag.wait { color: var(--warn); }
@@ -170,6 +168,7 @@ input[type="checkbox"]:not([role="switch"]):checked::after { border-color: var(-
 .tag.bad { color: var(--danger); }
 .tag.adm { background: var(--info-bg); color: var(--info); }
 .op-nav a .tag.adm { background: var(--bg-sub); color: var(--text); }
+.tag.host { background: var(--host-bg); color: var(--host); }
 .tag.mgr { background: var(--s2); color: var(--text); }
 .off-row .tag, .off-row .btn:not(:disabled) { color: var(--text); }
 
@@ -208,7 +207,7 @@ dialog::backdrop { background: rgba(0, 0, 0, .6); }
 .more { display: inline-block; vertical-align: middle; }
 .mn { position: fixed; z-index: 60; min-width: 176px; padding: 6px; background: var(--bg-sub); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); text-align: left; }
 .mn[hidden] { display: none; }
-.mn button { display: block; width: 100%; text-align: left; padding: 9px 12px; border-radius: 8px; font-size: 14px; color: var(--text); background: transparent; border: 0; cursor: pointer; }
+.mn button { display: block; width: 100%; text-align: left; padding: 9px 12px; border-radius: 8px; font-size: 0.875rem; color: var(--text); background: transparent; border: 0; cursor: pointer; }
 .mn button:hover, .mn button:focus-visible { background: var(--s2); outline: 0; }
 .mn button.red { color: var(--danger); }
 .act-cell { display: inline-flex; align-items: center; gap: 2px; justify-content: flex-end; }
@@ -222,7 +221,7 @@ dialog::backdrop { background: rgba(0, 0, 0, .6); }
 .op-main ul.plain.nav-list li .tag { margin: 0; }
 
 /* bo-pages2: 행 머리(th scope=row)는 본문 글자 크기로(머리글 12px 규칙이 새지 않게), 정책 폼은 패널로 정돈 */
-.tbl-wrap tbody th[scope="row"] { font: 600 14px/1.5 var(--font); letter-spacing: 0; background: transparent; height: auto; padding: 14px 18px; color: var(--text); text-align: left; }
+.tbl-wrap tbody th[scope="row"] { font: 600 0.875rem/1.5 var(--font); letter-spacing: 0; background: transparent; height: auto; padding: 14px 18px; color: var(--text); text-align: left; }
 details.add > .stack { background: var(--s1); border-radius: var(--r); padding: 20px 24px; max-width: 720px; }
 details.add > .stack .tbl-wrap { background: var(--bg-sub); }
 details.add > .stack .tbl-wrap th { background: transparent; }
@@ -235,4 +234,24 @@ details.add > .stack h3 { margin-top: 8px; }
   details.add > .stack .tbl-wrap th, details.add > .stack .tbl-wrap td, dialog .tbl-wrap th, dialog .tbl-wrap td { padding: 10px 10px; }
   details.add > .stack .tbl-wrap td:last-child, dialog .tbl-wrap td:last-child { text-align: left; white-space: normal; }
 }
-button.go { background: none; border: 0; font: inherit; font-size: 14px; cursor: pointer; }
+button.go { background: none; border: 0; font: inherit; font-size: 0.875rem; cursor: pointer; }
+
+/* ---- 운영사 홈 작업 대기열 (신규 색 토큰 없음) ---- */
+.queue { display: flex; align-items: center; gap: 16px; min-height: var(--tap); padding: 12px 8px; border-bottom: 1px solid var(--line); color: var(--text); text-decoration: none; }
+a.queue:hover { background: var(--s1); }
+.q-n { flex: none; min-width: 4.5rem; font-size: 1.6rem; line-height: 1.2; font-weight: 700; color: var(--strong); font-variant-numeric: tabular-nums; }
+.q-n small { display: block; font-size: .75rem; font-weight: 500; color: var(--muted); }
+.q-b { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.q-b strong { color: var(--strong); }
+.queue > .tag { flex: 0 1 13rem; min-width: 0; }
+.queue .go { color: var(--info); }
+@media (max-width: 1023px) {
+  .queue { flex-wrap: wrap; gap: 2px 12px; padding: 10px 4px; }
+  .q-n { min-width: 3.2rem; }
+  .q-b { display: contents; }
+  .q-b strong { order: 2; flex: 1 1 0; }
+  .queue > .tag { order: 3; flex: 0 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .q-b .small { order: 4; flex: 1 0 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .queue .go { display: none; }
+  .queue > .btn { order: 5; flex: 1 0 100%; justify-content: flex-start; padding: 0; }
+}

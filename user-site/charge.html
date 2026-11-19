@@ -51,7 +51,8 @@
     <button data-set="cs:paycancel">결제 취소</button>
     <button data-set="cs:checking">결과 확인 중</button>
     <button data-set="cs:under19">충전 불가(만 19세 미만)</button>
-    <button data-set="cs:limit">한도 초과</button></div>
+    <button data-set="cs:limit">한도 초과</button>
+    <button data-set="cs:restricted">약관 미동의(제한)</button></div>
   <div class="group" data-show="view=charge cs=limit"><b>한도 종류</b>
     <button data-set="limit:once">1회</button><button data-set="limit:day">일</button><button data-set="limit:month">월</button></div>
   <div class="group" data-show="view=donate"><b>후원 상태</b>
@@ -85,6 +86,7 @@
   <div class="bal"><span>현재 잔액</span><strong>3,500 <span class="slot">S1 명칭</span></strong> <span class="muted small">(샘플)</span></div>
 
   <div class="notice" role="status" data-show="cs=under19"><strong><span class="slot">S1 명칭</span> 충전은 만 19세부터 할 수 있어요</strong><p>시청, 구독, 채팅, 댓글은 그대로 쓸 수 있어요. <span class="slot">법무 7-2 안내 문구</span></p><p style="margin-top:8px"><a class="btn" href="main.html">방송 보러 가기</a></p></div>
+  <div class="notice" role="status" data-show="cs=restricted"><strong>약관에 동의하면 충전할 수 있어요</strong><p class="small">동의 전에는 시청·탈퇴·내 정보 보기만 할 수 있어요. 충전·후원·채팅·댓글은 막혀요. <span class="slot">Q46</span></p><p style="margin-top:8px"><a class="btn primary" href="consent.html">약관 동의하기</a></p></div>
   <div class="notice danger" role="alert" data-show="cs=limit"><strong>충전 한도를 넘었어요</strong>
     <p data-show="cs=limit limit=once">한 번에 충전할 수 있는 한도는 <span class="slot">1회 한도 값</span>이에요. 더 적은 금액권을 골라 주세요.</p>
     <p data-show="cs=limit limit=day">오늘 충전할 수 있는 한도는 <span class="slot">일 한도 값</span>이에요. <span class="slot">다시 가능한 시점</span></p>
@@ -114,7 +116,7 @@
   <div class="notice" role="status" data-show="cs=paycancel"><strong>결제를 취소했어요</strong><p><span class="slot">S1 명칭</span>는 충전되지 않았어요.</p></div>
   <div class="notice" role="status" data-show="cs=checking"><strong>결제 결과를 확인하고 있어요</strong><p>잠시만 기다려 주세요. 이 화면을 닫아도 결과는 MY의 충전·후원 내역에서 확인할 수 있어요.</p></div>
 
-  <form id="f-charge" data-show="cs=normal|none|soldout|pricechg|paying|payfail|paycancel|checking|limit" onsubmit="return false" class="stack">
+  <form id="f-charge" data-show="cs=normal|none|soldout|pricechg|paying|payfail|paycancel|checking|limit|restricted" onsubmit="return false" class="stack">
     <fieldset>
       <legend>금액권 선택</legend>
       <div class="prods">
@@ -139,6 +141,8 @@
       <button class="btn primary block" id="pay" data-show="cs=normal|soldout|pricechg|payfail|paycancel|checking"><span class="slot">V1 가격</span>&nbsp;원 결제하기</button>
       <button class="btn block" disabled data-show="cs=none" aria-describedby="nopick">결제하기</button>
       <p class="help" id="nopick" data-show="cs=none">금액권을 선택해 주세요.</p>
+      <button class="btn block" disabled data-show="cs=restricted" aria-describedby="rs-c">결제하기</button>
+      <p class="help" id="rs-c" data-show="cs=restricted">약관에 동의한 뒤 충전할 수 있어요.</p>
       <button class="btn block" disabled data-show="cs=limit" aria-describedby="lim-c">결제하기</button>
       <p class="help" id="lim-c" data-show="cs=limit">충전 한도를 넘었어요.</p>
       <button class="btn block" disabled data-show="cs=paying">결제 진행 중</button>
@@ -222,6 +226,7 @@
     var r = document.querySelectorAll('input[name=prod]');
     if (b.dataset.cs === 'none') r.forEach(function (x) { x.checked = false; });
     else if (!document.querySelector('input[name=prod]:checked')) r[1].checked = true;
+    var fs = document.querySelector('#f-charge fieldset'); if (fs) fs.disabled = b.dataset.cs === 'restricted';
     b.dataset.sel = document.querySelector('input[name=prod]:checked') ? 'yes' : 'no';
     var amt = document.getElementById('amt');
     if (b.dataset.ds === 'belowmin') amt.setAttribute('aria-invalid', 'true'); else amt.removeAttribute('aria-invalid');

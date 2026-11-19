@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방송국 상세·조치 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-reports.css">
+<link rel="stylesheet" href="operator-members.css">
+<link rel="stylesheet" href="operator-stations.css">
+</head>
+<body data-default="role:op s:normal g:limited step:3 lim:multi appeal:none imp:some dlg:closed p:ok d:ok">
+<!-- 신고 건수만으로 자동 조치하지 않는다. 이력은 추가만(수정·삭제 없음). 정산 보류는 이 화면에서 하지 않는다. 정지·폐쇄·폐쇄 확정은 최고 관리자 단독(2인 확인은 슬롯).
+     g: active/limited/suspended/closing/closed · step: 폐쇄 진행 중인 단계 1~6(그 앞은 완료) · lim: 제한 항목 샘플 · appeal: none/sent/review/ok/no · imp: 영향 있음/없음
+     dlg: closed/impact/confirm/closeconfirm · p: 영향 불러오기 ok/loading/err · d: 저장 결과 ok/saveerr/conflict/already · (목업 전용) ?auto=1 이면 확인 대화상자에서 [기록]을 자동으로 누른다 -->
+<header id="site-header" data-active="stations" data-title="방송국"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:notfound">방송국 없음</button></div>
+  <div class="group"><b>방송국 상태</b><button data-set="g:active">정상</button><button data-set="g:limited">제한</button><button data-set="g:suspended">정지</button><button data-set="g:closing">폐쇄 예정</button><button data-set="g:closed">폐쇄</button></div>
+  <div class="group"><b>폐쇄 단계</b><button data-set="step:1">1</button><button data-set="step:2">2</button><button data-set="step:3">3</button><button data-set="step:4">4</button><button data-set="step:5">5</button><button data-set="step:6">6</button></div>
+  <div class="group"><b>제한 항목</b><button data-set="lim:none">없음</button><button data-set="lim:broadcast">방송</button><button data-set="lim:donate">후원</button><button data-set="lim:tts">TTS</button><button data-set="lim:upload">업로드</button><button data-set="lim:multi">여러 개</button></div>
+  <div class="group"><b>이의제기</b><button data-set="appeal:none">없음</button><button data-set="appeal:sent">접수</button><button data-set="appeal:review">심사 중</button><button data-set="appeal:ok">인용</button><button data-set="appeal:no">기각</button></div>
+  <div class="group"><b>영향</b><button data-set="imp:some">있음</button><button data-set="imp:zero">없음</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:impact">영향</button><button data-set="dlg:confirm">확인</button><button data-set="dlg:closeconfirm">폐쇄 확정</button></div>
+  <div class="group"><b>영향 불러오기</b><button data-set="p:ok">성공</button><button data-set="p:loading">로딩</button><button data-set="p:err">실패</button></div>
+  <div class="group"><b>저장 결과</b><button data-set="d:ok">성공</button><button data-set="d:saveerr">저장 실패</button><button data-set="d:conflict">다른 운영자 조치</button><button data-set="d:already">이미 같은 조치</button> <span class="help">확인 대화상자에서 [기록]을 누르면 보여요.</span></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <p><a href="stations.html">← 방송국 목록</a></p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:160px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>방송국 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=notfound"><p><strong>방송국을 찾을 수 없어요</strong></p><p><a class="btn" href="stations.html">목록으로</a></p></div>
+
+    <div class="stack" data-show="s=normal">
+      <div class="st-head"><h1 id="sname"></h1><span id="hd-tags"></span><span class="muted small">소유자 <a id="owner" href="member-detail.html"></a></span></div>
+      <p class="only-m"><a class="linkbtn" href="#frm">조치하기 ↓</a></p>
+      <p class="muted small">신고 건수만으로 자동 조치하지 않아요. 아래 신고·이의는 참고 정보이고 조치 근거가 아니에요.</p>
+
+      <div class="notice" id="note" role="status"></div>
+      <div class="notice" id="ap-note" role="status" hidden></div>
+      <p id="msg" tabindex="-1" class="notice" role="status" hidden></p>
+
+      <div class="rd">
+        <div class="stack">
+          <section class="panel" aria-labelledby="h-sc"><h2 id="h-sc">현재 적용 범위</h2>
+            <p class="help" id="sc-help"></p>
+            <ul class="plain scope" id="scope" style="margin-top:8px"></ul></section>
+
+          <section class="panel" aria-labelledby="h-im"><h2 id="h-im">진행 중 영향</h2>
+            <dl class="kv">
+              <dt>진행 중 라이브</dt><dd>샘플 N건</dd>
+              <dt>예약 방송</dt><dd>샘플 N건</dd>
+              <dt>공개 VOD</dt><dd>샘플 N건</dd>
+              <dt>구독자</dt><dd>샘플 N명</dd>
+              <dt>구성원</dt><dd>샘플 N명</dd>
+              <dt>미정산액</dt><dd>샘플 N <a class="small" href="settlements.html">정산 목록 ›</a></dd>
+              <dt>정산 보류</dt><dd>현재 보류 아님 (샘플) <span class="muted small">정산 보류는 <a href="settlements.html">정산 목록</a>의 정산 상세에서 따로 정해요</span></dd>
+            </dl></section>
+
+          <section class="panel" aria-labelledby="h-cl" data-show="g=closing|closed"><h2 id="h-cl">폐쇄 진행 체크리스트</h2>
+            <p class="help">단계는 순서대로만 완료 표시돼요. 앞 단계가 끝나지 않으면 다음 단계는 누를 수 없어요.</p>
+            <ol class="tl stp" id="stp" style="margin-top:8px"></ol></section>
+
+          <section aria-labelledby="h-mb"><h2 id="h-mb">구성원</h2>
+            <ul class="plain mb" style="margin-top:8px">
+              <li><a href="member-detail.html?n=가&amp;st=owner" class="mo">샘플 닉네임 가</a> <span class="tag host">소유자</span></li>
+              <li><a href="member-detail.html?n=나&amp;st=staff">샘플 닉네임 나</a> <span class="tag adm">관리자</span></li>
+              <li><a href="member-detail.html?n=다&amp;st=staff">샘플 닉네임 다</a> <span class="tag mgr">매니저</span></li>
+            </ul>
+            <p class="muted small">구성원 권한은 소유 목회자가 관리해요. 이 화면에서 바꾸지 않아요.</p></section>
+
+          <section aria-labelledby="h-rr"><h2 id="h-rr">최근 신고·이의 (참고)</h2>
+            <p class="muted small">참고 정보예요. 조치 근거가 아니에요.</p>
+            <ul class="plain files rel" style="margin-top:8px">
+              <li><span>접수일 샘플 날짜 1 · <span class="tag">외부 후원 유도</span><span class="tag wip">검토 중</span></span><a class="go" href="report-detail.html" aria-label="샘플 날짜 1 신고 상세">신고 상세 ›</a></li>
+              <li><span>접수일 샘플 날짜 2 · <span class="tag">욕설·비방</span><span class="tag ok">처리 완료</span></span><a class="go" href="report-detail.html?s=saved" aria-label="샘플 날짜 2 신고 상세">신고 상세 ›</a></li>
+              <li id="ap-li"><span>이의제기 샘플 날짜 · <span class="tag wait">접수</span></span><a class="go" href="appeal-detail.html" aria-label="이의제기 처리">이의제기 처리 ›</a></li>
+            </ul></section>
+
+          <section aria-labelledby="h-h"><h2 id="h-h">상태·조치 이력</h2>
+            <ol class="tl" id="tl" style="margin-top:8px"></ol>
+            <p class="muted small">이력은 고치거나 지울 수 없어요. 잘못된 조치는 해제나 정정 기록으로 남겨요. <span class="slot">이력·증거 보존기간</span></p></section>
+        </div>
+
+        <div class="stack">
+          <div class="panel" data-show="g=closed"><h2>조치</h2><p style="margin-top:8px">폐쇄된 방송국이에요. 이의제기가 인용되면 복구 체크리스트로만 풀 수 있어요. 지금은 정정 기록만 추가할 수 있어요.</p></div>
+          <form class="panel stack rd-form" id="frm" onsubmit="return false" aria-labelledby="h-f" novalidate>
+            <h2 id="h-f"><span data-show="g=closed">정정 기록</span><span data-show="g=active|limited|suspended|closing">조치</span></h2>
+            <fieldset class="radios" id="f-act" aria-describedby="f-act-e"><legend>조치 선택 <span class="muted">필수</span></legend>
+              <div class="opt" data-show="g=active|limited"><label><input type="radio" name="act" value="limit" id="o-limit"> 제한 설정·항목 변경</label><p class="help" id="w-limit" hidden></p></div>
+              <div class="opt" data-show="g=active|limited"><label><input type="radio" name="act" value="suspend" id="o-suspend" aria-describedby="w-suspend"> 정지</label><p class="help" id="w-suspend" hidden></p></div>
+              <div class="opt" data-show="g=active|limited|suspended"><label><input type="radio" name="act" value="closenotice" id="o-closenotice" aria-describedby="w-closenotice"> 폐쇄 예고</label><p class="help" id="w-closenotice" hidden></p></div>
+              <div class="opt" data-show="g=closing"><label><input type="radio" name="act" value="closestep" id="o-closestep" aria-describedby="w-closestep"> 폐쇄 진행 단계 완료</label><p class="help" id="w-closestep" hidden></p></div>
+              <div class="opt" data-show="g=closing"><label><input type="radio" name="act" value="closeconfirm" id="o-closeconfirm" aria-describedby="w-closeconfirm"> 폐쇄 확정</label><p class="help" id="w-closeconfirm" hidden></p></div>
+              <div class="opt" data-show="g=limited|suspended|closing"><label><input type="radio" name="act" value="release" id="o-release" aria-describedby="w-release"> <span id="rel-name">해제</span></label><p class="help" id="w-release" hidden></p></div>
+              <div class="opt"><label><input type="radio" name="act" value="fix" id="o-fix" aria-describedby="w-fix"> 정정 기록 추가</label><p class="help" id="w-fix">상태는 바뀌지 않아요</p></div>
+              <span class="err" id="f-act-e" hidden>조치를 선택해 주세요.</span></fieldset>
+            <p class="help" data-show="g=active|limited|suspended|closing">정산 보류는 이 화면에서 하지 않아요. 정산 보류는 정산 화면에서 따로 정해요. <a href="settlements.html">정산 목록 ›</a></p>
+
+            <fieldset class="radios xin" id="x-limit" hidden><legend>제한 항목 <span class="muted">필수, 1개 이상</span></legend>
+              <label class="check"><input type="checkbox" name="li" value="broadcast"> 신규 방송 시작</label>
+              <label class="check"><input type="checkbox" name="li" value="donate"> 후원 수령</label>
+              <label class="check"><input type="checkbox" name="li" value="tts"> TTS</label>
+              <label class="check"><input type="checkbox" name="li" value="upload"> 업로드</label>
+              <label class="check"><input type="checkbox" name="li" value="kill"> 진행 중 라이브 즉시 종료</label>
+              <p class="help"><span class="slot">추가 항목 후보(기획 확정 전)</span></p>
+              <span class="err" id="f-lim-e" hidden>제한할 항목을 1개 이상 골라 주세요.</span></fieldset>
+            <fieldset class="radios xin" id="x-susp" hidden><legend>진행 중 라이브</legend>
+              <label><input type="radio" name="live" value="now" checked> 즉시 종료</label>
+              <label><input type="radio" name="live" value="after"> 현재 방송 종료 후 적용</label></fieldset>
+            <label class="field xin" id="x-date" hidden><span class="label">폐쇄 예정일 <span class="muted">필수</span></span><input class="input" type="date" id="f-date" aria-describedby="f-date-e f-date-h"><span class="err" id="f-date-e" hidden>폐쇄 예정일을 골라 주세요.</span><span class="help" id="f-date-h" style="display:block">최소 고지 기간 <span class="slot">기간(법무 확인 전)</span></span></label>
+            <p class="help xin" id="x-step" hidden></p>
+
+            <label class="field"><span class="label">사유 <span class="muted">필수</span></span><textarea class="textarea" id="f-why" rows="4" aria-describedby="f-why-e f-why-h"></textarea><span class="err" id="f-why-e" hidden>사유를 입력해 주세요.</span><span class="help" id="f-why-h" style="display:block">소유자 안내 화면에 그대로 보여요. 신고자 등 제3자 정보는 적지 마세요.</span></label>
+
+            <div class="field" id="f-ev"><span class="label">증거 <span class="muted" id="ev-req">필수, 1개 이상</span></span>
+              <p class="help" style="margin:0 0 8px">형식 <span class="slot">형식</span>, 최대 <span class="slot">개수</span>개, 한 개당 <span class="slot">크기</span></p>
+              <label class="btn pick-file"><input class="sr" type="file" id="f-file" multiple aria-label="파일 선택, 증거 자료" aria-describedby="f-ev-e f-ev-h">파일 선택</label>
+              <span class="err" id="f-ev-e" style="display:block" hidden>증거를 1개 이상 첨부해 주세요.</span>
+              <p class="help" id="f-ev-h">(목업) 샘플 첨부 파일을 모두 삭제하면 증거 필수 오류를 볼 수 있어요. 조치와 관계없는 다른 사람의 얼굴, 연락처, 계좌번호, 주소가 보이면 가려서 올려 주세요. <span class="slot">보관 기간·열람 범위 안내 문구 법무 확인 전</span></p>
+              <ul class="plain files" id="f-files" aria-label="첨부한 증거">
+                <li data-ev="ok"><span>샘플 캡처 1.png <span class="muted small">샘플 크기</span> · 첨부됨</span><span class="f-acts"><button class="linkbtn" type="button" data-del aria-label="샘플 캡처 1.png 삭제">삭제</button></span></li>
+                <li data-ev="fail"><span>샘플 캡처 2.png <span class="muted small">샘플 크기</span> · <span class="err">올리지 못했어요</span></span><span class="f-acts"><button class="linkbtn" type="button" data-retry aria-label="샘플 캡처 2.png 다시 올리기">다시 시도</button><button class="linkbtn" type="button" data-del aria-label="샘플 캡처 2.png 삭제">삭제</button></span></li>
+              </ul>
+              <p class="sr" role="status" id="f-live"></p></div>
+
+            <fieldset class="radios"><legend>관련 신고 연결 <span class="muted">선택</span></legend>
+              <label class="check"><input type="checkbox" name="rel"> 샘플 날짜 1 · 외부 후원 유도</label>
+              <label class="check"><input type="checkbox" name="rel"> 샘플 날짜 2 · 욕설·비방</label></fieldset>
+
+            <div><span class="label">담당자</span><p class="ro">샘플 운영자 (로그인한 운영자)</p></div>
+            <div><span class="label">시각</span><p class="ro muted">저장 시 자동 기록</p></div>
+            <p class="help">위반 단계 참고: 단계표는 <span class="slot">위반 단계표</span>. 단계를 건너뛰면 사유에 이유를 적어 주세요. 단계는 자동으로 오르지 않아요.</p>
+            <button class="btn primary block" type="button" id="save">영향 보기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<dialog class="wide" id="dlg" aria-labelledby="d-t"><h2 id="d-t"></h2>
+  <div id="s-a">
+    <p class="muted small" style="margin-top:4px" id="a-sub"></p>
+    <section id="a-load" role="status" aria-busy="true" style="margin-top:12px" hidden><p class="muted">영향을 불러오는 중</p><div class="skeleton" style="height:120px"></div></section>
+    <div class="notice danger" id="a-err" role="alert" style="margin-top:12px" hidden><strong>영향 내용을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" id="a-retry">다시 불러오기</button></p></div>
+    <dl class="kv" id="a-kv"></dl>
+    <div class="dlg-acts"><button class="btn primary" type="button" id="a-next">다음</button><button class="btn" type="button" data-close id="a-cancel">취소</button></div>
+  </div>
+  <div id="s-b" hidden>
+    <dl class="kv" id="b-kv"></dl>
+    <label class="field" id="b-nm-w" style="margin-top:12px" hidden><span class="label">확인을 위해 방송국 이름을 그대로 입력해 주세요 <span class="muted">필수</span></span><input class="input" id="b-nm" autocomplete="off" aria-describedby="b-nm-e"><span class="err" id="b-nm-e" hidden>방송국 이름이 달라요.</span></label>
+    <label class="check" id="b-ck-w" style="margin-top:8px" hidden><input type="checkbox" id="b-ck"> 영향 내용을 확인했어요</label>
+    <p class="help" style="margin-top:8px"><span class="slot">소유자에게 알림과 이메일이 가요(필수 통지) · 법무 확인 전</span> <span class="slot" id="b-two">2인 확인 필요 여부</span></p>
+    <div class="notice danger" role="alert" id="b-err" style="margin-top:12px" hidden><strong>기록하지 못했어요</strong><p>입력한 내용은 그대로 두었어요. 잠시 뒤 다시 눌러 주세요.</p></div>
+    <div class="notice danger" role="alert" id="b-conf" style="margin-top:12px" hidden><strong>다른 운영자가 방금 이 방송국에 조치했어요</strong><p style="margin-top:8px"><button class="btn" type="button" id="b-reload">새로 불러오기</button></p></div>
+    <p class="help" id="b-why" hidden></p>
+    <div class="dlg-acts"><button class="btn danger" type="button" id="b-go" aria-describedby="b-why">기록</button><button class="btn" type="button" data-close id="b-cancel">취소</button></div>
+  </div>
+</dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); }, hist = [], curLim = [], P = null, lastSig = '';
+  var NAME = { active: '가', limited: '나', suspended: '다', closing: '라', closed: '마' }, OWN = { active: '가', limited: '나', suspended: '마', closing: '바', closed: '사' };
+  var STEPS = ['예고', '신규 활동 차단', '방송 종료', '폐쇄 정산·지급', 'VOD 보관', '폐쇄 확정'];
+  var LI = { broadcast: '신규 방송 시작', donate: '후원 수령', tts: 'TTS', upload: '업로드', kill: '진행 중 라이브 즉시 종료' };
+  var LIMS = { none: [], broadcast: ['broadcast'], donate: ['donate'], tts: ['tts'], upload: ['upload'], multi: ['broadcast', 'donate'] };
+  var A = { limit: '제한 설정·항목 변경', suspend: '정지', closenotice: '폐쇄 예고', closestep: '폐쇄 진행 단계 완료', closeconfirm: '폐쇄 확정', release: '해제', fix: '정정 기록 추가' };
+  var TAG = { active: ['ok', '정상'], limited: ['wait', '제한'], suspended: ['bad', '정지'], closed: ['off', '폐쇄'] };
+  var HS = { // 이력 샘플(최근 것이 위)
+    rel: { k: '제한 해제', who: '샘플 운영자', ev: 1, rel: 0 }, lim: { k: '제한 설정', who: '샘플 운영자2', ev: 2, x: '제한 항목: 신규 방송 시작·후원 수령', rel: 1 },
+    sus: { k: '정지', who: '샘플 운영자(최고 관리자)', ev: 2, x: '진행 중 라이브: 즉시 종료', rel: 2 }, not: { k: '폐쇄 예고', who: '샘플 운영자(최고 관리자)', ev: 2, x: '폐쇄 예정일 샘플 날짜', rel: 2 },
+    stp: { k: '폐쇄 진행 단계 완료', who: '샘플 운영자(최고 관리자)', ev: 1, x: '앞 단계 완료 기록', rel: 0 }, cls: { k: '폐쇄 확정', who: '샘플 운영자(최고 관리자)', ev: 2, rel: 2 }, fix: { k: '정정 기록', who: '샘플 운영자', ev: 1, rel: 0 }
+  };
+  var HG = { active: ['rel', 'lim'], limited: ['lim'], suspended: ['sus', 'lim'], closing: ['stp', 'not', 'sus'], closed: ['cls', 'stp', 'not'] };
+  function g() { return b.dataset.g || 'limited'; }
+  function sup() { return b.dataset.role === 'super'; }
+  function step() { return g() === 'closed' ? 7 : +b.dataset.step || 3; }
+  function sname() { return '샘플 방송국 ' + NAME[g()]; }
+  function lims() {
+    var k = b.dataset.lim;
+    if (g() === 'suspended' || g() === 'closed') return ['broadcast', 'donate', 'tts', 'upload'];
+    if (g() === 'closing') return step() >= 2 ? ['broadcast', 'donate', 'tts', 'upload'] : [];
+    if (g() !== 'limited') return [];
+    return k === 'rec' ? curLim : (LIMS[k] || []);
+  }
+  function act() { var r = document.querySelector('input[name=act]:checked'); return r ? r.value : ''; }
+  function actName(a) { return a === 'release' ? ({ limited: '제한 해제', suspended: '정지 해제', closing: '폐쇄 예고 해제' }[g()] || '해제') : A[a]; }
+  function evN() { return document.querySelectorAll('#f-files [data-ev=ok]').length; }
+  function say(t) { $('f-live').textContent = t; }
+  function appPend() { return b.dataset.appeal === 'sent' || b.dataset.appeal === 'review'; }
+
+  function setOpt(k, dis, why, hint) {
+    var i = $('o-' + k), h = $('w-' + k); i.disabled = dis; i.closest('label').classList.toggle('off', dis);
+    h.innerHTML = dis ? why : (hint || ''); h.hidden = !(dis || hint);
+    if (dis && i.checked) i.checked = false;
+  }
+  function hrow(h) {
+    return '<li><strong>' + h.k + '</strong> · ' + h.who + ' · ' + (h.t || '샘플 시각') + (h.tag || '') + '<br>사유: ' + (h.r || '샘플 사유') + ' · 증거 ' + h.ev + '건' + (h.x ? ' · ' + h.x : '') +
+      ' · 연결 신고 ' + (h.rel ? '샘플 ' + h.rel + '건' : '없음') + ' · 소유자 통지 ' + (h.n || '됨') + ' <span class="slot">통지 범위</span></li>';
+  }
+  function buildAll() {
+    var G = g(), S = step(), L = lims(), sp = sup(), key = b.dataset.lim;
+    // 머리
+    $('sname').textContent = sname();
+    $('hd-tags').innerHTML = G === 'closing' ? '<span class="tag wait">폐쇄 예정 샘플 날짜</span>' : '<span class="tag ' + TAG[G][0] + '">' + TAG[G][1] + '</span>';
+    $('owner').textContent = '샘플 닉네임 ' + OWN[G]; $('owner').setAttribute('href', 'member-detail.html?n=' + OWN[G] + '&st=owner&role=' + b.dataset.role);
+    // 안내
+    var N = { active: ['지금 적용 중인 조치가 없어요', '정상 운영 중이에요. 조치는 오른쪽 폼에서 기록해요.'], limited: ['제한 중이에요', '제한 항목은 아래 "현재 적용 범위"에 있어요. 종료 샘플 시각'],
+      suspended: ['정지 중이에요', '새 방송·후원 수령·업로드가 막혀 있어요. 해제는 최고 관리자만 할 수 있어요.'], closing: ['폐쇄 진행 중이에요 (' + Math.min(S, 6) + '/6단계)', '예정일 샘플 날짜 · 다음 단계: ' + STEPS[Math.min(S, 6) - 1] + '. 폐쇄 확정은 5단계까지 끝낸 뒤에 해요.'],
+      closed: ['폐쇄된 방송국이에요', '이력만 볼 수 있어요. 정정 기록만 추가할 수 있어요.'] }[G];
+    $('note').innerHTML = '<strong>' + N[0] + '</strong><p>' + N[1] + '</p>';
+    var ap = b.dataset.appeal, an = { sent: '이의제기가 접수됐어요', review: '이의제기를 심사 중이에요', ok: '이의제기가 받아들여졌어요', no: '이의제기가 받아들여지지 않았어요' }[ap];
+    $('ap-note').hidden = !an; $('ap-li').hidden = ap === 'none';
+    if (an) $('ap-note').innerHTML = '<strong>' + an + '</strong><p>' + (ap === 'sent' || ap === 'review' ? '해제는 이의제기 화면에서 해요. ' : ap === 'ok' ? '조치를 푸는 일은 이의제기 화면에서 이어져요. ' : '') + '<a href="appeal-detail.html?role=' + b.dataset.role + '">이의제기 상세로</a></p>';
+    // 범위
+    var fixed = G === 'suspended' || G === 'closed';
+    $('sc-help').textContent = fixed ? (G === 'suspended' ? '정지 중에는 아래로 고정돼요. 항목별로 바꿀 수 없어요.' : '폐쇄된 방송국이에요. 아래로 고정돼요.') : G === 'closing' ? '폐쇄 진행에 따라 적용돼요. 항목별로 바꿀 수 없어요.' : G === 'active' ? '제한 항목이 없어요.' : '';
+    var h = ['broadcast', 'donate', 'tts', 'upload'].map(function (k) {
+      var on = L.indexOf(k) > -1; return '<li><span>' + LI[k] + '</span><span class="tag ' + (on ? 'wait' : 'off') + '">' + (on ? '제한 중' : '허용') + '</span></li>';
+    }).join('');
+    if (fixed) h += '<li><span>소유자 로그인·제재 안내 열람 · 이의제기 제출 <span class="slot">정지·폐쇄 중 허용 범위(기획 확정 전)</span></span><span class="tag off">허용</span></li>';
+    $('scope').innerHTML = h;
+    // 체크리스트
+    $('stp').innerHTML = STEPS.map(function (nm, i) {
+      var n = i + 1, st = n < S ? 'ok' : n === S ? 'wip' : 'wait', lab = { ok: '완료', wip: '진행 중', wait: '대기' }[st], bt = '', why = '';
+      if (st !== 'ok') {
+        var dis = !sp || st === 'wait', msg = !sp ? '최고 관리자만 할 수 있어요' : st === 'wait' ? '앞 단계를 먼저 끝내야 해요' : '';
+        bt = '<button class="linkbtn" type="button" data-stp="' + n + '"' + (dis ? ' disabled aria-describedby="sw' + n + '"' : '') + '>' + (n === 6 ? '폐쇄 확정으로 이동' : '이 단계 완료로 기록') + '</button>';
+        if (msg) why = '<p class="help" id="sw' + n + '">' + msg + '</p>';
+      }
+      return '<li><span class="stp-b"><span class="tag ' + st + '">' + lab + '</span> <strong>' + n + '. ' + nm + '</strong>' + why + '</span>' + bt + '</li>';
+    }).join('');
+    // 이력
+    $('tl').innerHTML = hist.map(hrow).join('') + HG[G].map(function (k) {
+      var x = Object.assign({}, HS[k]);
+      if (ap !== 'none' && k === HG[G][0] && G !== 'active') x.tag = ' <span class="tag wait">이의제기</span>';
+      return hrow(x);
+    }).join('');
+    // 조치 선택
+    $('rel-name').textContent = actName('release');
+    var hint = '최고 관리자 단독 결정이에요 · 감사 로그에 남아요 · <span class="slot">2인 확인 필요 여부</span>';
+    setOpt('limit', false, '');
+    setOpt('suspend', !sp, '최고 관리자만 할 수 있어요', sp ? hint : '');
+    setOpt('closenotice', !sp, '최고 관리자만 할 수 있어요', sp ? hint : '');
+    setOpt('closestep', !sp || S >= 6, !sp ? '최고 관리자만 할 수 있어요' : '마지막 단계는 "폐쇄 확정"으로 해요');
+    setOpt('closeconfirm', !sp || S < 6, !sp ? '최고 관리자만 할 수 있어요' : '5단계(VOD 보관)까지 끝낸 뒤에 할 수 있어요', sp ? hint : '');
+    var rdis = appPend() || ((G === 'suspended' || G === 'closing') && !sp);
+    setOpt('release', rdis, appPend() ? '이 조치는 이의제기 심사 중이에요. 해제는 이의제기 화면에서 해요. <a href="appeal-detail.html?role=' + b.dataset.role + '">이의제기 화면으로</a>' : '최고 관리자만 할 수 있어요');
+    document.querySelectorAll('input[name=act]').forEach(function (x) { if (x.checked && x.closest('[hidden]')) x.checked = false; });
+    sync();
+    if (lastSig !== G + key) preLim(L);
+    lastSig = G + key;
+    // 대화상자 상태 키
+    var dl = b.dataset.dlg, d = $('dlg');
+    if (dl !== 'closed' && !d.open) {
+      if (dl === 'closeconfirm' && !(G === 'closing' && S === 6)) { b.dataset.g = 'closing'; b.dataset.step = '6'; return window.mockRender(); }
+      P = P || sample(); openDlg(dl === 'impact' ? 'a' : 'b');
+      if (b.dataset.auto && dl !== 'impact') setTimeout(function () { $('b-ck').checked = true; $('b-nm').value = sname(); gate(); $('b-go').click(); });
+    } else if (dl === 'closed' && d.open) d.close();
+  }
+  function preLim(L) { document.querySelectorAll('input[name=li]').forEach(function (x) { x.checked = L.indexOf(x.value) > -1; }); }
+  function sync() {
+    var a = act(); $('x-limit').hidden = a !== 'limit'; $('x-susp').hidden = a !== 'suspend'; $('x-date').hidden = a !== 'closenotice';
+    $('x-step').hidden = a !== 'closestep'; if (a === 'closestep') $('x-step').textContent = step() + '단계 "' + STEPS[step() - 1] + '" 완료로 기록해요.';
+    $('ev-req').textContent = a === 'release' ? '선택' : '필수, 1개 이상';
+    $('f-ev-e').hidden = $('f-ev-e').hidden || a === 'release';
+  }
+  $('f-act').addEventListener('change', sync);
+  window.mockAfter = buildAll;
+
+  // 증거 첨부(샘플): member-detail.html 과 같은 동작
+  function row(name) {
+    var li = document.createElement('li'); li.dataset.ev = 'ok';
+    li.innerHTML = '<span><span class="fn"></span> <span class="muted small">샘플 크기</span> · 첨부됨</span><span class="f-acts"><button class="linkbtn" type="button" data-del>삭제</button></span>';
+    li.querySelector('.fn').textContent = name; li.querySelector('[data-del]').setAttribute('aria-label', name + ' 삭제');
+    return li;
+  }
+  $('f-file').addEventListener('change', function () {
+    [].forEach.call(this.files, function (f) { $('f-files').appendChild(row(f.name)); say(f.name + ' 올렸어요'); });
+    this.value = '';
+  });
+  $('f-files').addEventListener('click', function (e) {
+    var li = e.target.closest('li'), name = li && li.firstElementChild.firstChild.textContent.trim();
+    if (e.target.closest('[data-retry]')) { var n = row(name); li.replaceWith(n); n.querySelector('[data-del]').focus(); say(name + ' 올렸어요'); }
+    else if (e.target.closest('[data-del]')) {
+      var nx = li.nextElementSibling || li.previousElementSibling; li.remove();
+      (nx ? nx.querySelector('[data-del]') : $('f-file')).focus(); say(name + ' 삭제했어요');
+    }
+  });
+  // 체크리스트 버튼: 해당 조치를 골라 폼으로 이동(기록은 폼에서)
+  $('stp').addEventListener('click', function (e) {
+    var t = e.target.closest('[data-stp]'); if (!t) return;
+    var r = $(+t.dataset.stp === 6 ? 'o-closeconfirm' : 'o-closestep'); if (r.disabled) return;
+    r.checked = true; sync(); r.focus(); $('frm').scrollIntoView({ block: 'start' });
+  });
+
+  // ---- 검증 → 대화상자 A(영향) → B(확인) ----
+  function itemsSel() { return [].map.call(document.querySelectorAll('input[name=li]:checked'), function (x) { return x.value; }); }
+  $('save').addEventListener('click', function () {
+    var a = act(), bad = [
+      ['f-act', !a, function () { return document.querySelector('.opt:not([hidden]) input:not(:disabled)') || $('save'); }],
+      ['f-lim', a === 'limit' && !itemsSel().length, function () { return document.querySelector('input[name=li]'); }],
+      ['f-date', a === 'closenotice' && !$('f-date').value, function () { return $('f-date'); }],
+      ['f-why', !$('f-why').value.trim(), function () { return $('f-why'); }],
+      ['f-ev', a !== 'release' && !evN(), function () { return $('f-file'); }]], first = null;
+    bad.forEach(function (x) {
+      $(x[0] + '-e').hidden = !x[1];
+      var el = x[0] === 'f-act' ? $('f-act') : x[2]();
+      if (x[0] === 'f-lim') el = $('x-limit');
+      if (x[1]) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+      if (x[1] && !first) first = x[2]();
+    });
+    if (first) { first.focus(); return; }
+    P = { act: a, items: itemsSel(), date: $('f-date').value || '샘플 날짜', live: (document.querySelector('input[name=live]:checked') || {}).value, reason: $('f-why').value.trim(), ev: evN(), rel: document.querySelectorAll('input[name=rel]:checked').length };
+    $('dlg')._opener = this; b.dataset.dlg = 'impact'; openDlg('a');
+  });
+  function sample() {
+    var G = g(), sp = sup(), a = { active: 'limit', limited: 'limit', suspended: sp ? 'release' : 'fix', closing: sp ? (step() >= 6 ? 'closeconfirm' : 'closestep') : 'fix', closed: 'fix' }[G];
+    if (b.dataset.dlg === 'closeconfirm') a = 'closeconfirm';
+    return { act: a, items: ['broadcast', 'donate'], date: '샘플 날짜', live: 'now', reason: '샘플 사유입니다. 소유자 안내 화면에 그대로 보이는 문구의 예시예요.', ev: 2, rel: 1 };
+  }
+  function lines() {
+    var z = b.dataset.imp === 'zero', n = z ? '샘플 0' : '샘플 N', a = P.act, o = [];
+    var full = [['진행 중 라이브', n + '건'], ['예약 방송', n + '건'], ['공개 VOD', n + '건'], ['구독자', n + '명'], ['구성원', n + '명'], ['미정산액', n]];
+    var settle = ['정산 보류', '현재 보류 아님 (샘플) · 이 조치로 자동 보류되지 않아요'];
+    if (a === 'limit') {
+      var M = { broadcast: ['신규 방송 시작 제한', '예약 방송 ' + n + '건은 예정 시각에 시작할 수 없어요'], donate: ['후원 수령 제한', '진행 중 라이브 ' + n + '건에서 후원을 받을 수 없어요'], tts: ['TTS 제한', '진행 중 라이브 ' + n + '건에서 TTS가 꺼져요'],
+        upload: ['업로드 제한', '새 업로드를 시작할 수 없어요. 공개 VOD ' + n + '건은 그대로예요'], kill: ['진행 중 라이브 즉시 종료', '진행 중 라이브 ' + n + '건이 바로 종료돼요'] };
+      o = P.items.map(function (k) { return M[k]; }).concat([settle]);
+    } else if (a === 'suspend') o = [['진행 중 라이브 처리', P.live === 'after' ? '현재 방송이 끝난 뒤 적용돼요' : '바로 종료돼요']].concat(full, [settle]);
+    else if (a === 'closenotice') o = [['폐쇄 예정일', P.date]].concat(full, [settle]);
+    else if (a === 'closestep') o = [['완료할 단계', step() + '단계 ' + STEPS[Math.min(step(), 6) - 1]]].concat(full, [settle]);
+    else if (a === 'closeconfirm') o = [['폐쇄 후', '되돌릴 수 없어요. 이의제기가 인용되면 복구 체크리스트로만 풀 수 있어요']].concat(full, [settle]);
+    else if (a === 'release') {
+      var nm = { limited: lims().map(function (k) { return LI[k]; }).join('·') || '제한 항목', suspended: '방송·후원·업로드', closing: '폐쇄 예정' }[g()];
+      o = [['복원되는 것', nm + (g() === 'closing' ? '이 취소되고 예정일이 사라져요' : '이 다시 허용돼요')],
+        ['복원되지 않는 것', '취소된 예약 방송은 자동 복원되지 않아요. 소유자에게 재예약 안내가 가요. 이미 종료된 라이브도 다시 시작되지 않아요'], settle];
+    } else o = [['상태 변화', '상태는 바뀌지 않고 이력에 정정 기록만 추가돼요']];
+    return o;
+  }
+  function kv(rows) { return rows.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join(''); }
+  function openDlg(which) {
+    var d = $('dlg'), a = P.act, ps = b.dataset.p;
+    $('s-a').hidden = which !== 'a'; $('s-b').hidden = which !== 'b';
+    if (which === 'a') {
+      $('d-t').textContent = '이 조치가 미치는 영향'; $('a-sub').textContent = sname() + ' · ' + actName(a);
+      $('a-load').hidden = ps !== 'loading'; $('a-err').hidden = ps !== 'err'; $('a-kv').hidden = ps !== 'ok';
+      $('a-kv').innerHTML = ps === 'ok' ? kv(lines()) : ''; $('a-next').disabled = ps !== 'ok';
+    } else {
+      $('d-t').textContent = a === 'closeconfirm' ? '방송국을 폐쇄할까요?' : '이 조치를 기록할까요?';
+      $('b-kv').innerHTML = kv([['방송국', sname()], ['조치', actName(a)]].concat(a === 'limit' ? [['제한 항목', P.items.map(function (k) { return LI[k]; }).join('·')]] : [], a === 'closenotice' ? [['폐쇄 예정일', P.date]] : [],
+        [['담당자', '샘플 운영자 (자동 기록)'], ['시각', '기록하는 순간 자동으로 남아요'], ['사유', P.reason.slice(0, 40) + (P.reason.length > 40 ? '…' : '')], ['증거', P.ev + '건']]));
+      $('b-nm-w').hidden = a !== 'closeconfirm'; $('b-ck-w').hidden = !(a === 'suspend' || a === 'closenotice'); $('b-two').hidden = !(a === 'closeconfirm' || a === 'suspend');
+      $('b-nm').value = ''; $('b-nm').removeAttribute('aria-invalid'); $('b-nm-e').hidden = true; $('b-ck').checked = false;
+      $('b-err').hidden = $('b-conf').hidden = true; $('b-go').textContent = '기록'; gate();
+    }
+    if (!d.open) d.showModal();
+    ($(which === 'a' ? 'a-cancel' : 'b-cancel')).focus();
+  }
+  function gate() {
+    var a = P.act, ok = true, why = '';
+    if (a === 'closeconfirm' && $('b-nm').value !== sname()) { ok = false; why = '방송국 이름을 입력하면 눌러 볼 수 있어요'; }
+    if ((a === 'suspend' || a === 'closenotice') && !$('b-ck').checked) { ok = false; why = '영향 내용을 확인하면 눌러 볼 수 있어요'; }
+    $('b-go').disabled = !ok; $('b-why').hidden = ok; $('b-why').textContent = why;
+  }
+  $('b-nm').addEventListener('input', function () {
+    var bad = this.value && this.value !== sname(); $('b-nm-e').hidden = !bad;
+    if (bad) this.setAttribute('aria-invalid', 'true'); else this.removeAttribute('aria-invalid');
+    gate();
+  });
+  $('b-ck').addEventListener('change', gate);
+  $('a-next').addEventListener('click', function () { b.dataset.dlg = P.act === 'closeconfirm' ? 'closeconfirm' : 'confirm'; openDlg('b'); });
+  $('a-retry').addEventListener('click', function () { b.dataset.p = 'ok'; openDlg('a'); $('a-next').focus(); });
+  function done(text) {
+    b.dataset.dlg = 'closed'; $('dlg').close(); window.mockRender();
+    var m = $('msg'); m.hidden = false; m.textContent = text; m.focus();
+  }
+  $('b-go').addEventListener('click', function () {
+    var btn = this; btn.disabled = true; btn.textContent = '저장 중…'; $('b-err').hidden = true;
+    var d = b.dataset.d;
+    if (d === 'saveerr') { btn.disabled = false; btn.textContent = '기록'; $('b-err').hidden = false; return; }
+    if (d === 'conflict') { btn.textContent = '기록'; $('b-conf').hidden = false; $('b-why').hidden = false; $('b-why').textContent = '최신 상태를 확인한 뒤 다시 저장해 주세요'; $('b-reload').focus(); return; }
+    if (d === 'already') { done('이미 같은 조치가 적용돼 있어요'); return; }
+    var a = P.act, G = g(), S = step(), x = '', k = actName(a);
+    if (a === 'limit') { curLim = P.items.filter(function (i) { return i !== 'kill'; }); b.dataset.lim = 'rec'; b.dataset.g = 'limited'; x = '제한 항목: ' + P.items.map(function (i) { return LI[i]; }).join('·'); }
+    else if (a === 'suspend') { b.dataset.g = 'suspended'; x = '진행 중 라이브: ' + (P.live === 'after' ? '현재 방송 종료 후 적용' : '즉시 종료'); }
+    else if (a === 'closenotice') { b.dataset.g = 'closing'; b.dataset.step = '2'; x = '폐쇄 예정일 ' + P.date; }
+    else if (a === 'closestep') { b.dataset.step = String(Math.min(S + 1, 6)); x = S + '단계 ' + STEPS[S - 1] + ' 완료'; }
+    else if (a === 'closeconfirm') { b.dataset.g = 'closed'; }
+    else if (a === 'release') { b.dataset.g = 'active'; b.dataset.lim = 'none'; }
+    hist.unshift({ k: a === 'fix' ? '정정 기록' : k, who: '샘플 운영자', t: '방금', r: P.reason.slice(0, 40), ev: P.ev, x: x, rel: P.rel, n: '됨' });
+    $('f-why').value = ''; $('f-date').value = ''; document.querySelectorAll('input[name=act]:checked,input[name=rel]:checked').forEach(function (i) { i.checked = false; });
+    lastSig = '';
+    done('조치를 기록했어요: ' + sname() + ' · ' + k);
+  });
+  $('b-reload').addEventListener('click', function () { b.dataset.d = 'ok'; done('최신 상태를 불러왔어요. 입력한 내용은 그대로 두었어요.'); });
+  // Esc 로 닫아도 연 버튼으로 포커스 복귀(저장 성공은 done()이 #msg 로 옮긴다)
+  $('dlg').addEventListener('cancel', function () { var o = this._opener; if (o) setTimeout(function () { o.focus(); }); });
+  $('dlg').addEventListener('close', function () { b.dataset.dlg = 'closed'; window.mockRender(); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

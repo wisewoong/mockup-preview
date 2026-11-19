@@ -31,6 +31,8 @@
     star: S(P('M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z')),
     mail: S('<rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/>' + P('M4 7l8 6 8-6')),
     external: S(P('M14 4h6v6M20 4l-9 9M18 14v5H5V6h5')),
+    more: S('<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>'),
+    doc: S(P('M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h5M9.5 16h5')),
     help: S('<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2.2"/>' + P('M9.5 9.5a2.5 2.5 0 114 2c-1 .7-1.5 1.2-1.5 2.3M12 17v.2')),
     ttsmute: S(P(spk + 'M17 9.5a4 4 0 010 5'), 'i-off') + S(P(spk + 'M16 9.5l5 5M21 9.5l-5 5'), 'i-on')
   };
@@ -70,7 +72,7 @@
     });
     h += '<h3 id="dg9">다른 사이트</h3><ul aria-labelledby="dg9"><li><a href="../pastor-site/index.html" target="_blank" rel="noopener" data-dr-ext><span data-icon="external" data-keep></span><span class="t">목회자 사이트로 가기<span class="sr"> (새 창)</span></span></a>' +
       '<p class="sub"><span class="slot">목회자 사이트 주소 [배포 주소 확정 전]</span></p><p class="sub">목회자 사이트는 로그인을 따로 해요.</p></li></ul>' +
-      '<ul class="dr-bottom"><li><div class="rowst"><span data-icon="help" data-keep></span><span class="t">도움말·약관</span></div><p class="sub"><span class="slot">화면 미작성 · 약관 문구 [법무 확인 후]</span></p></li></ul></div>';
+      '<ul class="dr-bottom"><li><a href="help.html" data-to="help.html"><span data-icon="help" data-keep></span><span class="t">도움말·공지</span></a></li><li><a href="terms.html" data-to="terms.html"><span data-icon="doc" data-keep></span><span class="t">약관·정책</span></a></li></ul></div>';
     d.innerHTML = h; document.body.appendChild(d);
     if (window.mockIcons) window.mockIcons(d);
     // 아이콘 span은 글자 없이 아이콘만 쓰므로 접근성 이름 제거(옆 글자가 이름)
@@ -100,12 +102,25 @@
     if (!drawer) return;
     var g = isGuest();
     drawer.querySelector('.dr-login').hidden = !g;
+    drawer.querySelectorAll('.dr-bottom a').forEach(function (a) { if (a.dataset.to === FILE) a.setAttribute('aria-current', 'page'); });
     drawer.querySelectorAll('[data-dr-need]').forEach(function (a) {
       var to = a.dataset.to; a.href = g ? 'login.html?next=' + encodeURIComponent(to) : to;
       a.querySelector('[data-dr-hint]').hidden = !g;
       if (to === FILE) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     drawer.querySelector('[data-dr-login]').href = FILE === 'login.html' ? 'login.html' : 'login.html?next=' + encodeURIComponent(FILE);
+  }
+  // 약관 개정 예고 배너(상태 n=upcoming에서만): 헤더 아래 한 줄, 닫으면 이 탭 세션 동안 숨김. 약관·동의·로그인 화면에는 띄우지 않는다.
+  function revBar() {
+    var o = document.getElementById('revbar'), gone = false;
+    try { gone = sessionStorage.getItem('mw.rev.x') === '1'; } catch (e) {}
+    var on = H && b.dataset.n === 'upcoming' && !gone && ['terms.html', 'consent.html', 'login.html'].indexOf(FILE) < 0;
+    if (!on) { if (o) o.remove(); return; }
+    if (o) return;
+    o = document.createElement('div'); o.id = 'revbar'; o.className = 'notice revbar'; o.setAttribute('role', 'status');
+    o.innerHTML = '<div class="wrap"><p class="small">약관이 곧 바뀌어요. 시행일 <span class="slot">날짜</span> <a href="terms.html?k=terms&v=new">자세히 보기</a></p><button class="btn ib" type="button" data-icon="x" data-label="개정 안내 닫기" data-revx>닫기</button></div>';
+    H.insertAdjacentElement('afterend', o); if (window.mockIcons) window.mockIcons(o);
+    o.querySelector('[data-revx]').addEventListener('click', function () { try { sessionStorage.setItem('mw.rev.x', '1'); } catch (e) {} o.remove(); });
   }
   function isGuest() { return ['state', 'auth', 's'].some(function (k) { return b.dataset[k] === 'guest'; }); }
   if (H) {
@@ -139,7 +154,7 @@
     var lb = document.querySelector('.loginbtn'), ab = document.querySelector('.actbtn');
     if (lb) { lb.hidden = !guest; lb.href = lg; }
     if (ab) ab.hidden = guest;
-    drawerPaint();
+    drawerPaint(); revBar();
     var bell = document.querySelector('.bellbtn');
     if (bell) {
       bell.hidden = guest;
@@ -237,30 +252,37 @@ document.addEventListener('click', function (e) {
   });
 })();
 
-// 신고 접수 대화상자(목업): [data-report="대상 문구"] 버튼이 <dialog>를 연다. 상태는 body data-rp = ok|sending|done|dup|nokind|fail|gone|guest (쿼리 ?rp=). 채팅·댓글 메시지 메뉴의 신고 진입은 해당 메뉴가 목업에 없어 연결하지 않았다.
+// 신고 접수 대화상자(목업): [data-report="대상 문구"] 버튼 또는 채팅 ⋯ 메뉴([data-msg-menu])의 '신고'가 <dialog>를 연다. 상태는 body data-rp = ok|sending|done|dup|nokind|fail|gone|guest|limited (쿼리 ?rp=). 비회원 채팅(chat=guest)은 항상 guest.
 (function () {
-  var dlg, opener, R = ['외부 후원 유도(계좌·연락처·링크)', '저작권 침해', '사칭', '욕설·혐오·괴롭힘', '허위 정보', '기타'];
+  var dlg, mdlg, opener, forced, going;
+  var R = ['외부 후원 유도(계좌·연락처·링크)', '저작권 침해', '사칭', '욕설·혐오·괴롭힘', '허위 정보', '기타'];
+  var RD = ['외부 후원 유도(계좌·연락처·링크)', '사칭', '욕설·혐오·괴롭힘', '기타']; // 후원 메시지: 저작권·스팸·도배 뺌, TTS 별도 항목 없음. 전체가 사용자 결정 전
+  var RC = ['외부 후원 유도(계좌·연락처·링크)', '사칭', '욕설·혐오·괴롭힘', '스팸·도배', '기타']; // 채팅 기본안: 저작권 침해 뺌. 목록 전체가 사용자 결정 전
   function q(i) { return dlg.querySelector(i); }
+  function back(b) { var t = b && b.isConnected && b.offsetParent ? b : document.getElementById('h-chat'); if (t) t.focus(); }
+  function backdrop(d) { d.addEventListener('click', function (e) { if (e.target !== d) return; var r = d.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close(); }); }
   function build() {
-    dlg = document.createElement('dialog'); dlg.setAttribute('aria-labelledby', 'rp-t');
-    dlg.innerHTML = '<h2 id="rp-t" tabindex="-1">신고하기</h2><p class="muted small" id="rp-m" style="margin-top:4px"></p>' +
+    dlg = document.createElement('dialog'); dlg.className = 'sheet'; dlg.setAttribute('aria-labelledby', 'rp-t');
+    dlg.innerHTML = '<h2 id="rp-t" tabindex="-1">신고하기</h2><div class="muted small" id="rp-m" style="margin-top:4px"></div>' +
       '<div id="rp-res" role="status"></div>' +
       '<form id="rp-f" onsubmit="return false"><fieldset style="border:0;padding:0;margin:12px 0 0" aria-describedby="rp-e"><legend style="font-weight:700;color:var(--strong)">신고 사유 <span class="slot">사유 목록 사용자 결정 전</span></legend>' +
-      R.map(function (r, i) { return '<label class="check"><input type="radio" name="rpk" value="' + i + '"><span>' + r + '</span></label>'; }).join('') +
-      '<p class="err" id="rp-e" hidden>신고 사유를 선택해 주세요.</p></fieldset>' +
+      '<div id="rp-rs"></div><p class="err" id="rp-e" hidden>신고 사유를 선택해 주세요.</p></fieldset>' +
       '<div class="field" id="rp-o" hidden style="margin-top:8px"><label class="label" for="rp-x">자세한 내용</label><textarea class="textarea" id="rp-x" aria-describedby="rp-xh"></textarea><p class="help" id="rp-xh">계좌번호 등 개인정보는 쓰지 마세요.</p></div>' +
-      '<div class="field" id="ev" style="margin-top:12px"><span class="label" id="ev-l">증빙 자료 (선택)</span>' +
+      '<div id="rp-chat" hidden style="margin-top:12px"><p class="help" id="rp-ch"></p><p class="help">신고한 메시지와 신고 내용의 보관 기간: <span class="slot">보존 기간</span></p></div>' +
+      '<div class="field" id="ev" style="margin-top:12px"><span class="label" id="ev-l">내가 올린 증빙 (선택)</span>' +
       '<p class="help">화면 캡처 등 신고 내용을 보여 주는 파일이에요. 형식 <span class="slot">형식</span>, 최대 <span class="slot">개수</span>개, 한 개당 <span class="slot">크기</span></p>' +
-      '<label class="btn block ev-pick" id="ev-pick" style="margin-top:8px">파일 선택<input class="sr" type="file" multiple id="ev-in" aria-label="파일 선택, 증빙 자료"></label>' +
+      '<label class="btn block ev-pick" id="ev-pick" style="margin-top:8px">파일 선택<input class="sr" type="file" multiple id="ev-in" aria-label="파일 선택, 내가 올린 증빙"></label>' +
       '<p class="help" id="ev-full" hidden>더 올릴 수 없어요(<span class="slot">개수</span>개). 삭제한 뒤 추가할 수 있어요.</p>' +
       '<p class="help">신고 내용과 관계없는 다른 사람의 얼굴, 연락처, 계좌번호, 주소가 보이면 가려서 올려 주세요. <span class="slot">보관 기간·열람 범위 안내 문구 법무 확인 전</span> <span class="slot">수집 동의 문구 법무 확인 전</span></p>' +
       '<ul class="plain ev-list" id="ev-list" aria-label="첨부한 증빙 목록" hidden></ul><p class="sr" id="ev-live" role="status"></p>' +
       '<div class="mockbar" style="margin-top:8px"><div class="group"><b>증빙 목업</b><button type="button" data-ev-add="up">올리는 중</button><button type="button" data-ev-add="ok">첨부됨</button><button type="button" data-ev-add="bad1">형식 거절</button><button type="button" data-ev-add="bad2">크기 거절</button><button type="button" data-ev-add="fail">실패</button><button type="button" id="ev-lim" aria-pressed="false">개수 한도</button></div></div></div>' +
-      '<p class="help" style="margin-top:12px">신고 건수만으로 자동 조치되지 않고, 운영자가 확인해요.</p><p class="help" id="rp-h">신고 사유를 선택해 주세요.</p>' +
+      '<p class="help" style="margin-top:12px"><span class="slot">신고자 공개 여부 안내</span></p>' +
+      '<p class="help" style="margin-top:4px">접수된 신고는 운영자가 검토해요. 바로 처리되지 않을 수 있고, 결과와 시점은 달라질 수 있어요.</p><p class="help" id="rp-h">신고 사유를 선택해 주세요.</p>' +
       '<div class="notice" id="ev-esc" role="alert" hidden style="margin-top:12px"><strong>올리는 중인 파일이 있어요</strong><p>지금 닫으면 신고가 접수되지 않아요.</p><p class="row" style="margin-top:8px"><button class="btn" type="button" id="ev-stay">계속 올리기</button><button class="btn" type="button" id="ev-quit">그만두고 닫기</button></p></div>' +
-      '<div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn primary" type="button" id="rp-c">취소</button><button class="btn" type="submit" id="rp-s" disabled>신고 접수</button></div></form>';
+      '<div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn" type="button" id="rp-c">취소</button><button class="btn primary" type="submit" id="rp-s" disabled>신고 접수</button></div></form>';
     document.body.appendChild(dlg);
-    dlg.addEventListener('close', function () { if (opener) opener.focus(); });
+    backdrop(dlg);
+    dlg.addEventListener('close', function () { back(opener); });
     q('#rp-c').onclick = evClose;
     dlg.addEventListener('cancel', function (e) { if (evBusy()) { e.preventDefault(); evClose(); } });
     q('#ev-stay').onclick = function () { q('#ev-esc').hidden = true; q('#rp-c').focus(); };
@@ -268,12 +290,12 @@ document.addEventListener('click', function (e) {
     evBind();
     dlg.addEventListener('change', function (e) {
       if (e.target.name !== 'rpk') return;
-      q('#rp-o').hidden = e.target.value !== '5'; q('#rp-s').disabled = false; q('#rp-h').hidden = true; q('#rp-e').hidden = true; evSync();
+      q('#rp-o').hidden = e.target.value !== 'etc'; q('#rp-s').disabled = false; q('#rp-h').hidden = true; q('#rp-e').hidden = true; evSync();
     });
     q('#rp-f').addEventListener('submit', function () {
       if (q('#rp-s').getAttribute('aria-disabled') === 'true') return;
       if (!q('input[name=rpk]:checked')) { q('#rp-e').hidden = false; return; }
-      if ((document.body.dataset.rp || 'ok') === 'ok') document.body.dataset.rp = 'done';
+      if ((forced || document.body.dataset.rp || 'ok') === 'ok') document.body.dataset.rp = 'done';
       paint();
     });
   }
@@ -339,15 +361,15 @@ document.addEventListener('click', function (e) {
     });
   }
   function paint() {
-    var s = document.body.dataset.rp || 'ok', res = q('#rp-res'), f = q('#rp-f'), btn = q('#rp-s');
+    var s = forced || document.body.dataset.rp || 'ok', res = q('#rp-res'), f = q('#rp-f'), btn = q('#rp-s');
     var link = '<p style="margin-top:8px"><a href="reports.html">내 신고 보기</a></p>', evn = dlg.querySelectorAll('#ev-list [data-ev="ok"]').length;
     var msg = { done: '<strong>신고를 접수했어요</strong><p>' + (evn ? '첨부 ' + evn + '개 포함. ' : '') + '처리 상태는 내 신고에서 볼 수 있어요.</p>' + link,
-      dup: '<strong>이미 신고한 내용이에요</strong>' + link, gone: '<strong>이미 사라진 내용이에요</strong>',
+      dup: '<strong>이미 신고한 내용이에요</strong>' + link, limited: '<strong>지금은 신고할 수 없어요</strong><p>신고하려면 <span class="slot">제한 조건</span>이 필요해요.</p>', gone: '<strong>이미 사라진 내용이에요</strong>',
       guest: '<strong>로그인하면 신고할 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() || 'main.html') + '">로그인</a></p>',
       fail: '<strong>신고를 접수하지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" id="rp-r">다시 시도</button></p>' }[s];
     res.className = msg ? (s === 'fail' ? 'notice danger' : 'notice') : ''; res.style.marginTop = msg ? '12px' : ''; res.innerHTML = msg || '';
     res.setAttribute('role', s === 'fail' ? 'alert' : 'status');
-    f.hidden = ['done', 'dup', 'gone', 'guest'].indexOf(s) > -1;
+    f.hidden = ['done', 'dup', 'gone', 'guest', 'limited'].indexOf(s) > -1;
     btn.textContent = s === 'sending' ? '접수하는 중' : '신고 접수'; btn.setAttribute('aria-busy', s === 'sending');
     if (s === 'sending') btn.disabled = true;
     q('#rp-e').hidden = s !== 'nokind'; if (s === 'nokind') q('#rp-h').hidden = true;
@@ -355,11 +377,39 @@ document.addEventListener('click', function (e) {
     if (f.hidden && !q('#rp-k')) { var k = document.createElement('div'); k.id = 'rp-k'; k.className = 'row'; k.style.cssText = 'margin-top:16px;justify-content:flex-end'; k.innerHTML = '<button class="btn" type="button">닫기</button>'; k.firstChild.onclick = function () { dlg.close(); }; res.after(k); }
     var k2 = q('#rp-k'); if (k2) k2.hidden = !f.hidden;
   }
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-report]'); if (!b) return;
-    if (!dlg) build(); opener = b; q('#rp-m').textContent = b.dataset.report;
-    dlg.querySelectorAll('input[name=rpk]').forEach(function (i) { i.checked = false; }); q('#rp-o').hidden = true; q('#rp-s').disabled = true; q('#rp-h').hidden = false;
+  function openReport(b, chat) {
+    if (!dlg) build(); opener = b;
+    forced = chat && document.body.dataset.chat === 'guest' ? 'guest' : null;
+    var m = q('#rp-m'); m.textContent = '';
+    if (chat) {
+      var h = document.createElement('div'); h.append((chat.kind === 'don' ? '후원 메시지 · ' : '채팅 메시지 · ') + chat.nick + ' · '); var sl = document.createElement('span'); sl.className = 'slot'; sl.textContent = '보낸 시각'; h.append(sl);
+      var bq = document.createElement('blockquote'); bq.className = 'rp-q'; bq.textContent = chat.text; m.append(h, bq);
+    } else m.textContent = b.dataset.report;
+    q('#rp-chat').hidden = !chat;
+    if (chat) q('#rp-ch').textContent = chat.kind === 'don' ? '신고하는 후원 메시지의 작성자, 내용, 보낸 시각과 해당 후원 기록이 신고와 함께 접수돼요.' : '신고하는 메시지의 작성자, 내용, 보낸 시각이 신고와 함께 접수돼요.';
+    var L = chat ? (chat.kind === 'don' ? RD : RC) : R;
+    q('#rp-rs').innerHTML = L.map(function (r, i) { return '<label class="check"><input type="radio" name="rpk" value="' + (i === L.length - 1 ? 'etc' : i) + '"><span>' + r + '</span></label>'; }).join('');
+    q('#rp-o').hidden = true; q('#rp-s').disabled = true; q('#rp-h').hidden = false;
     q('#ev-list').innerHTML = ''; evLim = false; q('#ev-lim').setAttribute('aria-pressed', 'false'); q('#ev-live').textContent = ''; evSync();
     paint(); dlg.showModal(); q('#rp-t').focus();
+  }
+  function openMenu(b) {
+    var nick = b.dataset.nick, text = b.dataset.text;
+    if (!mdlg) {
+      mdlg = document.createElement('dialog'); mdlg.className = 'sheet'; mdlg.setAttribute('aria-labelledby', 'mn-t');
+      mdlg.innerHTML = '<p id="mn-t" style="font-weight:700;color:var(--strong)"><span id="mn-n"></span> <span id="mn-k">메시지</span></p><p class="muted small ellipsis" id="mn-b"></p>' +
+        '<p style="margin-top:8px"><button class="btn mn-bad block" type="button" id="mn-r" data-icon="flag" data-keep>신고</button></p><p><button class="btn block" type="button" id="mn-x">닫기</button></p>';
+      document.body.appendChild(mdlg); if (window.mockIcons) window.mockIcons(mdlg); backdrop(mdlg);
+      mdlg.querySelector('#mn-x').onclick = function () { mdlg.close(); };
+      mdlg.querySelector('#mn-r').onclick = function () { going = true; mdlg.close(); going = false; openReport(opener, { nick: opener.dataset.nick, text: opener.dataset.text, kind: opener.dataset.kind }); };
+      mdlg.addEventListener('close', function () { if (!going) back(opener); });
+    }
+    opener = b; mdlg.querySelector('#mn-n').textContent = nick; mdlg.querySelector('#mn-k').textContent = b.dataset.kind === 'don' ? '후원 메시지' : '메시지'; mdlg.querySelector('#mn-b').textContent = text;
+    mdlg.showModal(); mdlg.querySelector('#mn-r').focus();
+  }
+  document.addEventListener('click', function (e) {
+    var m = e.target.closest('[data-msg-menu]'); if (m) return openMenu(m);
+    var b = e.target.closest('[data-report]'); if (!b) return;
+    openReport(b, null);
   });
 })();

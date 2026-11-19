@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방송국 관리 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+<link rel="stylesheet" href="operator-verify.css">
+<link rel="stylesheet" href="operator-members.css">
+<link rel="stylesheet" href="operator-stations.css">
+</head>
+<body data-default="role:op s:normal">
+<!-- 이 화면에서는 조치하지 않는다(상세에서만). 신고 건수 열·정렬·필터·일괄 조치를 두지 않는다. 방송국·소유자 닉네임은 모두 가상 샘플. -->
+<header id="site-header" data-active="stations"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>방송국 관리</h1>
+    <p class="muted small">신고 건수만으로 자동 조치하지 않아요. 목록은 참고용이에요. 조치는 방송국 상세에서만 해요.</p>
+
+    <form class="filters" id="sf" role="search" aria-label="방송국 검색" onsubmit="return false">
+      <label class="field"><span class="label">방송국명 또는 소유자 닉네임</span><input class="input" type="search" id="q" autocomplete="off"></label>
+      <label class="field"><span class="label">상태</span><select class="input" id="f-st"><option value="">전체</option><option value="normal">정상</option><option value="limited">제한</option><option value="suspended">정지</option><option value="closing">폐쇄 예정</option><option value="closed">폐쇄</option></select></label>
+      <label class="field"><span class="label">조치 대기</span><select class="input" id="f-pend"><option value="">전체</option><option value="appeal">이의제기 접수</option><option value="closing">폐쇄 진행 중</option><option value="soon">폐쇄 예정일 임박</option></select></label>
+      <label class="field"><span class="label">정렬</span><select class="input" id="f-sort"><option value="date">최근 조치일 순</option><option value="name">방송국명 순</option><option value="state">상태 순</option></select></label>
+    </form>
+
+    <p id="msg" role="status" data-show="s=normal"></p>
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:120px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>목록을 불러오지 못했어요</strong><p>검색어와 필터는 그대로 두었어요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=empty"><p><strong>등록된 방송국이 없어요</strong></p></div>
+    <div class="empty" id="nomatch" hidden><p><strong>조건에 맞는 방송국이 없어요</strong></p><p>검색어나 필터를 바꿔 보세요.</p><button class="btn" type="button" id="reset">필터 지우기</button></div>
+
+    <div class="stack" data-show="s=normal" id="listw">
+      <div class="tbl-wrap cards v"><table><caption class="sr">방송국 목록 (샘플)</caption>
+        <thead><tr><th scope="col">방송국</th><th scope="col">상태</th><th scope="col">제한·진행 요약</th><th scope="col">최근 조치일</th><th scope="col">작업</th></tr></thead>
+        <tbody id="tb"></tbody></table></div>
+      <p class="row"><button class="btn" type="button">더 보기</button> <span class="slot">한 번에 보이는 수</span></p>
+    </div>
+  </main>
+</div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  // k=상태 키, o=상태 정렬 순, d=최근 조치일 정렬용(클수록 최근), p=조치 대기 종류
+  var T = { normal: ['ok', '정상'], limited: ['wait', '제한'], suspended: ['bad', '정지'], closing: ['wait', '폐쇄 예정'], closed: ['off', '폐쇄'] };
+  var R = [
+    { n: '샘플 방송국 가', u: '샘플 닉네임 가', k: 'normal', o: 0, d: 1, sum: '', link: 'g=active' },
+    { n: '샘플 방송국 나', u: '샘플 닉네임 나', k: 'limited', o: 1, d: 5, p: 'appeal', sum: '제한 중 · 신규 방송 시작·후원 수령 · 이의제기 접수', link: 'g=limited&lim=multi&appeal=sent' },
+    { n: '샘플 방송국 다', u: '샘플 닉네임 마', k: 'suspended', o: 2, d: 3, sum: '정지 중 · 진행 중 라이브 종료됨', link: 'g=suspended' },
+    { n: '샘플 방송국 라', u: '샘플 닉네임 바', k: 'closing', o: 3, d: 6, p: 'closing', sum: '폐쇄 진행 3/6단계 · 예정일 샘플 날짜', link: 'g=closing&step=3' },
+    { n: '샘플 방송국 아', u: '샘플 닉네임 자', k: 'closing', o: 3, d: 4, p: 'closing soon', sum: '폐쇄 진행 2/6단계 · 예정일 샘플 날짜 임박', link: 'g=closing&step=2' },
+    { n: '샘플 방송국 마', u: '샘플 닉네임 사', k: 'closed', o: 4, d: 2, sum: '폐쇄됨 · 정산 마감 샘플', link: 'g=closed' }
+  ];
+  function build() {
+    if (b.dataset.s !== 'normal') { $('nomatch').hidden = true; return; }
+    var q = $('q').value.trim(), st = $('f-st').value, pd = $('f-pend').value, so = $('f-sort').value;
+    var L = R.filter(function (r) { return (!q || (r.n + r.u).indexOf(q) > -1) && (!st || r.k === st) && (!pd || (r.p || '').split(' ').indexOf(pd) > -1); });
+    L.sort(function (x, y) { return so === 'name' ? x.n.localeCompare(y.n, 'ko') : so === 'state' ? x.o - y.o : y.d - x.d; });
+    $('tb').innerHTML = L.map(function (r) {
+      return '<tr><th scope="row" class="c-title">' + r.n + ' <span class="muted small">소유자 ' + r.u + '</span></th>' +
+        '<td class="c-tag"><span class="tag ' + T[r.k][0] + '">' + T[r.k][1] + '</span></td>' +
+        '<td class="c-meta' + (r.sum ? '' : ' c-none') + '">' + (r.sum || '—') + '</td>' +
+        '<td class="c-meta">최근 조치 샘플 날짜 ' + r.d + '</td>' +
+        '<td class="c-act"><a class="go" href="station-detail.html?' + r.link + '" aria-label="' + r.n + ' 상세">상세 ›</a></td></tr>';
+    }).join('');
+    $('msg').textContent = '방송국 샘플 ' + L.length + '곳';
+    $('listw').hidden = !L.length; $('nomatch').hidden = !!L.length;
+  }
+  window.mockAfter = function () {
+    build();
+    // 목록 안 링크도 역할·테마를 이어 가도록 한 번 더 보정(셸의 링크 보정은 build 전에 돈다)
+    var u = new URLSearchParams(location.search);
+    document.querySelectorAll('#tb a[href]').forEach(function (a) {
+      var x = new URL(a.getAttribute('href'), location.href); x.searchParams.set('role', b.dataset.role);
+      if (u.get('theme')) x.searchParams.set('theme', u.get('theme'));
+      a.setAttribute('href', x.pathname.split('/').pop() + x.search);
+    });
+  };
+  ['q', 'f-st', 'f-pend', 'f-sort'].forEach(function (i) { $(i).addEventListener('input', window.mockAfter); });
+  $('reset').addEventListener('click', function () { $('q').value = ''; $('f-st').value = ''; $('f-pend').value = ''; window.mockAfter(); $('q').focus(); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

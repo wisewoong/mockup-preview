@@ -94,6 +94,7 @@
   </section>
 </div></main>
 
+<script src="mock.js"></script>
 <script>
   var KEY = 'mock-recent', SEED = ['로마서 강해', '새벽 기도', '찬양', '수요 예배', '간증'];
   var recent; try { recent = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
@@ -131,10 +132,9 @@
     if (e.target.closest('[data-set="s:beforeempty"]')) { recent = []; save(); draw(); }
   });
   window.mockDerive = function (b) { if (b.dataset.s === 'results' || b.dataset.s === 'partial') q.value = '로마서'; document.getElementById('recent').hidden = !recent.length || b.dataset.s === 'beforeempty'; };
-  draw();
+  draw(); window.mockRender();
   var p = new URLSearchParams(location.search).get('q'); if (p) { q.value = p; }
 if (new URLSearchParams(location.search).get('s') === 'results' || new URLSearchParams(location.search).get('s') === 'partial') q.value = '로마서';
 </script>
-<script src="mock.js"></script>
 </body>
 </html>

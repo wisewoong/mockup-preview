@@ -28,6 +28,7 @@
   <main class="op-main stack">
     <h1>목회자 심사</h1>
     <p class="muted small">서류 보관기간 <span class="slot">보관기간 미정</span> · 보완 제출 기한 <span class="slot">제출 기한 미정</span></p>
+    <p class="muted small">“취소 검토 중”은 승인된 인증을 취소할지 검토하는 상태예요(사유·증빙 기록, 정보 변경 재심사 중에도 기존 배지는 유지). 검토 기한 <span class="slot">검토 기한(정책)</span></p>
 
     <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:160px"></div></section>
     <div class="notice danger" role="alert" data-show="s=loaderr"><strong>신청 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
@@ -35,7 +36,7 @@
 
     <div class="stack" data-show="s=normal|noperm|noreason|saveerr|locked|gone|saved">
       <div class="filters"><label class="row" style="gap:8px"><span>상태</span>
-        <select class="input" id="st"><option value="todo" selected>검토 대기·재제출됨</option><option value="">전체</option><option>검토 대기</option><option>재제출됨</option><option>보완 요청 중</option><option>승인</option><option>반려</option><option>신청자 취소</option></select></label></div>
+        <select class="input" id="st"><option value="todo" selected>검토 대기·재제출됨</option><option value="">전체</option><option>검토 대기</option><option>재제출됨</option><option>보완 요청 중</option><option>승인</option><option>반려</option><option>신청자 취소</option><option>취소 검토 중</option></select></label></div>
       <div class="empty" id="none" hidden><p><strong>조건에 맞는 신청이 없어요</strong></p><button class="btn" type="button" id="clear">필터 지우기</button></div>
       <div class="tbl-wrap cards v" id="list"><table><caption class="sr">심사 신청 목록 (샘플)</caption>
         <thead><tr><th scope="col">신청일</th><th scope="col">신청자 닉네임</th><th scope="col">상태</th><th scope="col">담당자</th><th scope="col"><span class="sr">검토</span></th></tr></thead>
@@ -45,6 +46,7 @@
           <tr data-st="보완 요청 중"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임C</td><td class="c-tag"><span class="tag wait">보완 요청 중</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="go" href="#detail" data-set="v:more" aria-label="샘플닉네임C 신청 검토">검토 ›</a></td></tr>
           <tr data-st="승인"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임D</td><td class="c-tag"><span class="tag ok">승인</span></td><td class="c-meta">샘플 운영자2</td><td class="c-act"><a class="go" href="#detail" data-set="v:ok" aria-label="샘플닉네임D 신청 보기">보기 ›</a></td></tr>
           <tr data-st="반려"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임E</td><td class="c-tag"><span class="tag bad">반려</span></td><td class="c-meta">샘플 운영자2</td><td class="c-act"><a class="go" href="#detail" data-set="v:no" aria-label="샘플닉네임E 신청 보기">보기 ›</a></td></tr>
+          <tr data-st="취소 검토 중"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임G</td><td class="c-tag"><span class="tag wait">취소 검토 중</span></td><td class="c-meta">샘플 운영자</td><td class="c-act"><a class="go" href="#detail" data-set="v:ok" aria-label="샘플닉네임G 인증 취소 검토 보기">보기 ›</a></td></tr>
           <tr data-st="신청자 취소"><td class="c-meta">샘플 날짜</td><td class="c-title">샘플닉네임F</td><td class="c-tag"><span class="tag off">신청자 취소</span></td><td class="c-meta">— <span class="sr">담당자 없음</span></td><td class="c-act"><a class="go" href="#detail" data-set="v:cancel" aria-label="샘플닉네임F 신청 보기">보기 ›</a></td></tr>
         </tbody></table></div>
 
@@ -195,6 +197,8 @@
     row = a.closest('tr'); $('who').textContent = a.closest('tr').querySelector('.c-title').textContent; if (b.dataset.s === 'saved') b.dataset.s = 'normal';
   }, true);
   $('st').addEventListener('change', filter);
+  // 홈 대시보드 링크(?f=cancel)면 '취소 검토 중'으로 시작한다
+  if (new URLSearchParams(location.search).get('f') === 'cancel') { $('st').value = '취소 검토 중'; filter(); }
   $('clear').addEventListener('click', function () { $('st').value = ''; filter(); $('st').focus(); });
   document.addEventListener('change', function (e) { if (e.target.name === 'res') { lab(); if (!$('why-e').hidden || !$('denom-e').hidden) check(); } });
   $('save').addEventListener('click', function () {

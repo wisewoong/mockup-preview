@@ -7,19 +7,19 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body data-default="role:owner s:normal auth:verified adj:on live:off">
-<!-- 대시보드. 사용자 결정 전: 구성원 첫 화면, 관리자의 인증 신청 가능 여부, 방송국 제한 중 방송 가능 여부 -->
+<!-- 대시보드. 사용자 결정 전: 관리자의 인증 신청 가능 여부. 구성원 첫 화면·제한 중 방송은 확정(05 문서) -->
 <header id="site-header" data-active="dashboard"></header>
 
 <div class="mockbar"><div class="wrap">
   <div data-rolebar></div>
   <div class="group"><b>화면 상태</b>
-    <button data-set="s:normal">기본</button><button data-set="s:new">새 방송국(0건)</button><button data-set="s:loading">로딩</button><button data-set="s:error">일부 실패</button><button data-set="s:limited">방송국 제한</button><button data-set="s:suspended">방송국 정지</button><button data-set="s:closed">방송국 폐쇄</button>
+    <button data-set="s:normal">기본</button><button data-set="s:new">새 방송국(0건)</button><button data-set="s:loading">로딩</button><button data-set="s:error">일부 실패</button><button data-set="s:limited">방송국 제한</button><button data-set="s:suspended">방송국 정지</button><button data-set="s:closing">폐쇄 예정</button><button data-set="s:closed">방송국 폐쇄</button>
   </div>
   <div class="group"><b>인증 상태</b>
     <button data-set="auth:verified">인증됨</button><button data-set="auth:review">심사 중</button><button data-set="auth:none">미인증</button><button data-set="auth:rejected">반려</button><button data-set="auth:revoked">해제·정지</button><button data-set="auth:transfer">소유자 교체 직후</button>
   </div>
   <div class="group"><b>방송</b><button data-set="live:off">방송 안 함</button><button data-set="live:on">방송 중</button><button data-set="adj:on">조정 알림 있음</button><button data-set="adj:off">조정 알림 없음</button></div>
-  <p class="muted">사용자 결정 전: 구성원 첫 화면(방송국 1개면 이 화면, 2개 이상이면 선택 목록), 관리자의 인증 신청 가능 여부(권고: 불가), 제한 중 방송 가능 여부, 관리자 부분 부여. 확정(2026-11-15 추천 반영): 자동 녹화 영상의 권리 확인은 영상 올리기 목록의 [권리 확인하기]에서 받아요(새 화면 없음).</p>
+  <p class="muted">사용자 결정 전: 관리자의 인증 신청 가능 여부(권고: 불가), 관리자 부분 부여. 확정: 구성원 첫 화면(방송국 1개면 이 화면, 2개 이상이면 선택 목록, AC-21), 제한(LIMITED)은 운영자가 고른 제한 항목 조합이라 막히는 기능은 항목별로 달라요(05 문서 Q8~11·Q23). 확정(2026-11-15 추천 반영): 자동 녹화 영상의 권리 확인은 영상 올리기 목록의 [권리 확인하기]에서 받아요(새 화면 없음).</p>
 </div></div>
 
 <main class="wrap"><div class="col">
@@ -35,18 +35,19 @@
   <div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:120px"></div><div class="skeleton" style="height:80px"></div>
 </section>
 
-<div class="stack" data-show="role=owner|adm0|admall s=normal|new|error|limited|suspended|closed">
+<div class="stack" data-show="role=owner|adm0|admall s=normal|new|error|limited|suspended|closing|closed">
   <div class="row between">
     <h1>샘플 방송국 <span class="vbadge lg" data-show="auth=verified">인증됨</span></h1>
-    <p><span class="muted">방송국 상태</span> <strong class="ok" data-show="s=normal|new|error">정상</strong><strong class="err" data-show="s=limited">일부 기능 제한</strong><strong class="err" data-show="s=suspended">방송국 정지</strong><strong class="err" data-show="s=closed">폐쇄</strong> <span class="tag role"></span></p>
+    <p><span class="muted">방송국 상태</span> <strong class="ok" data-show="s=normal|new|error">정상</strong><strong class="err" data-show="s=limited">일부 기능 제한</strong><strong class="err" data-show="s=suspended">방송국 정지</strong><strong class="err" data-show="s=closing">폐쇄 예정</strong><strong class="err" data-show="s=closed">폐쇄</strong> <span class="tag role"></span></p>
   </div>
-  <div class="notice danger" role="alert" data-show="s=limited"><strong>방송국 일부 기능이 제한되어 있어요</strong><p>제한 중 방송할 수 있는지는 <span class="slot">정책 확정 전</span>이에요.</p></div>
+  <div class="notice danger" role="alert" data-show="s=limited"><strong>방송국 일부 기능이 제한되어 있어요</strong><p>운영자가 고른 기능만 막혀요. 어떤 기능이 제한됐는지는 <a href="sanctions.html">제재 안내</a>에서 볼 수 있어요. 해제는 운영자가 직접 해요.</p></div>
+  <div class="notice" role="status" data-show="s=closing"><strong>방송국이 곧 폐쇄돼요</strong><p>폐쇄 예정일은 <span class="slot">기한</span>이에요. 그 전에 필요한 영상과 정산 내역을 확인해 주세요. 방송과 새 영상 올리기는 폐쇄 예정 중에도 <span class="slot">운영자가 정한 범위</span> 안에서만 할 수 있어요.</p></div>
   <div class="notice danger" role="alert" data-show="s=suspended"><strong>방송국이 정지되었어요</strong><p>사유와 이의제기 방법은 알림에서 볼 수 있어요.</p></div>
   <div class="notice danger" role="alert" data-show="s=closed"><strong>방송국이 폐쇄되었어요</strong><p>폐쇄된 방송국에서는 방송과 영상 올리기를 할 수 없어요.</p></div>
   <div class="notice" data-show="role=owner|admall adj=on"><strong>후원 설정이 조정되었어요</strong><p>운영사 한도가 바뀌어 설정이 자동으로 조정됐어요.</p><p style="margin-top:8px"><a class="btn lnk" href="donation-settings.html?adj=on">후원 설정 보기</a></p></div>
   <section class="panel todo" aria-labelledby="h-todo">
     <h2 id="h-todo">오늘 할 일</h2>
-    <div data-show="s=normal|limited|suspended|closed|error">
+    <div data-show="s=normal|limited|suspended|closing|closed|error">
       <div class="item" data-show="role=owner|admall"><p><strong>예정 방송을 시작할 시간이에요</strong><br><span class="muted small">샘플 예정 방송 제목</span></p><a class="btn lnk" href="live-start.html" data-show="role=owner|admall s=normal|error">라이브 시작</a><span data-show="role=owner|admall s=limited|suspended|closed"><button class="btn" disabled aria-describedby="why-t2">라이브 시작</button><span class="help" id="why-t2">방송국 상태 때문에 지금은 쓸 수 없어요</span></span></div>
       <div class="item"><p><strong>권리 확인이 필요한 영상 2개</strong><br><span class="muted small">확인 전에는 공개할 수 없어요</span></p><a class="btn lnk" href="videos.html?rt=need">확인하기</a></div>
       <div class="item" data-show="auth=review|rejected|revoked"><p><strong>인증 결과를 확인해 주세요</strong></p><a class="btn lnk" href="#h-auth">보기</a></div>
@@ -61,7 +62,7 @@
     <div data-show="live=off role=owner|admall">
       <p>지금은 방송하지 않아요.</p>
       <p style="margin-top:8px"><a class="btn primary" href="live-start.html" data-show="role=owner|admall s=normal|new|error">라이브 시작</a><button class="btn" disabled aria-describedby="why-l" data-show="role=owner|admall s=limited|suspended|closed">라이브 시작</button></p>
-      <p class="help" data-show="role=owner|admall s=limited">방송국 제한 중 · 방송 가능 여부 <span class="slot">정책 확정 전</span></p>
+      <p class="help" data-show="role=owner|admall s=limited">방송국 제한 중 · 방송이 제한 항목에 들어 있으면 시작할 수 없어요 (<a href="sanctions.html">제재 안내</a>)</p>
       <p class="help" data-show="role=owner|admall s=suspended|closed">방송국 상태 때문에 지금은 쓸 수 없어요</p>
     </div>
     <div data-show="s=normal|limited|suspended|closed">

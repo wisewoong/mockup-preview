@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>문의 접수함 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-reports.css">
+<link rel="stylesheet" href="operator-verify.css">
+<link rel="stylesheet" href="operator-inquiries.css">
+</head>
+<body data-default="role:op s:normal v:all">
+<!-- 문의 접수함. 제목만 보이고 본문 미리보기 없음(개인정보 최소 노출). 기한 값은 정책이라 슬롯, 날짜·이름은 샘플.
+     요청자에게 보이는 상태 글자: 접수=접수, 처리 중=확인 중, 보류=확인 중, 답변 완료=답변 왔어요, 종결=종결 -->
+<header id="site-header" data-active="inquiries"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:filtered0">필터 결과 0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:noperm">권한 없음</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>문의 접수함</h1>
+    <p class="muted small">답변 목표 <span class="slot">시간(정책)</span> · 문의 보존 <span class="slot">기간(정책)</span> · 유형 구분은 <span class="slot">후보(확정 전)</span></p>
+
+    <div data-show="s=noperm"><div class="empty"><p><strong>운영자 권한이 없어요</strong></p><p>운영자 권한이 필요해요. 최고 관리자에게 문의해 주세요.</p></div></div>
+
+    <div class="stack" data-show="s=normal|empty|filtered0|loading|loaderr">
+      <div class="chips" role="group" aria-label="보기 범위"><button class="chip" type="button" data-set="v:all">전체</button><button class="chip" type="button" data-set="v:mine">내 담당</button><button class="chip" type="button" data-set="v:none">미배정</button></div>
+      <div class="chips" role="group" aria-label="문의 유형">
+        <button class="chip" type="button" data-k="" aria-pressed="true">전체 유형</button>
+        <button class="chip" type="button" data-k="pay" aria-pressed="false">결제</button>
+        <button class="chip" type="button" data-k="general" aria-pressed="false">일반</button>
+        <button class="chip" type="button" data-k="birth" aria-pressed="false">생년월일 정정</button>
+        <button class="chip" type="button" data-k="blocked" aria-pressed="false">차단</button>
+        <button class="chip" type="button" data-k="late" aria-pressed="false">이의 기한 경과</button>
+        <button class="chip" type="button" data-k="station" aria-pressed="false">방송국</button>
+        <button class="chip" type="button" data-k="settle" aria-pressed="false">정산</button>
+        <button class="chip" type="button" data-k="other" aria-pressed="false">기타</button>
+      </div>
+      <div class="filters row" style="flex-wrap:wrap">
+        <label class="row" style="gap:8px"><span>상태</span>
+          <select class="input" id="st"><option value="todo" selected>처리 대기 (접수·처리 중)</option><option value="new">접수</option><option value="wip">처리 중</option><option value="hold">보류</option><option value="answered">답변 완료</option><option value="closed">종결</option><option value="">전체</option></select></label>
+        <label class="row" style="gap:8px"><span>경과</span>
+          <select class="input" id="dl"><option value="">전체</option><option value="over">기한 지남</option><option value="soon">기한 임박</option><option value="in">기한 안</option></select></label>
+        <label class="row" style="gap:8px"><span>요청자</span>
+          <select class="input" id="un"><option value="">전체</option><option value="member">회원</option><option value="pastor">목회자</option></select></label>
+      </div>
+      <p class="muted small">정렬 기준: 기한 지남 &gt; 기한 임박 &gt; 오래된 순 · 기본은 처리 대기 건만 보여요</p>
+      <p class="sr" role="status" id="cnt"></p>
+
+      <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:48px;margin-top:8px"></div><div class="skeleton" style="height:48px;margin-top:8px"></div><div class="skeleton" style="height:48px;margin-top:8px"></div></section>
+      <div class="notice danger" role="alert" data-show="s=loaderr"><strong>문의 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+      <div class="empty" data-show="s=empty"><p><strong>접수된 문의가 없어요</strong></p></div>
+      <div class="empty" id="none" hidden><p><strong>조건에 맞는 문의가 없어요</strong></p><button class="btn" type="button" id="clear">필터 지우기</button></div>
+
+      <div class="tbl-wrap cards v iq" data-show="s=normal|filtered0" id="list"><table><caption class="sr">문의 목록 (샘플)</caption>
+        <thead><tr><th scope="col">접수일</th><th scope="col">유형</th><th scope="col">요약</th><th scope="col">요청자</th><th scope="col">상태</th><th scope="col">기한</th><th scope="col">담당자</th><th scope="col"><span class="sr">상세</span></th></tr></thead>
+        <tbody id="tb"></tbody></table></div>
+    </div>
+  </main>
+</div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, k = '', $ = function (i) { return document.getElementById(i); };
+  var KN = { pay: '결제', general: '일반', birth: '생년월일 정정', blocked: '차단', late: '이의 기한 경과', station: '방송국', settle: '정산', other: '기타' };
+  var SN = { new: ['접수', 'wait'], wip: ['처리 중', 'wip'], hold: ['보류', 'off'], answered: ['답변 완료', 'ok'], closed: ['종결', 'off'] };
+  var DN = { over: ['기한 지남', 'bad'], soon: ['기한 임박', 'wait'], in: ['기한 안', 'off'], none: ['기한 미정', 'off'] };
+  // 정렬 순서(기한 지남 > 임박 > 오래된 순)로 적은 샘플. a: me=내 담당, none=미배정, 그 외=다른 운영자
+  var R = [
+    { k: 'pay', t: '결제했는데 열매가 안 들어왔어요', n: '샘플닉네임A', u: 'member', st: 'new', dl: 'over', a: 'none' },
+    { k: 'birth', t: '생년월일을 잘못 입력했어요', n: '샘플닉네임B', u: 'member', st: 'wip', dl: 'over', a: 'me' },
+    { k: 'blocked', t: '채팅이 제한된 이유가 궁금해요', n: '샘플닉네임C', u: 'member', st: 'wip', dl: 'soon', a: '샘플 운영자2' },
+    { k: 'late', t: '이의제기 기간이 지났어요', n: '샘플목회자D', u: 'pastor', st: 'new', dl: 'soon', a: 'none' },
+    { k: 'station', t: '방송국 소개 문구를 바꾸고 싶어요', n: '샘플목회자E', u: 'pastor', st: 'wip', dl: 'in', a: 'me' },
+    { k: 'settle', t: '정산 내역이 달라 보여요', n: '샘플목회자F', u: 'pastor', st: 'hold', dl: 'none', a: '샘플 운영자2' },
+    { k: 'general', t: '앱은 언제 나오나요', n: '샘플닉네임G', u: 'member', st: 'new', dl: 'in', a: 'none' },
+    { k: 'other', t: '이용 방법을 알려 주세요', n: '샘플닉네임H', u: 'member', st: 'answered', dl: 'none', a: 'me' },
+    { k: 'pay', t: '같은 결제가 두 번 된 것 같아요', n: '샘플닉네임I', u: 'member', st: 'closed', dl: 'none', a: '샘플 운영자2' }
+  ];
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  $('tb').innerHTML = R.map(function (r) {
+    var s = SN[r.st], d = DN[r.dl], a = r.a === 'none' ? '— <span class="sr">담당자 없음</span>' : r.a === 'me' ? '샘플 운영자 (나)' : r.a;
+    var go = r.st === 'answered' || r.st === 'closed' ? '보기' : '상세';
+    return '<tr data-k="' + r.k + '" data-st="' + r.st + '" data-dl="' + r.dl + '" data-u="' + r.u + '" data-a="' + (r.a === 'me' ? 'me' : r.a === 'none' ? 'none' : 'other') + '">' +
+      '<td class="c-meta c-date">샘플 날짜</td><td class="c-meta c-kind"><span class="tag">' + KN[r.k] + '</span></td><td class="c-title">' + esc(r.t) + '</td>' +
+      '<td class="c-meta c-req">' + r.n + '<span class="tag">' + (r.u === 'member' ? '회원' : '목회자') + '</span></td>' +
+      '<td class="c-tag"><span class="tag ' + s[1] + '">' + s[0] + '</span></td><td class="c-dl"><span class="tag ' + d[1] + '">' + d[0] + '</span></td>' +
+      '<td class="c-meta c-asg">' + a + '</td>' +
+      '<td class="c-act"><a class="go" href="inquiry-detail.html?k=' + r.k + '&amp;st=' + r.st + '&amp;u=' + (r.u) + '" aria-label="' + esc(r.t) + ' 문의 ' + go + '">' + go + ' ›</a></td></tr>';
+  }).join('');
+  function f() {
+    var n = 0, s = b.dataset.s, v = b.dataset.v, sv = $('st').value;
+    document.querySelectorAll('#tb tr').forEach(function (r) {
+      var D = r.dataset, ok = (!k || D.k === k) && (!$('dl').value || D.dl === $('dl').value) && (!$('un').value || D.u === $('un').value) &&
+        (!sv || D.st === sv || (sv === 'todo' && (D.st === 'new' || D.st === 'wip'))) && (v === 'all' || (v === 'mine' ? D.a === 'me' : D.a === 'none'));
+      r.hidden = !ok; if (ok) n++;
+    });
+    if (s === 'filtered0') n = 0;
+    $('list').hidden = s !== 'normal' && s !== 'filtered0' || n === 0;
+    $('none').hidden = !(n === 0 && (s === 'normal' || s === 'filtered0'));
+    $('cnt').textContent = s === 'normal' || s === 'filtered0' ? n + '건' : '';
+  }
+  function chip(v) {
+    k = v;
+    document.querySelectorAll('.chip[data-k]').forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.k === v)); });
+  }
+  window.mockAfter = f;
+  ['st', 'dl', 'un'].forEach(function (i) { $(i).addEventListener('change', f); });
+  document.querySelectorAll('.chip[data-k]').forEach(function (c) { c.addEventListener('click', function () { chip(c.dataset.k); f(); }); });
+  $('clear').addEventListener('click', function () {
+    chip(''); $('st').value = ''; $('dl').value = ''; $('un').value = ''; b.dataset.v = 'all'; b.dataset.s = 'normal'; window.mockRender(); $('st').focus();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

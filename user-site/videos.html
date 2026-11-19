@@ -106,14 +106,14 @@
       <p style="margin-top:8px"><button class="btn">등록</button></p>
     </div>
     <div class="notice" data-show="c=guest"><p>댓글은 로그인하면 남길 수 있어요.</p><p style="margin-top:8px"><a class="btn" href="login.html?next=videos.html">로그인하고 댓글 남기기</a></p></div>
-    <div class="notice" data-show="c=restricted"><strong>댓글이 제한되었어요</strong><p><a href="#">이의제기</a></p></div>
+    <div class="notice" data-show="c=restricted"><strong>댓글이 제한되었어요</strong><p><a aria-disabled="true" href="#">이의제기</a> <span class="slot">화면 미작성</span></p></div>
 
     <div data-show="c=normal|guest|filtered|failed|restricted" style="margin-top:16px">
       <div class="cm"><p><span class="who">푸른언덕</span><span class="when">2시간 전</span></p><p>좋은 말씀 감사합니다.</p><p style="margin-top:4px"><button class="btn" data-icon="flag" data-label="이 댓글 신고">신고</button></p></div>
       <div class="cm"><p><span class="who">하늘바람</span><span class="when">어제</span></p><p>28절 설명이 도움이 됐어요.</p><p style="margin-top:4px"><button class="btn" data-icon="flag" data-label="이 댓글 신고">신고</button></p></div>
     </div>
     <div class="cm" data-show="c=hidden"><p><span class="who">새벽별</span></p><p>숨겨진 댓글이에요.</p></div>
-    <div class="cm" data-show="c=hidden"><p><span class="who">나</span></p><p>숨김 처리됨 · <a href="#">이의제기</a></p></div>
+    <div class="cm" data-show="c=hidden"><p><span class="who">나</span></p><p>숨김 처리됨 · <a aria-disabled="true" href="#">이의제기</a> <span class="slot">화면 미작성</span></p></div>
     <div class="empty" data-show="c=empty" style="margin-top:16px"><p>첫 댓글을 남겨보세요</p></div>
     <p class="muted" data-show="c=loading" role="status" style="margin-top:16px">댓글을 불러오는 중</p>
     <div class="notice danger" role="alert" data-show="c=loadfail" style="margin-top:16px"><strong>댓글을 불러오지 못했어요</strong><p><button class="btn" style="margin-top:8px" data-icon="retry" data-keep>다시 시도</button></p></div>

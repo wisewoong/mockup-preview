@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>문서 관리 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+<link rel="stylesheet" href="operator-reports.css">
+<style>
+@media (min-width: 1024px) { #a-dlg { width: min(44rem, 94vw); max-width: none; } }
+#a-dlg table { table-layout: fixed; width: 100%; }
+#a-dlg td:last-child, #a-dlg th:last-child, .tbl-wrap td[data-label="비고"] { white-space: normal; text-align: left; }
+#a-dlg td, #a-dlg th { overflow-wrap: anywhere; }
+</style>
+</head>
+<body data-default="role:super s:normal k:terms p:notice m:major r:before">
+<!-- 구조는 products.html(현재 → 예정 → 새 버전 추가 → 이력)을 따른다. 숫자·기간·본문은 모두 .slot.
+     p=none|draft|wait|before|notice|due|late|partial, m=major|minor(예정 버전 중요도), r=before|after(재동의 집계), k=terms|privacy|policy.
+     시행일 min 의 고지 기간 값은 미정이라 NOTICE_DAYS(스크립트 상단)만 고치면 된다. -->
+<header id="site-header" data-active="documents"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:conflict">충돌</button></div>
+  <div class="group"><b>문서</b><button data-set="k:terms">이용약관</button><button data-set="k:privacy">개인정보</button><button data-set="k:policy">운영정책</button></div>
+  <div class="group"><b>예정 버전</b><button data-set="p:none">없음</button><button data-set="p:draft">초안</button><button data-set="p:wait">승인 대기</button><button data-set="p:before">고지 전</button><button data-set="p:notice">고지 중</button><button data-set="p:due">기한 임박</button><button data-set="p:late">기한 지남</button><button data-set="p:partial">일부 실패</button></div>
+  <div class="group"><b>변경 중요도</b><button data-set="m:major">중요</button><button data-set="m:minor">경미</button></div>
+  <div class="group"><b>재동의 집계</b><button data-set="r:before">시행 전</button><button data-set="r:after">시행 후</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <p><a href="documents.html">← 목록</a></p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:120px;margin-top:12px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>문서 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+
+    <div class="stack" data-show="s=normal|empty|saveerr|conflict">
+      <h1 class="docname">이용약관</h1>
+
+      <div class="notice danger" role="alert" tabindex="-1" id="ban-save" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 값은 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
+      <div class="notice danger" role="alert" tabindex="-1" id="ban-conf" data-show="s=conflict"><strong>다른 운영자가 먼저 바꿨어요</strong><p>입력한 값은 그대로 두었어요. 새로 불러온 뒤 다시 확인해 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">새로 불러오기</button></p></div>
+      <div class="notice danger" role="alert" data-show="p=late"><strong>고지 기한이 지났어요</strong><p>시행일 <span class="slot">날짜</span> 전에 고지가 나가지 못했어요. 지금 발송하거나, 예정 버전을 취소하고 새 시행일로 다시 등록해 주세요. <a href="#h-send">고지 발송으로 이동</a></p></div>
+      <div class="notice danger" role="alert" data-show="p=partial"><strong>일부 채널의 고지 발송이 실패했어요</strong><p>실패한 채널만 다시 보낼 수 있어요. <a href="#h-send">고지 발송으로 이동</a></p></div>
+      <p id="msg" tabindex="-1" class="notice" role="status" hidden></p>
+
+      <div class="notice" data-show="role=op"><strong>초안과 승인 요청까지 할 수 있어요</strong><p class="small">승인·예약·예약 취소·발송은 최고 관리자만 해요 <span class="slot">승인 권한 범위</span></p></div>
+
+      <div class="empty" data-show="s=empty"><p><strong>등록된 버전이 없어요</strong></p><p>이 문서는 아직 첫 버전이 없어요. 아래에서 첫 버전을 등록해 주세요.</p></div>
+
+      <section aria-labelledby="h-cur" data-show="s=normal|saveerr|conflict"><h2 id="h-cur">현재 적용 버전</h2>
+        <div class="panel stack" style="margin-top:8px">
+          <p><span class="tag ok">적용 중</span> 버전 <span class="slot">샘플</span> · 시행일 <span class="slot">날짜</span></p>
+          <p class="row"><button class="linkbtn" type="button" data-open="pv-dlg" data-ttl="현재 버전 본문" data-bad="현재 적용 중">본문 보기</button>
+            <span class="muted small">사용자 화면 보기: <span class="slot">화면 작성 예정</span></span></p></div></section>
+
+      <section aria-labelledby="h-pend" data-show="p=draft|wait|before|notice|due|late|partial s=normal|saveerr|conflict"><h2 id="h-pend">예정 버전</h2>
+        <div class="panel stack" style="margin-top:8px">
+          <p><strong>버전 <span class="slot">샘플</span> · 시행일 <span class="slot" id="pv-date">날짜</span></strong>
+            <span class="tag" data-show="m=major">중요 변경 · 재동의 필요</span><span class="tag" data-show="m=minor">경미 · 고지만</span></p>
+          <p data-show="m=major">변경 요약 <span class="slot">변경 요약 문구</span></p>
+          <p class="small muted">등록자 샘플 운영자 · 등록 시각 샘플 시각</p>
+          <p class="row">
+            <button class="linkbtn" type="button" data-open="pv-dlg" data-ttl="예정 버전 미리보기" data-bad="시행 전 · 미리보기">미리보기</button>
+            <button class="btn bad" type="button" data-role="super" data-open="cancel-dlg" aria-describedby="cx-why" data-show="p=wait|before|notice|due|late|partial">예약 취소</button>
+          </p>
+          <p class="help" id="cx-why" data-show="role=op p=wait|before|notice|due|late|partial">예약 취소는 최고 관리자만 할 수 있어요</p>
+          <div data-show="p=draft|wait" class="stack">
+            <p class="help" data-show="p=draft role=op">초안이에요. 승인 요청을 하면 최고 관리자에게 넘어가요.</p>
+            <p><span class="tag wait" data-show="p=wait">승인 대기</span><span class="tag off" data-show="p=draft">초안 · 승인 요청 전</span></p>
+            <p class="row">
+              <button class="btn primary" type="button" id="ap-pend" data-show="role=super">승인하고 예약</button>
+              <button class="btn" type="button" id="rq-pend" data-show="role=op p=draft">승인 요청</button>
+              <button class="btn" type="button" disabled aria-describedby="ap-why1" data-show="role=op">승인하고 예약</button>
+            </p>
+            <p class="help" id="ap-why1" data-show="role=op">승인하고 예약은 최고 관리자만 할 수 있어요</p>
+          </div></div></section>
+
+      <section aria-labelledby="h-per" data-show="p=wait|before|notice|due|late|partial s=normal|saveerr|conflict"><h2 id="h-per">고지 기간 상태</h2>
+        <dl class="kv" style="margin-top:8px">
+          <dt>고지 기한일</dt><dd><span class="slot">날짜</span> <span class="muted small">시행일 − 고지 기간 <span class="slot">고지 기간</span></span></dd>
+          <dt>시행일</dt><dd><span class="slot">날짜</span></dd>
+          <dt>상태</dt><dd>
+            <span class="tag wait" data-show="p=wait">승인 전 · 고지가 시작되지 않았어요</span>
+            <span class="tag wait" data-show="p=before">고지 전 · 고지 기한일에 자동 발송돼요</span>
+            <span class="tag wip" data-show="p=notice">고지 중 · 시행일까지 알려요</span>
+            <span class="tag wait" data-show="p=due">고지 기한 임박 · 아직 발송 전이에요</span>
+            <span class="tag bad" data-show="p=late">고지 기한 지남 · 발송되지 않았어요</span>
+            <span class="tag bad" data-show="p=partial">일부 발송 실패 · 실패한 채널이 있어요</span></dd></dl></section>
+
+      <section aria-labelledby="h-send" data-show="p=before|notice|due|late|partial s=normal|saveerr|conflict"><h2 id="h-send">고지 발송</h2>
+        <p class="muted small" style="margin:4px 0 8px">승인하면 고지 기한일에 자동으로 예약돼요. 아래 버튼은 보조예요.</p>
+        <p class="row" data-show="p=before|due|late"><button class="btn" type="button" data-role="super" data-open="send-dlg" data-ttl="지금 발송할까요?" data-go="발송" aria-describedby="sd-why">지금 발송</button></p>
+        <p class="row" data-show="p=partial"><button class="btn" type="button" data-role="super" data-open="send-dlg" data-ttl="실패분을 다시 보낼까요?" data-go="다시 보내기" aria-describedby="sd-why">실패분 다시 보내기</button></p>
+        <p class="help" id="sd-why" data-show="role=op p=before|due|late|partial">발송은 최고 관리자만 할 수 있어요</p>
+        <div class="tbl-wrap cards" style="margin-top:8px"><table><caption class="sr">고지 발송 현황 (샘플)</caption>
+          <thead><tr><th scope="col">채널</th><th scope="col">상태</th><th scope="col">발송 시각</th><th scope="col">비고</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">사이트 개정 예고 배너</th><td data-label="상태"><span class="tag ok" data-show="p=notice|partial">발송됨</span><span class="tag wait" data-show="p=before|due">발송 전</span><span class="tag bad" data-show="p=late">발송 안 됨</span></td><td data-label="발송 시각"><span class="slot" data-show="p=notice|partial">샘플 시각</span><span class="muted" data-show="p=before|due|late">—</span></td><td data-label="비고" class="muted">사이트 상단에 개정 예고가 보여요</td></tr>
+            <tr><th scope="row">인앱 알림</th><td data-label="상태"><span class="tag ok" data-show="p=notice|partial">발송됨</span><span class="tag wait" data-show="p=before|due">발송 전</span><span class="tag bad" data-show="p=late">발송 안 됨</span></td><td data-label="발송 시각"><span class="slot" data-show="p=notice|partial">샘플 시각</span><span class="muted" data-show="p=before|due|late">—</span></td><td data-label="비고" class="muted">알림 한도 <span class="slot">알림 한도</span> 안에서 보내요</td></tr>
+            <tr><th scope="row">이메일</th><td data-label="상태"><span class="tag ok" data-show="p=notice">발송됨</span><span class="tag bad" data-show="p=partial">일부 실패 <span class="slot">샘플 N건</span></span><span class="tag wait" data-show="p=before|due">발송 전</span><span class="tag bad" data-show="p=late">발송 안 됨</span></td><td data-label="발송 시각"><span class="slot" data-show="p=notice|partial">샘플 시각</span><span class="muted" data-show="p=before|due|late">—</span></td><td data-label="비고" class="muted">이메일이 없는 회원 <span class="slot">샘플 N명</span>은 인앱 알림·사이트 배너로 대신 알려요</td></tr>
+          </tbody></table></div></section>
+
+      <section aria-labelledby="h-re" data-show="m=major s=normal|saveerr|conflict"><h2 id="h-re">재동의 현황</h2>
+        <p class="muted small" style="margin:4px 0 8px">중요 변경만 집계해요. 개인별 미동의 목록은 없어요. 한 회원의 동의 이력은 회원 상세에서 봐요.</p>
+        <p data-show="r=before">시행일 이후 집계돼요</p>
+        <div class="tbl-wrap cards" data-show="r=after"><table><caption class="sr">계정 종류별 재동의 현황 (샘플)</caption>
+          <thead><tr><th scope="col">계정 종류</th><th scope="col">동의</th><th scope="col">미동의</th><th scope="col">시청만 이용 중</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">일반 회원</th><td data-label="동의"><span class="slot">샘플 N건</span></td><td data-label="미동의"><span class="slot">샘플 N건</span></td><td data-label="시청만 이용 중"><span class="slot">샘플 N건</span></td></tr>
+            <tr><th scope="row">목회자</th><td data-label="동의"><span class="slot">샘플 N건</span></td><td data-label="미동의"><span class="slot">샘플 N건</span></td><td data-label="시청만 이용 중"><span class="slot">샘플 N건</span></td></tr>
+          </tbody></table></div></section>
+
+      <section aria-labelledby="h-add" data-show="s=normal|empty|saveerr|conflict"><h2 id="h-add">새 버전 추가</h2>
+        <p class="muted small" style="margin:4px 0 8px" data-show="p=none">문서는 덮어쓰지 않고 시행일이 있는 새 버전으로 추가해요. 고지 채널은 사이트 개정 예고 배너·인앱 알림·이메일 3가지예요.</p>
+        <p class="notice" data-show="p=draft|wait|before|notice|due|late|partial">예정 버전이 있어서 새 버전을 추가할 수 없어요. 예정 버전을 취소하면 추가할 수 있어요.</p>
+        <details class="add" id="frm-d" data-show="p=none"><summary>새 버전 추가</summary>
+          <form class="stack" id="frm" onsubmit="return false" aria-label="문서 새 버전" novalidate>
+            <label class="field"><span class="label">버전 이름 <span class="muted">자동</span></span><input class="input" value="저장할 때 자동으로 정해져요" readonly aria-readonly="true"></label>
+            <div class="field"><label for="f-body"><span class="label">본문 <span class="muted">필수</span></span></label>
+              <p class="help" style="margin:0 0 6px">내용은 <span class="slot">법무 확인 후 작성</span> <button class="linkbtn" type="button" id="copy" data-show="s=normal|saveerr|conflict">현재 버전에서 복사</button></p>
+              <textarea class="textarea" id="f-body" rows="6" aria-describedby="f-body-e"></textarea><span class="err" id="f-body-e" hidden>본문을 입력해 주세요.</span></div>
+            <fieldset class="radios" id="f-imp" aria-describedby="f-imp-e"><legend>변경 중요도 <span class="muted">필수</span></legend>
+              <label><input type="radio" name="imp" value="minor"> 경미 · 고지만 해요</label>
+              <label><input type="radio" name="imp" value="major"> 중요 · 재동의가 필요해요</label>
+              <span class="err" id="f-imp-e" hidden>변경 중요도를 골라 주세요.</span></fieldset>
+            <label class="field"><span class="label">변경 요약 <span class="muted" id="f-sum-req">중요 변경은 필수</span></span><textarea class="textarea" id="f-sum" rows="3" aria-describedby="f-sum-e"></textarea><span class="err" id="f-sum-e" hidden>중요 변경은 변경 요약을 입력해 주세요.</span></label>
+            <label class="field"><span class="label">시행일 <span class="muted">필수</span></span><span class="help">오늘 + 고지 기간 <span class="slot">고지 기간</span> 이후부터 고를 수 있어요</span><input class="input" id="f-date" type="date" aria-describedby="f-date-e"><span class="err" id="f-date-e" hidden>시행일을 골라 주세요. 오늘 + 고지 기간 이후만 가능해요.</span></label>
+            <label class="field"><span class="label">내부 사유 <span class="muted">필수</span></span><textarea class="textarea" id="f-why" rows="3" aria-describedby="f-why-e"></textarea><span class="err" id="f-why-e" hidden>내부 사유를 입력해 주세요.</span></label>
+            <p class="muted small">변경자와 시각이 기록돼요. 작성자와 승인자가 같아도 되는지는 <span class="slot">D13 정책</span>이에요.</p>
+            <div class="row">
+              <button class="btn primary" type="button" id="rq" data-show="role=op">승인 요청</button>
+              <button class="btn primary" type="button" id="ap" data-show="role=super">승인하고 예약</button>
+              <button class="btn" type="button" id="dr">초안 저장</button>
+              <button class="btn" type="button" disabled aria-describedby="ap-why2" data-show="role=op">승인하고 예약</button>
+            </div>
+            <p class="help" id="ap-why2" data-show="role=op">승인하고 예약은 최고 관리자만 할 수 있어요</p>
+          </form></details></section>
+
+      <section aria-labelledby="h-his"><h2 id="h-his">이력</h2>
+        <div data-show="s=empty"><p class="muted" style="margin-top:8px">아직 이력이 없어요</p></div>
+        <div class="tbl-wrap cards" style="margin-top:8px" data-show="s=normal|saveerr|conflict"><table><caption class="sr">문서 버전 이력 (샘플)</caption>
+          <thead><tr><th scope="col">버전</th><th scope="col">시행일</th><th scope="col">중요도</th><th scope="col">등록자</th><th scope="col">상태</th></tr></thead>
+          <tbody>
+            <tr data-show="p=draft|wait|before|notice|due|late|partial"><th scope="row">버전 <span class="slot">샘플</span></th><td data-label="시행일"><span class="slot">날짜</span></td><td data-label="중요도"><span data-show="m=major">중요</span><span data-show="m=minor">경미</span></td><td data-label="등록자">샘플 운영자</td><td data-label="상태"><span class="tag off" data-show="p=draft">초안</span><span class="tag wait" data-show="p=wait">승인 대기</span><span class="tag wip" data-show="p=before|notice|due|late|partial">예정</span></td></tr>
+            <tr><th scope="row">버전 <span class="slot">샘플</span></th><td data-label="시행일"><span class="slot">날짜</span></td><td data-label="중요도">중요</td><td data-label="등록자">샘플 운영자</td><td data-label="상태"><span class="tag ok">적용 중</span></td></tr>
+            <tr><th scope="row">버전 <span class="slot">샘플</span></th><td data-label="시행일"><span class="slot">날짜</span></td><td data-label="중요도">경미</td><td data-label="등록자">샘플 운영자</td><td data-label="상태"><span class="tag off">종료</span></td></tr>
+            <tr><th scope="row">버전 <span class="slot">샘플</span></th><td data-label="시행일"><span class="slot">날짜</span></td><td data-label="중요도">경미</td><td data-label="등록자">샘플 운영자</td><td data-label="상태"><span class="tag off">취소됨</span></td></tr>
+          </tbody></table></div></section>
+    </div>
+  </main>
+</div>
+
+<dialog id="a-dlg" aria-labelledby="a-t"><h2 id="a-t">이 버전을 승인하고 예약할까요?</h2>
+  <div class="tbl-wrap" style="margin-top:12px"><table><caption class="sr">변경 전후 비교</caption>
+    <thead><tr><th scope="col">항목</th><th scope="col">현재</th><th scope="col">새 값</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">시행일</th><td><span class="slot">날짜</span></td><td id="a-date">—</td></tr>
+      <tr><th scope="row">고지 기한</th><td class="muted">—</td><td><span class="slot">시행일 − 고지 기간</span></td></tr>
+      <tr><th scope="row">변경 중요도</th><td class="muted">—</td><td id="a-imp">—</td></tr>
+      <tr><th scope="row">재동의 대상</th><td>해당 없음</td><td id="a-re">—</td></tr>
+      <tr><th scope="row">고지 채널</th><td class="muted">—</td><td>사이트 개정 예고 배너 · 인앱 알림 · 이메일</td></tr>
+    </tbody></table></div>
+  <div class="notice danger" id="a-q46" style="margin-top:12px" hidden><strong>중요 변경은 시행일 이후 첫 로그인에서 동의 전까지 충전·후원·쓰기가 막혀요(Q46)</strong><p class="small">시청·탈퇴·내 정보 보기만 할 수 있어요 <span class="slot">Q46 법무 확인 전</span></p></div>
+  <label class="check" style="margin-top:12px"><input type="checkbox" id="a-ok"> 내용을 확인했어요</label>
+  <p class="muted small" style="margin-top:12px">승인하면 고지 기한일에 고지가 자동으로 예약돼요. 승인자와 시각이 기록돼요.</p>
+  <div class="notice danger" role="alert" id="a-err" style="margin-top:12px" hidden><strong>저장하지 못했어요</strong><p>입력한 내용은 그대로 두었어요.</p></div>
+  <div class="notice danger" role="alert" id="a-conf" style="margin-top:12px" hidden><strong>다른 운영자가 먼저 바꿨어요</strong><p style="margin-top:8px"><button class="btn" type="button" id="a-reload">새로 불러오기</button></p></div>
+  <p class="help" id="a-why" hidden>내용을 확인하면 눌러 볼 수 있어요</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" id="a-go" aria-describedby="a-why">승인하고 예약</button></div>
+</dialog>
+
+<dialog id="cancel-dlg" aria-labelledby="cx-t"><h2 id="cx-t">예약을 취소할까요?</h2><p class="muted small" style="margin-top:8px">취소하면 이 버전은 적용되지 않아요. 기록은 이력에 남아요.</p>
+  <label class="check" style="margin-top:12px" data-show="p=notice|partial"><input type="checkbox" id="cx-fix" checked> 이미 나간 고지를 바로잡는 정정 고지를 보내요</label>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>돌아가기</button><button class="btn danger" type="button" id="cx-go">예약 취소</button></div></dialog>
+
+<dialog id="send-dlg" aria-labelledby="sd-t"><h2 id="sd-t">지금 발송할까요?</h2><p style="margin-top:8px">보낸 고지는 취소할 수 없어요. 고지 채널은 사이트 개정 예고 배너 · 인앱 알림 · 이메일이에요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>돌아가기</button><button class="btn danger" type="button" id="sd-go">발송</button></div></dialog>
+
+<dialog id="pv-dlg" aria-labelledby="pv-t"><h2 id="pv-t">미리보기</h2>
+  <p style="margin-top:8px"><span class="tag" id="pv-bad">시행 전 · 미리보기</span></p>
+  <p style="margin-top:12px">버전 <span class="slot">샘플</span> · 시행일 <span class="slot">날짜</span></p>
+  <div class="panel" style="margin-top:12px"><span class="slot">본문</span></div>
+  <p style="margin-top:12px" data-show="m=major">변경 요약 <span class="slot">변경 요약 문구</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>닫기</button></div></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var NAMES = { terms: '이용약관', privacy: '개인정보 처리방침', policy: '운영정책' };
+  var NOTICE_DAYS = 0; // 고지 기간 값은 미정(.slot). 정해지면 이 값만 고친다
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  var minD = new Date(); minD.setDate(minD.getDate() + NOTICE_DAYS); $('f-date').min = iso(minD);
+  var opened = false, src = 'form';
+  function imp() { var r = document.querySelector('input[name=imp]:checked'); return r ? r.value : ''; }
+  function say(t) { var m = $('msg'); m.hidden = false; m.textContent = t; m.focus(); }
+
+  window.mockAfter = function () {
+    var nm = NAMES[b.dataset.k] || NAMES.terms;
+    document.querySelectorAll('.docname').forEach(function (x) { x.textContent = nm; });
+    document.title = nm + ' 문서 관리 - 말씀ON 운영사';
+    document.querySelectorAll('[data-role="super"]').forEach(function (x) { x.disabled = b.dataset.role !== 'super'; });
+    var off = !$('a-ok').checked; $('a-go').disabled = off; $('a-why').hidden = !off;
+    $('f-sum-req').textContent = imp() === 'major' ? '필수' : imp() === 'minor' ? '선택' : '중요 변경은 필수';
+    if (b.dataset.s === 'empty' && !opened) { $('frm-d').open = true; opened = true; }
+  };
+  document.addEventListener('change', function (e) { if (e.target.id === 'a-ok' || e.target.name === 'imp') window.mockRender(); });
+
+  // 검증: 모든 오류를 한 번에 표시하고 첫 오류로 포커스
+  function check() {
+    var m = imp(), first = null, d = $('f-date').value;
+    [['f-body', !$('f-body').value.trim()], ['f-imp', !m], ['f-sum', m === 'major' && !$('f-sum').value.trim()], ['f-date', !d || d < $('f-date').min], ['f-why', !$('f-why').value.trim()]].forEach(function (r) {
+      $(r[0] + '-e').hidden = !r[1]; $(r[0]).setAttribute('aria-invalid', String(r[1]));
+      if (r[1] && !first) first = r[0] === 'f-imp' ? document.querySelector('input[name=imp]') : $(r[0]);
+    });
+    if (first) first.focus();
+    return !first;
+  }
+  // 저장 실패·충돌 상태에서는 배너로 포커스하고 진행하지 않는다
+  function blocked() {
+    var s = b.dataset.s, bn = s === 'saveerr' ? $('ban-save') : s === 'conflict' ? $('ban-conf') : null;
+    if (bn) { bn.scrollIntoView({ block: 'center' }); bn.focus(); }
+    return !!bn;
+  }
+  function saved(p, m, text) {
+    b.dataset.p = p; if (m) b.dataset.m = m;
+    var d = $('f-date').value; if (d && src === 'form') $('pv-date').textContent = d;
+    window.mockRender(); say(text);
+  }
+  $('dr').addEventListener('click', function () { if (blocked()) return; src = 'form'; saved('draft', imp(), '초안으로 저장했어요. 승인 요청 전이에요.'); });
+  $('rq').addEventListener('click', function () { if (!check() || blocked()) return; src = 'form'; saved('wait', imp(), '승인을 요청했어요. 최고 관리자의 처리를 기다려요.'); });
+  $('rq-pend').addEventListener('click', function () { if (blocked()) return; src = 'pend'; saved('wait', '', '승인을 요청했어요. 최고 관리자의 처리를 기다려요.'); });
+  $('copy').addEventListener('click', function () { $('f-body').value = '현재 버전 본문(샘플)'; $('f-body').focus(); });
+
+  function openApprove(opener, m, date) {
+    $('a-date').textContent = date; $('a-imp').textContent = m === 'major' ? '중요 · 재동의 필요' : '경미 · 고지만';
+    $('a-re').innerHTML = m === 'major' ? '전체 회원·목회자 <span class="slot">재동의 대상 범위</span>' : '해당 없음(고지만)';
+    $('a-q46').hidden = m !== 'major';
+    $('a-ok').checked = false; $('a-err').hidden = $('a-conf').hidden = true; $('a-go').textContent = '승인하고 예약'; window.mockRender();
+    var d = $('a-dlg'); d._opener = opener; d.showModal();
+  }
+  $('ap').addEventListener('click', function () { if (!check()) return; src = 'form'; openApprove(this, imp(), $('f-date').value); });
+  $('ap-pend').addEventListener('click', function () { src = 'pend'; openApprove(this, b.dataset.m, '샘플 날짜'); });
+  $('a-go').addEventListener('click', function () {
+    var s = b.dataset.s;
+    if (s === 'saveerr') { $('a-err').hidden = false; return; }
+    if (s === 'conflict') { $('a-conf').hidden = false; $('a-why').hidden = false; this.disabled = true; $('a-reload').focus(); return; }
+    var g = this, m = $('a-imp').textContent.indexOf('중요') === 0 ? 'major' : 'minor';
+    g.disabled = true; g.textContent = '저장 중…';
+    setTimeout(function () { $('a-dlg').close(); saved('before', m, '승인하고 예약했어요. 고지 기한일에 고지가 자동으로 나가요.'); }, 600);
+  });
+  $('a-reload').addEventListener('click', function () { b.dataset.s = 'normal'; $('a-dlg').close(); window.mockRender(); say('새로 불러왔어요. 입력한 내용은 그대로 두었어요.'); });
+
+  document.addEventListener('click', function (e) {
+    var o = e.target.closest('[data-ttl]'); if (!o) return;
+    if (o.dataset.open === 'pv-dlg') { $('pv-t').textContent = o.dataset.ttl; $('pv-bad').textContent = o.dataset.bad; }
+    if (o.dataset.open === 'send-dlg') { $('sd-t').textContent = o.dataset.ttl; $('sd-go').textContent = o.dataset.go; }
+  });
+  $('cx-go').addEventListener('click', function () { $('cancel-dlg').close(); if (blocked()) return; b.dataset.p = 'none'; window.mockRender(); say('예약을 취소했어요. 기록은 이력에 남아요.'); });
+  $('sd-go').addEventListener('click', function () { $('send-dlg').close(); if (blocked()) return; b.dataset.p = 'notice'; window.mockRender(); say('고지를 발송했어요.'); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

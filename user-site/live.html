@@ -28,10 +28,14 @@
   .panel .body { padding: 12px 16px; overflow: auto; }
   #p-don { flex: none; max-height: 280px; } #p-don .body { background: transparent; }
   #p-chat { flex: 1; } #p-chat .list { flex: 1; min-height: 160px; }
-  .bubble { background: var(--chat-bubble); border: 0; border-radius: 12px; padding: 10px 14px; color: var(--strong); }
+  .bubble { background: var(--chat-bubble); border: 0; border-radius: 12px; padding: 10px 14px; color: var(--strong); box-shadow: inset 3px 0 0 var(--chat-gold); }
+  .bubble.has-more { position: relative; padding-right: 32px; }
+  .bubble .msg-more { top: -4px; right: -8px; }
+  .bubble .tag.me { color: var(--role-me); background: transparent; padding: 0; margin-left: 6px; font-size: .75rem; }
+  .bubble.hid { box-shadow: none; background: var(--s2); color: var(--muted); }
   .bubble + .bubble { margin-top: 8px; }
   .bubble .who { font-weight: 700; color: var(--don-name); } .bubble p + p { margin-top: 2px; }
-  .tag.don { color: var(--don-name); background: transparent; padding: 0; }
+  .tag.don { color: var(--don-name); background: transparent; padding: 0; font-weight: 600; }
   .tag.don svg { width: 12px; height: 12px; margin-right: 3px; vertical-align: -1px; }
   .msg { padding: 0; font-size: 1rem; line-height: 1.5; color: var(--strong); font-weight: 400; } .msg + .msg { margin-top: 12px; }
   .msg .who { display: block; margin-bottom: 2px; color: var(--muted); font-size: .85rem; font-weight: 700; line-height: 1.4; }
@@ -45,6 +49,9 @@
   .msg .tag.mgr { color: var(--role-mgr); }
   .msg .tag.me { color: var(--role-me); }
   .sys { margin: 8px 0; }
+  #p-chat .msg:not(.me) { position: relative; padding-right: 32px; }
+  .msg-more { position: absolute; top: -12px; right: -12px; width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer; }
+  .msg-more svg { width: 16px; height: 16px; } .msg-more:hover { background: var(--s2); }
   .composer { padding: 12px 16px; border-top: 1px solid var(--line); }
   .composer .r { display: flex; gap: 8px; } .composer .r .input { flex: 1; }
   .tabs-m { display: none; }
@@ -73,7 +80,7 @@
   .tabs-m { border-bottom: 1px solid var(--line); }
 </style>
 </head>
-<body data-notabs data-default="variant:general state:normal tab:chat lp:yes me:viewer">
+<body data-notabs data-default="variant:general state:normal tab:chat lp:yes me:viewer dm:normal">
 <!-- 이 목업의 방송 썸네일은 Unsplash 무료 사진(img/)이며 실제 방송 화면이 아니다. -->
 <!-- mock: 방송 제목, 방송국, 목회자 이름, 채팅 내용, 후원 금액, 시청자 수는 모두 목업 값이다. -->
 
@@ -92,22 +99,33 @@
     <button data-set="state:sendfail">전송 실패</button>
     <button data-set="state:guest">비회원</button>
     <button data-set="state:chatlost">채팅 연결 끊김</button>
+    <button data-set="state:chatblocked">채팅 차단됨</button>
+    <button data-set="state:unverified">이메일 미인증</button>
     <button data-set="state:ttsfault">TTS 장애</button>
     <button data-set="state:nodon">후원 메시지 0건</button>
     <button data-set="state:interrupted">송출 끊김</button>
     <button data-set="state:limited">방송국 제한</button>
+    <button data-set="state:restricted">약관 미동의(제한)</button>
     <button data-set="state:ended">종료됨</button>
     <button data-set="state:noaccess">권한 없음</button>
+  </div>
+  <div class="group"><b>후원 메시지</b>
+    <button data-set="dm:normal">보임</button><button data-set="dm:hidden">숨김 처리됨</button>
   </div>
   <div class="group"><b>내 역할</b>
     <button data-set="me:viewer">시청자</button><button data-set="me:host">방송자</button><button data-set="me:admin">관리자</button><button data-set="me:mgr">매니저</button>
     <p class="help">방송자는 자기 방송에 후원·구독하지 않는다(사용자 결정).</p>
   </div>
+  <div class="group"><b>신고 상태</b>
+    <button data-set="rp:ok">정상</button><button data-set="rp:sending">접수 중</button><button data-set="rp:done">접수됨</button><button data-set="rp:dup">중복</button><button data-set="rp:fail">실패</button><button data-set="rp:gone">사라짐</button><button data-set="rp:limited">제한</button>
+    <p class="help">비회원 상태에서 ⋯를 누르면 항상 로그인 안내가 나와요.</p>
+  </div>
   <div class="group" data-show="state=limited"><b>LIMITED 후원</b><button data-set="lp:yes">후원 가능</button><button data-set="lp:no">후원 불가</button></div>
-  <p class="muted">방송국 제한 때 후원 가능 여부는 사용자 결정 전이에요. 비공개 콘텐츠의 공유 버튼 노출·링크 복사 허용도 사용자 결정 전이에요. 방송국 이름 링크색은 사용자 결정 전이에요. 신고 사유 목록과 자기 방송·자기 댓글 신고 처리는 사용자 결정 전이에요(명세 §16.1에 사유 목록 없음).</p>
+  <p class="muted">방송국 제한(LIMITED)은 운영자가 고른 제한 항목 조합이라 후원 가능 여부가 항목에 따라 달라요(05 Q8~11 임시 확정). 이 막대의 후원 가능·불가는 두 경우의 예시예요. 채팅 차단·이메일 미인증은 05 Q2·Q56 임시 확정이에요. 비공개 콘텐츠의 공유 버튼 노출·링크 복사 허용도 사용자 결정 전이에요. 방송국 이름 링크색은 사용자 결정 전이에요. 신고 사유 목록과 자기 방송·자기 댓글 신고 처리는 사용자 결정 전이에요 <span class="slot">자기 메시지 신고 처리</span>(명세 §16.1에 사유 목록 없음).</p>
 </div></div>
 
 <main class="wrap live-wrap">
+<div class="notice" role="status" data-show="state=restricted" style="margin-top:16px"><strong>약관에 동의하면 채팅·후원을 할 수 있어요</strong><p class="small">동의 전에는 시청만 할 수 있어요. 충전·후원·채팅·댓글은 막혀요. <span class="slot">Q46</span> <a href="consent.html">약관 동의하기</a></p></div>
 <div class="live-grid" data-fs-box>
 
   <!-- 영상 영역. 실제 플레이어 대신 썸네일 이미지를 둔다 -->
@@ -151,10 +169,12 @@
     <!-- 후원 버튼: 모바일은 하단 고정 -->
     <div class="donate-wrap" data-show="don=on|off me=viewer|admin|mgr">
       <div data-show="don=on"><div class="row"><a class="btn primary donate" href="charge.html?view=donate">후원하기</a></div>
-        <p class="help" data-show="state=limited">이 방송국은 일부 기능이 제한돼요. 후원 가능 여부: <span class="slot">LIMITED 후원 가능 여부</span></p></div>
+        <p class="help" data-show="state=limited">이 방송국은 운영자가 제한한 항목에 따라 후원 가능 여부가 달라요 <span class="slot">제한 항목 [운영자 선택]</span></p></div>
       <div data-show="don=off"><button class="btn donate" disabled aria-describedby="why">후원하기</button>
-        <p class="help" id="why" data-show="state=limited">이 방송국은 일부 기능이 제한돼요. 후원 가능 여부: <span class="slot">LIMITED 후원 가능 여부</span></p>
-        <p class="help" data-show="state=ended">방송이 끝나 후원할 수 없어요.</p></div>
+        <p class="help" id="why" data-show="state=limited">이 방송국은 운영자가 제한한 항목에 따라 후원 가능 여부가 달라요 <span class="slot">제한 항목 [운영자 선택]</span></p>
+        <p class="help" data-show="state=ended">방송이 끝나 후원할 수 없어요.</p>
+        <p class="help" data-show="state=unverified">이메일 인증 후 후원할 수 있어요</p>
+        <p class="help" data-show="state=restricted">약관에 동의한 뒤 후원할 수 있어요 <a href="consent.html">약관 동의하기</a></p></div>
     </div>
   </div>
 
@@ -177,20 +197,27 @@
     <!-- 후원 메시지 말풍선: 채팅과 분리된 고정 영역 -->
     <section class="panel" id="p-don" aria-labelledby="h-don">
       <h2 id="h-don">후원 메시지</h2>
-      <div class="body" aria-live="polite">
+      <!-- 스크린리더: 새 후원 메시지는 아래 숨은 live 영역에만 알린다(⋯ 버튼이 들어간 말풍선 영역 전체를 live로 두지 않음). 목업은 정적이라 내용 없음 -->
+      <div class="body">
+        <p class="sr" role="status" aria-live="polite" id="don-live"></p>
         <div data-show="variant=general state=nodon"><p class="muted">아직 후원 메시지가 없어요.</p></div>
         <div data-show="variant=worship"><div class="notice"><span class="slot">S3 후원 메시지 노출 방식</span></div></div>
-        <div data-show="variant=general state=normal|chatopen|pastorclosed|sending|sendfail|guest|chatlost|ttsfault|interrupted|limited|ended|noaccess">
-          <div class="bubble"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">아침이슬</span></p><p>목사님 말씀 덕분에 힘이 났습니다.</p></div>
-          <div class="bubble"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">익명</span></p><p>오늘도 감사합니다.</p></div>
-          <div class="bubble"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">든든한반석</span></p><p>수요 모임 기도 부탁드립니다.</p></div>
+        <div data-show="variant=general state=normal|chatopen|pastorclosed|sending|sendfail|guest|chatlost|chatblocked|unverified|ttsfault|interrupted|limited|ended|noaccess">
+          <div data-show="dm=normal">
+          <div class="bubble has-more"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">아침이슬</span><button type="button" class="msg-more" data-icon="more" data-label="아침이슬 후원 메시지 더보기" aria-haspopup="dialog" data-msg-menu data-kind="don" data-nick="아침이슬" data-text="목사님 말씀 덕분에 힘이 났습니다."></button></p><p>목사님 말씀 덕분에 힘이 났습니다.</p></div>
+          </div>
+          <div class="bubble hid" data-show="dm=hidden"><p>숨겨진 후원 메시지예요</p></div>
+          <div class="bubble has-more"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">익명</span><button type="button" class="msg-more" data-icon="more" data-label="익명 후원 메시지 더보기" aria-haspopup="dialog" data-msg-menu data-kind="don" data-nick="익명" data-text="오늘도 감사합니다."></button></p><p>오늘도 감사합니다.</p></div>
+          <div class="bubble has-more"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">든든한반석</span><button type="button" class="msg-more" data-icon="more" data-label="든든한반석 후원 메시지 더보기" aria-haspopup="dialog" data-msg-menu data-kind="don" data-nick="든든한반석" data-text="수요 모임 기도 부탁드립니다."></button></p><p>수요 모임 기도 부탁드립니다.</p></div>
+          <div class="bubble" data-show="me=viewer state=normal|chatopen|sending|sendfail|ttsfault|limited|ended"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">새벽별</span><span class="tag me">나</span></p><p>주일에 뵙겠습니다.</p></div>
+          <div class="bubble" data-show="me=viewer state=normal|chatopen|sending|sendfail|ttsfault|limited|ended"><p><span class="tag don" data-icon="heart" data-keep>후원</span><span class="who">익명</span><span class="tag me">익명 · 나</span></p><p>늘 응원합니다.</p></div>
         </div>
       </div>
     </section>
 
     <section class="panel" id="p-chat" aria-labelledby="h-chat">
-      <h2 id="h-chat">채팅</h2>
-      <div class="body list" data-show="chat=open|slow|guest|lost|closedpastor">
+      <h2 id="h-chat" tabindex="-1">채팅</h2>
+      <div class="body list" data-show="chat=open|slow|guest|lost|closedpastor|blocked|unverified|restricted">
         <!-- 표시 이름은 닉네임 가정. 실명 노출 없음 -->
         <p class="msg host"><b class="who">샘물지기<span class="tag host">방송자</span><span class="tag me" data-show="me=host chat=open|slow|lost|closedpastor">나</span></b>안녕하세요. 오늘은 로마서 8장입니다.</p>
         <p class="msg"><b class="who">푸른언덕</b>안녕하세요. 잘 들립니다.</p>
@@ -204,7 +231,7 @@
         <div class="msg me admin" data-show="chat=open|slow me=admin"><p><b class="who">새벽별<span class="tag admin">관리자</span><span class="tag me">나</span><span class="muted" data-show="own=sending">전송 중</span></b>8장 28절입니다.</p><p class="err" data-show="own=sendfail">전송하지 못했어요. <button class="btn" style="min-height:44px;margin-left:8px" data-icon="retry" data-keep>다시 보내기</button></p></div>
         <div class="msg me mgr" data-show="chat=open|slow me=mgr"><p><b class="who">새벽별<span class="tag mgr">매니저</span><span class="tag me">나</span><span class="muted" data-show="own=sending">전송 중</span></b>8장 28절입니다.</p><p class="err" data-show="own=sendfail">전송하지 못했어요. <button class="btn" style="min-height:44px;margin-left:8px" data-icon="retry" data-keep>다시 보내기</button></p></div>
         <div class="msg me" data-show="chat=open|slow own=sendfail me=viewer"><p><b class="who">새벽별<span class="tag me">나</span></b>8장 28절입니다.</p><p class="err">전송하지 못했어요. <button class="btn" style="min-height:44px;margin-left:8px" data-icon="retry" data-keep>다시 보내기</button></p></div>
-        <p class="msg" data-show="chat=open|slow|guest|closedpastor"><b class="who">한도윤</b>감사합니다.</p>
+        <p class="msg" data-show="chat=open|slow|guest|closedpastor|blocked|unverified|restricted"><b class="who">한도윤</b>감사합니다.</p>
       </div>
       <div class="body list" data-show="chat=closedworship" role="status">
         <div class="notice"><strong>예배 중에는 채팅이 닫혀 있어요.</strong></div>
@@ -224,6 +251,17 @@
         <p style="margin-bottom:8px">채팅은 로그인하면 입력할 수 있어요.</p>
         <a class="btn primary block" href="login.html?next=live.html">로그인</a>
       </div>
+      <div class="composer" data-show="chat=blocked"><div class="notice danger" role="status"><strong>이 방송국에서 채팅이 제한됐어요</strong><p>채팅은 읽을 수 있어요. 궁금한 점은 <a href="inquiry.html?k=blocked">운영팀 문의</a>로 알려 주세요.</p></div></div>
+      <div class="composer" data-show="chat=unverified">
+        <label class="field"><span class="label">채팅 입력</span>
+          <span class="r"><input class="input" type="text" name="chat-unv" autocomplete="off" disabled aria-describedby="unv-h"><button class="btn" data-icon="send" data-label="채팅 보내기" disabled>보내기</button></span></label>
+        <p class="help" id="unv-h">이메일 인증 후 채팅을 쓸 수 있어요</p>
+      </div>
+      <div class="composer" data-show="chat=restricted">
+        <label class="field"><span class="label">채팅 입력</span>
+          <span class="r"><input class="input" type="text" name="chat-rs" autocomplete="off" disabled aria-describedby="rs-h"><button class="btn" data-icon="send" data-label="채팅 보내기" disabled>보내기</button></span></label>
+        <p class="help" id="rs-h">약관에 동의한 뒤 채팅할 수 있어요 <a href="consent.html">약관 동의하기</a></p>
+      </div>
       <div class="composer" data-show="chat=closedpastor"><p class="notice"><strong>목회자가 채팅을 닫았어요.</strong></p></div>
       <div class="composer" data-show="chat=lost" role="alert">
         <div class="notice danger"><strong>채팅 연결이 끊겼어요</strong><p>인터넷 연결을 확인한 뒤 다시 연결해 주세요.</p></div>
@@ -236,16 +274,26 @@
 </main>
 <script>
   // 목업 전용: 상태에서 파생값 계산
+  // 채팅 ⋯ 버튼: 본인(.me) 메시지는 만들지 않는다. 방송자 샘플은 내 역할이 방송자일 때 본인 메시지라 숨긴다
+  document.querySelectorAll('#p-chat .msg:not(.me)').forEach(function (m) {
+    var nick = m.querySelector('.who').firstChild.textContent.trim(), c = m.cloneNode(true);
+    c.querySelector('.who').remove(); var text = c.textContent.trim();
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'msg-more';
+    b.setAttribute('data-icon', 'more'); b.setAttribute('data-label', nick + ' 메시지 메뉴'); b.setAttribute('aria-haspopup', 'dialog');
+    b.setAttribute('data-msg-menu', ''); b.dataset.nick = nick; b.dataset.text = text;
+    if (m.classList.contains('host')) b.setAttribute('data-show', 'me=viewer|admin|mgr');
+    m.appendChild(b);
+  });
   window.mockDerive = function (b) {
     var s = b.dataset.state, w = b.dataset.variant === 'worship', m;
     if (s === 'noaccess') m = 'noaccess'; else if (s === 'ended') m = 'ended'; else if (s === 'chatlost') m = 'lost';
     else if (w) m = s === 'chatopen' ? 'slow' : 'closedworship';
-    else if (s === 'pastorclosed') m = 'closedpastor'; else if (s === 'guest') m = 'guest'; else m = 'open';
+    else if (s === 'restricted') m = 'restricted'; else if (s === 'chatblocked') m = 'blocked'; else if (s === 'unverified') m = 'unverified'; else if (s === 'pastorclosed') m = 'closedpastor'; else if (s === 'guest') m = 'guest'; else m = 'open';
     b.dataset.chat = m;
     b.dataset.own = (s === 'sending' || s === 'sendfail') ? s : 'sent';
     b.dataset.tts = (w || s === 'ended' || s === 'noaccess') ? 'off' : (s === 'ttsfault' ? 'fault' : 'on');
     b.dataset.stage = (s === 'interrupted' || s === 'ended' || s === 'noaccess') ? s : 'ok';
-    b.dataset.don = (s === 'ended' || (s === 'limited' && b.dataset.lp === 'no')) ? 'off' : (s === 'noaccess' ? 'none' : 'on');
+    b.dataset.don = (s === 'ended' || s === 'unverified' || s === 'restricted' || (s === 'limited' && b.dataset.lp === 'no')) ? 'off' : (s === 'noaccess' ? 'none' : 'on');
   };
 </script>
 <script src="mock.js"></script>

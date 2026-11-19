@@ -65,19 +65,20 @@
       el.classList.add('ib'); el.setAttribute('aria-label', l); el.title = l;
     });
   };
+  window.mockIcons(); // 본문(복사 버튼 등)에도 적용
 })();
 
 // 상태 전환(data-set="키:값"), 표시 조건(data-show="키=a|b 키=c"), 쿼리(?theme=dark&role=mgr&s=empty), 역할별 헤더
 (function () {
   var b = document.body, q = new URLSearchParams(location.search), H = document.getElementById('site-header');
   var ROLE = { owner: '소유자', adm0: '관리자', admall: '관리자', mgr: '매니저' };
-  var D = { dashboard: ['dashboard', 'dashboard.html', '대시보드'], live: ['live', 'live-start.html', '라이브 시작'], videos: ['videos', 'videos.html', '영상'], donation: ['donation', 'donation-settings.html', '후원 설정'], stats: ['stats', 'stats.html', '현황'], settlements: ['settlements', 'settlements.html', '정산'], chat: ['chat', 'live-control.html', '채팅 관리'], members: ['members', 'members.html', '구성원'] };
+  var D = { dashboard: ['dashboard', 'dashboard.html', '대시보드'], live: ['live', 'live-start.html', '라이브 시작'], videos: ['videos', 'videos.html', '영상'], donation: ['donation', 'donation-settings.html', '후원 설정'], stats: ['stats', 'stats.html', '현황'], settlements: ['settlements', 'settlements.html', '정산'], chat: ['chat', 'live-control.html', '채팅 관리'], members: ['members', 'members.html', '구성원'], notices: ['notices', 'notices.html', '공지'] };
   var ST = '샘플 방송국'; // 방송국명은 샘플
   function nav(role, a, tab) {
     // PC: 소유자 전체(정산은 소유자만), 관리자(전체 부여)는 정산 제외, 부여 없는 관리자는 라이브 시작·후원 설정도 숨김, 매니저는 채팅 관리만
     // 하단 탭은 4항목 이내(대시보드·라이브·영상·현황), 나머지는 내 정보 메뉴
     var K = role === 'mgr' ? ['chat'] : role === 'adm0' ? ['dashboard', 'videos', 'chat', 'stats'] : tab ? ['dashboard', 'live', 'videos', 'stats'] : ['dashboard', 'live', 'videos', 'donation', 'stats'].concat(role === 'owner' ? ['settlements'] : []);
-    if (!tab && role !== 'mgr') K.push('members');
+    if (!tab && role !== 'mgr') K.push('notices', 'members'); // 방송국 공지: 소유자·관리자만(매니저 숨김), 하단 4칸에는 못 넣어 '내 정보' 대화상자로
     return K.map(function (k) { var n = D[k]; return '<a href="' + n[1] + '"' + (a === n[0] || (a === 'live' && n[0] === 'chat') ? ' aria-current="page"' : '') + '>' + n[2] + '</a>'; }).join('');
   }
   if (q.get('theme')) document.documentElement.dataset.theme = q.get('theme');
@@ -99,7 +100,7 @@
     var T = document.createElement('nav'); T.className = 'bottombar four'; T.setAttribute('aria-label', '하단 메뉴'); document.body.appendChild(T);
     meDlg = document.createElement('dialog'); meDlg.id = 'me-dlg'; meDlg.setAttribute('aria-labelledby', 'me-t');
     meDlg.innerHTML = '<h2 id="me-t">내 정보</h2><p class="muted small" style="margin-top:4px">' + ST + ' · <span class="role"></span></p>' +
-      '<ul class="plain" style="margin-top:12px"><li id="me-donation"><a href="donation-settings.html">후원 설정</a></li><li id="me-settle"><a href="settlements.html">정산 내역</a></li><li id="me-members"><a href="members.html">구성원</a></li><li id="me-station"><a href="station-settings.html">방송국 설정</a></li><li id="me-sanc"><a href="sanctions.html">제재 안내</a></li><li id="me-verify"><a href="verification.html">목사 인증</a></li><li id="me-stations"><a href="stations.html">방송국 선택</a></li><li><a href="create-station.html">새 방송국 만들기</a></li><li><a href="../user-site/main.html">사이트 이동 (시청자 사이트)</a></li><li><a href="../user-site/history.html">내 정보 (시청자 사이트)</a></li></ul>' +
+      '<ul class="plain" style="margin-top:12px"><li id="me-donation"><a href="donation-settings.html">후원 설정</a></li><li id="me-settle"><a href="settlements.html">정산 내역</a></li><li id="me-notices"><a href="notices.html">방송국 공지</a></li><li id="me-members"><a href="members.html">구성원</a></li><li id="me-station"><a href="station-settings.html">방송국 설정</a></li><li id="me-sanc"><a href="sanctions.html">제재 안내</a></li><li id="me-verify"><a href="verification.html">목사 인증</a></li><li id="me-inquiry"><a href="inquiry.html">운영팀 문의</a></li><li id="me-stations"><a href="stations.html">방송국 선택</a></li><li><a href="create-station.html">새 방송국 만들기</a></li><li><a href="../user-site/main.html">사이트 이동 (시청자 사이트)</a></li><li><a href="../user-site/history.html">내 정보 (시청자 사이트)</a></li></ul>' +
       '<div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close>닫기</button></div>';
     document.body.appendChild(meDlg);
     // Esc·닫기 어느 쪽으로 닫아도 열었던 버튼으로 포커스 복귀(close 이벤트 한 곳에서만)
@@ -126,7 +127,7 @@
     if (H) {
       H.querySelector('.nav').innerHTML = nav(role, a);
       document.querySelector('.bottombar').innerHTML = nav(role, a, true);
-      [['me-members', role === 'mgr'], ['me-station', role === 'mgr'], ['me-sanc', role === 'mgr'], ['me-verify', role === 'mgr'], ['me-stations', !multi], ['me-donation', role === 'mgr' || role === 'adm0'], ['me-settle', role !== 'owner']].forEach(function (x) { var l = document.getElementById(x[0]); if (l) l.hidden = x[1]; });
+      [['me-notices', role === 'mgr'], ['me-members', role === 'mgr'], ['me-station', role === 'mgr'], ['me-sanc', role === 'mgr'], ['me-verify', role === 'mgr'], ['me-inquiry', role === 'mgr'], ['me-stations', !multi], ['me-donation', role === 'mgr' || role === 'adm0'], ['me-settle', role !== 'owner']].forEach(function (x) { var l = document.getElementById(x[0]); if (l) l.hidden = x[1]; });
       document.querySelector('.bottombar').style.gridTemplateColumns = 'repeat(' + (role === 'mgr' ? 1 : 4) + ',1fr)';
       document.querySelectorAll('.role').forEach(function (r) { r.textContent = ROLE[role] || role; r.classList.remove('host', 'adm', 'mgr'); r.classList.add(role === 'owner' ? 'host' : role === 'mgr' ? 'mgr' : 'adm'); });
     }

@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="operator-shell.css">
 <link rel="stylesheet" href="operator-reports.css">
 <link rel="stylesheet" href="operator-members.css">
+<style>.tbl-wrap td[data-label="사이트"] { white-space: normal; text-align: left; }</style>
 </head>
 <body data-default="role:op s:normal m:normal st:none h:some d:ok">
 <!-- 실명·연락처·생년월일·결제 수단은 표시하지 않는다(닉네임·내부 회원 번호·연령 구간 슬롯만). 이력은 수정·삭제 없이 새 기록으로만.
@@ -57,11 +58,21 @@
             </dl></section>
 
           <section aria-labelledby="h-st"><h2 id="h-st">방송국 소속</h2>
-            <p style="margin-top:8px" data-show="st=owner m=normal|limited|suspended">샘플 방송국 가 · 소유 <span class="muted small">방송국 상태</span> <span class="tag ok">운영 중 (ACTIVE)</span></p>
-            <p style="margin-top:8px" data-show="st=staff m=normal|limited|suspended">샘플 방송국 나 · 관리자 <span class="muted small">방송국 상태</span> <span class="tag ok">운영 중 (ACTIVE)</span></p>
+            <p style="margin-top:8px" data-show="st=owner m=normal|limited|suspended">샘플 방송국 가 · 소유 <span class="muted small">방송국 상태</span> <span class="tag ok">정상</span> <a class="go" href="station-detail.html?g=active" aria-label="샘플 방송국 가 상세·조치">방송국 상세 ›</a></p>
+            <p style="margin-top:8px" data-show="st=staff m=normal|limited|suspended">샘플 방송국 나 · 관리자 <span class="muted small">방송국 상태</span> <span class="tag wait">제한</span> <a class="go" href="station-detail.html?g=limited&amp;lim=multi" aria-label="샘플 방송국 나 상세·조치">방송국 상세 ›</a></p>
             <p style="margin-top:8px" data-show="st=none m=normal|limited|suspended">소속된 방송국이 없어요</p>
             <p style="margin-top:8px" data-show="m=left">소속된 방송국이 없어요</p>
             <p class="muted small">구성원 권한은 소유 목회자가 관리해요. 이 화면에서 바꾸지 않아요.</p></section>
+
+          <section aria-labelledby="h-c"><h2 id="h-c">약관 동의 이력</h2>
+            <div class="tbl-wrap" style="margin-top:8px"><table style="min-width:0"><caption class="sr">약관 동의 이력 (샘플)</caption>
+              <thead><tr><th scope="col">문서</th><th scope="col">버전</th><th scope="col">동의 시각</th><th scope="col">사이트</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">이용약관</th><td data-label="버전"><span class="slot">버전 샘플</span></td><td data-label="동의 시각">샘플 시각</td><td data-label="사이트">사용자 사이트</td></tr>
+                <tr><th scope="row">개인정보 처리방침</th><td data-label="버전"><span class="slot">버전 샘플</span></td><td data-label="동의 시각">샘플 시각</td><td data-label="사이트">사용자 사이트</td></tr>
+                <tr><th scope="row">이용약관</th><td data-label="버전"><span class="slot">버전 샘플</span> <span class="muted small">재동의</span></td><td data-label="동의 시각">샘플 시각</td><td data-label="사이트">목회자 사이트</td></tr>
+              </tbody></table></div>
+            <p class="muted small">동의 이력은 고치거나 지울 수 없어요. 문서별 버전 관리는 <a href="documents.html">약관·정책 문서</a>에서 해요. <span class="slot">동의 이력 보존기간</span></p></section>
 
           <section aria-labelledby="h-h"><h2 id="h-h">제재 이력</h2>
             <p id="h-none" style="margin-top:8px">제재 이력이 없어요</p>
@@ -87,7 +98,7 @@
             <p>교체하면 인증이 새 소유자에게 이전되지 않아요.</p>
             <p><button class="btn" type="button" data-open="own-dlg" data-super aria-describedby="own-why">소유자 교체 시작</button></p>
             <p class="help" id="own-why"><span data-show="role=op">최고 관리자만 할 수 있어요</span></p>
-            <p><span class="slot">방송국 폐쇄 화면 링크 자리 (다음 묶음)</span></p></section>
+            <p><a href="station-detail.html?g=active">방송국 제한·정지·폐쇄는 방송국 상세에서 해요 ›</a></p></section>
         </div>
 
         <form class="panel stack rd-form" id="frm" onsubmit="return false" aria-labelledby="h-f" novalidate data-show="m=normal|limited|suspended">

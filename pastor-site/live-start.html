@@ -6,8 +6,8 @@
 <title>라이브 시작 - 말씀ON 목회자</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body data-default="role:owner s:normal sig:before mode:normal send:browser k:none cont:0">
-<!-- 라이브 시작(PC). 사용자 결정 전: 제한 중 방송 가능 여부, 관리자 부분 부여(시작만·키만·TTS만), 예배 중 후원 메시지 처리 방식, 송출 중 화면·PC 나란히 보기(다음 묶음), 모바일 웹 안내 문구 -->
+<body data-default="role:owner s:normal sig:before mode:normal dm:dash send:browser k:none cont:0">
+<!-- 라이브 시작(PC). 사용자 결정 전: 관리자 부분 부여(시작만·키만·TTS만), 송출 중 화면·PC 나란히 보기(다음 묶음). 예배 중 후원 메시지 처리는 임시 설정(방송별 선택) -->
 <header id="site-header" data-active="live"></header>
 
 <div class="mockbar"><div class="wrap">
@@ -18,9 +18,9 @@
   <div class="group"><b>송출 상태</b>
     <button data-set="sig:before">방송 전</button><button data-set="sig:starting">서버 확인 중</button><button data-set="sig:startfail">시작 실패</button><button data-set="sig:timeout">시간 초과</button><button data-set="sig:wait">신호 기다리는 중</button><button data-set="sig:got">신호 받음</button><button data-set="sig:on">방송 중</button><button data-set="sig:cut">끊김</button><button data-set="sig:recon">재연결 중</button>
   </div>
-  <div class="group"><b>방송 모드</b><button data-set="mode:normal">일반</button><button data-set="mode:worship">예배</button><b>송출</b><button data-set="send:browser">브라우저</button><button data-set="send:obs">OBS</button></div>
+  <div class="group"><b>방송 모드</b><button data-set="mode:normal">일반</button><button data-set="mode:worship">예배</button><b>예배 중 후원 메시지</b><button data-set="dm:dash">대시보드에서만</button><button data-set="dm:chat">채팅에 표시</button><b>송출</b><button data-set="send:browser">브라우저</button><button data-set="send:obs">OBS</button></div>
   <div class="group"><b>스트림 키</b><button data-set="k:none">기본</button><button data-set="k:ok">재발급 성공</button><button data-set="k:fail">재발급 실패</button><button data-set="k:copied">복사 완료</button></div>
-  <p class="muted">사용자 결정 전: 제한 중 방송 가능 여부, 관리자 부분 부여(시작만·키만·TTS만), 예배 중 후원 메시지 처리 방식, 송출 중 화면·PC 나란히 보기(다음 묶음), 모바일 웹 안내 문구. 송출 상태는 실제 서버 확인 대신 목업 버튼으로 바꿔요.</p>
+  <p class="muted">사용자 결정 전: 관리자 부분 부여(시작만·키만·TTS만), 송출 중 화면·PC 나란히 보기(다음 묶음). 예배 중 후원 메시지 처리는 임시 설정(방송별 선택). 송출 상태는 실제 서버 확인 대신 목업 버튼으로 바꿔요.</p>
 </div></div>
 
 <main class="wrap"><div class="col">
@@ -29,7 +29,7 @@
 <section class="notice" role="alert" data-show="role=adm0"><strong>권한이 없어요</strong><p class="small">라이브 시작과 스트림 키는 소유자가 권한을 주면 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn lnk" href="dashboard.html">대시보드로 가기</a></p></section>
 <section data-show="role=owner|admall s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:200px"></div></section>
 
-<section data-show="role=owner|admall s=mobile"><div class="notice"><p><span class="slot">휴대폰 라이브 안내 문구 확정 필요</span></p><p style="margin-top:8px"><a class="btn lnk" href="upload.html">영상 올리기</a></p></div></section>
+<section data-show="role=owner|admall s=mobile"><div class="notice"><p><strong>휴대폰에서는 방송을 시작할 수 없어요</strong></p><p class="small">컴퓨터에서 방송을 시작해 주세요. 방송 중 채팅 관리는 휴대폰에서도 할 수 있어요.</p><p style="margin-top:8px"><a class="btn lnk" href="upload.html">영상 올리기</a></p></div></section>
 
 <div class="stack" data-show="role=owner|admall s=normal|denied|nocam|keyerr|limited|suspended|closed|unsupported|titlerej">
 <div class="notice statusline" role="status">
@@ -39,7 +39,7 @@
   <span class="small" data-show="sig=cut">연결을 확인하고 다시 송출해 주세요.</span>
   <span class="small muted" data-show="sig=recon">잠시 기다려 주세요. 연결되면 방송 중으로 돌아가요.</span>
 </div>
-<div class="notice danger" role="alert" data-show="s=limited"><strong>방송국이 제한 중이에요</strong><p>제한 중 방송 가능 여부: <span class="slot">정책 확정 전</span></p></div>
+<div class="notice danger" role="alert" data-show="s=limited"><strong>방송국이 제한 중이에요</strong><p>운영자가 방송을 제한 항목에 넣은 경우 시작할 수 없어요. <a href="sanctions.html">제재 안내</a>에서 확인해 주세요.</p></div>
 <div class="notice danger" role="alert" data-show="s=suspended"><strong>방송국이 정지되었어요</strong><p>정지 중에는 방송을 시작할 수 없어요. 사유와 이의제기 방법은 알림에서 볼 수 있어요.</p></div>
 <div class="notice danger" role="alert" data-show="s=closed"><strong>방송국이 폐쇄되었어요</strong><p>폐쇄된 방송국에서는 방송을 시작할 수 없어요.</p></div>
 <div class="two">
@@ -61,7 +61,11 @@
     <fieldset style="border:0;padding:0;margin:16px 0 0"><legend class="label" style="font-weight:700">채팅</legend>
       <label class="check"><input type="radio" name="chat" id="chat-o"><span>열기</span></label><label class="check"><input type="radio" name="chat" id="chat-c"><span>닫기</span></label>
       <p class="help">일반은 열림, 예배는 닫힘이 기본이에요. 예배 방송도 방송 시작 전에 "열기"를 고를 수 있어요.</p></fieldset>
-    <p class="help">예배 중 후원 메시지 처리: <span class="slot">방송 설정에서 확정 예정</span></p>
+    <fieldset class="pick" style="border:0;padding:0;margin:16px 0 0;grid-template-columns:1fr" data-show="mode=worship"><legend class="label" style="font-weight:700;margin-bottom:6px">예배 중 후원 메시지 <span class="slot">임시 설정</span></legend>
+      <label><input type="radio" name="dm" value="dash" data-dm="dash" checked><span><span class="t">대시보드에서만 확인</span><span class="small muted">채팅에는 보이지 않고 후원 탭에서 확인해요</span></span></label>
+      <label><input type="radio" name="dm" value="chat" data-dm="chat"><span><span class="t">채팅에 표시</span><span class="small muted">채팅 목록에 후원 메시지가 함께 보여요</span></span></label>
+    </fieldset>
+    <p class="help" data-show="mode=worship">예배 방송에서만 적용돼요. 일반 방송에서는 후원 메시지가 채팅에도 보여요.</p>
   </form>
   <div class="stack">
     <h2>송출 방식</h2>
@@ -116,6 +120,7 @@
     var d = b.dataset, can = d.role === 'owner' || d.role === 'admall', worship = d.mode === 'worship';
     var live = /^(on|cut|recon)$/.test(d.sig), lock = live || d.sig === 'starting';
     document.querySelectorAll('input[name=mode]').forEach(function (r) { r.checked = r.dataset.m === d.mode; r.disabled = lock && !(r.dataset.m === 'worship' && !worship && live); });
+    document.querySelectorAll('input[name=dm]').forEach(function (r) { r.checked = r.dataset.dm === d.dm; r.disabled = lock; });
     document.querySelectorAll('input[name=send]').forEach(function (r) { r.checked = r.dataset.s === d.send; r.disabled = lock; });
     // 모드가 바뀌면 채팅 기본값(일반 열림·예배 닫힘)으로 되돌리고, 그 뒤 수동 선택은 유지
     if (d.mode !== lastMode) { chatOpen = !worship; lastMode = d.mode; }
@@ -129,7 +134,7 @@
     if (!can) why = '소유자만 사용할 수 있어요';
     else if (d.s === 'suspended') why = '방송국이 정지되어 시작할 수 없어요';
     else if (d.s === 'closed') why = '방송국이 폐쇄되어 시작할 수 없어요';
-    else if (d.s === 'limited') why = '방송국 제한 중 · 방송 가능 여부 <span class="slot">정책 확정 전</span>';
+    else if (d.s === 'limited') why = '방송국 제한 중 · 제한 항목에 방송이 들어 있어요';
     else if (!t) why = '제목을 입력해 주세요';
     else if (d.send === 'obs' && !/^(got|startfail|timeout)$/.test(d.sig)) why = '송출 신호를 기다리는 중이에요';
     else if (d.send === 'browser' && (d.s === 'denied' || d.s === 'nocam' || d.s === 'unsupported')) why = '카메라와 마이크를 쓸 수 있어야 시작할 수 있어요';
@@ -142,11 +147,11 @@
   };
   document.addEventListener('change', function (e) {
     var t = e.target;
-    if (t.name === 'mode') b.dataset.mode = t.dataset.m; if (t.name === 'send') b.dataset.send = t.dataset.s;
+    if (t.name === 'mode') b.dataset.mode = t.dataset.m; if (t.name === 'send') b.dataset.send = t.dataset.s; if (t.name === 'dm') b.dataset.dm = t.dataset.dm;
     if (t.id === 'cat') { b.dataset.mode = t.value === '예배' ? 'worship' : b.dataset.mode; }
     window.mockRender();
   });
-  function start() { b.dataset.sig = 'starting'; window.mockRender(); clearTimeout(tm); tm = setTimeout(function () { if (b.dataset.sig === 'starting') { b.dataset.sig = 'on'; location.href = 'live-control.html?role=' + b.dataset.role + '&mode=' + b.dataset.mode + '&send=' + b.dataset.send; } }, 1500); } // 목업: 1.5초 뒤 서버 확인된 것으로 가정하고 live-control로 이동
+  function start() { b.dataset.sig = 'starting'; window.mockRender(); clearTimeout(tm); tm = setTimeout(function () { if (b.dataset.sig === 'starting') { b.dataset.sig = 'on'; location.href = 'live-control.html?role=' + b.dataset.role + '&mode=' + b.dataset.mode + '&dm=' + b.dataset.dm + '&send=' + b.dataset.send; } }, 1500); } // 목업: 1.5초 뒤 서버 확인된 것으로 가정하고 live-control로 이동
   $('ttl').addEventListener('input', window.mockRender);
   $('start').onclick = start;
   $('retry-start').onclick = start;

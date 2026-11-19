@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>약관 동의 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 560px; margin: 0 auto; padding: 24px 0 64px; }
+  .col > * + * { margin-top: 16px; }
+  .docs { list-style: none; margin: 0; padding: 0; }
+  .docs > li { border-top: 1px solid var(--line); padding: 12px 0; }
+  .docs h3 { font-size: 1rem; }
+  .linkbtn { min-height: var(--tap); padding: 0 4px; border: 0; background: none; color: var(--muted); font: inherit; text-decoration: underline; cursor: pointer; display: inline-flex; align-items: center; }
+  .linkbtn:hover { color: var(--text); }
+  .acts { display: grid; gap: 8px; }
+  .lim li { padding: 2px 0; }
+</style>
+</head>
+<body data-default="g:major site:pastor live:off role:owner">
+<!-- 약관 재동의 게이트(중요 변경만 해당). 약관 본문·요약·시행일은 법무 확정 전이라 슬롯이다.
+     동의 전에는 시청·탈퇴·내 정보 보기만 가능하고 쓰기(충전·후원·채팅·댓글·방송·업로드·초대 수락)는 서버가 막는다(Q46). 거부 후 처리는 법무 L21 확인 전. -->
+<header id="site-header" data-active=""></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>상태</b><button data-set="g:major">중요 변경</button><button data-set="g:minor">경미 변경</button><button data-set="g:reject">동의 거부</button><button data-set="g:saveerr">저장 실패</button><button data-set="g:restricted">제한 모드</button><button data-set="g:loading">로딩</button><button data-set="g:loaderr">로드 실패</button></div>
+  <div class="group"><b>방송</b><button data-set="live:off">방송 안 함</button><button data-set="live:on">송출 중</button></div>
+  <p class="muted">경미 변경은 재동의 없이 고지만 해요. 중요 변경은 시행일 이후 첫 로그인에서 이 화면이 나와요. 송출 중이면 방송을 끊지 않고 종료 뒤에 나와요. 운영자 계정은 대상이 아니에요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <!-- 경미 -->
+  <div data-show="g=minor"><h1 id="h-c1" tabindex="-1">약관이 바뀌었어요</h1>
+    <div class="notice" role="status" style="margin-top:16px"><strong>동의는 필요 없어요</strong><p class="small">시행일 <span class="slot">날짜</span> 부터 적용돼요. 변경 요약 <span class="slot">변경 요약 문구 [법무 확정 전]</span></p></div>
+    <p style="margin-top:16px"><a class="btn primary" data-go href="dashboard.html">확인했어요</a></p></div>
+
+  <!-- 중요 변경(동의 받기) -->
+  <div class="notice" role="status" data-show="g=major|saveerr live=on"><strong>방송은 끊기지 않아요</strong><p class="small">방송 종료 후 약관 동의 화면이 나와요. 그때까지는 방송과 채팅 관리를 그대로 쓸 수 있어요.</p><p style="margin-top:8px"><a class="btn primary" href="live-control.html">방송 화면으로 돌아가기</a></p></div>
+
+  <div data-show="g=major|saveerr live=off">
+    <h1 id="h-c2" tabindex="-1">약관이 바뀌었어요</h1>
+    <p class="muted" style="margin-top:8px">시행일 <span class="slot">날짜</span> 부터 아래 내용이 적용돼요. 계속 이용하려면 동의가 필요해요.</p>
+    <div class="notice danger" role="alert" data-show="g=saveerr" style="margin-top:16px"><strong>동의를 저장하지 못했어요</strong><p class="small">잠시 후 다시 시도해 주세요. 체크한 내용은 그대로 있어요.</p></div>
+
+    <ul class="docs" style="margin-top:16px">
+      <li><h3>이용약관</h3><p class="small muted">변경 요약 <span class="slot">변경 요약 문구 [법무 확정 전]</span></p><p class="small"><a data-doc="terms" href="../user-site/terms.html?k=terms&v=new" target="_blank" rel="noopener" aria-label="이용약관 전문 보기 (새 창)">전문 보기</a></p></li>
+      <li><h3>개인정보 처리방침</h3><p class="small muted">변경 요약 <span class="slot">변경 요약 문구 [법무 확정 전]</span></p><p class="small"><a data-doc="privacy" href="../user-site/terms.html?k=privacy&v=new" target="_blank" rel="noopener" aria-label="개인정보 처리방침 전문 보기 (새 창)">전문 보기</a></p></li>
+    </ul>
+
+    <fieldset style="border:0;padding:0;margin:16px 0 0">
+      <legend class="sr">동의 항목</legend>
+      <label class="check"><input type="checkbox" id="all"><span><strong>모두 동의해요</strong></span></label>
+      <label class="check"><input type="checkbox" class="req"><span>이용약관 새 버전에 동의해요 (필수) <span class="slot">버전 샘플</span></span></label>
+      <label class="check"><input type="checkbox" class="req"><span>개인정보 처리방침 새 버전에 동의해요 (필수) <span class="slot">버전 샘플</span></span></label>
+    </fieldset>
+
+    <div class="notice" style="margin-top:16px"><strong>동의 전에는 일부만 쓸 수 있어요</strong><p class="small">동의 전에는 시청·탈퇴·내 정보 보기만 할 수 있어요. 충전·후원·채팅·댓글·방송·업로드·초대 수락은 막혀요. <span class="slot">Q46</span></p></div>
+
+    <div class="acts" style="margin-top:16px">
+      <button class="btn primary block" type="button" id="go" disabled aria-describedby="why">동의하고 계속</button>
+      <p class="help" id="why" style="margin-top:0">모든 필수 항목에 체크하면 계속할 수 있어요.</p>
+      <button class="btn block" type="button" data-set="g:reject">동의하지 않아요</button>
+      <p style="text-align:center"><a class="linkbtn" data-later href="dashboard.html">나중에 할게요</a></p>
+    </div>
+  </div>
+
+  <!-- 거부 -->
+  <div data-show="g=reject">
+    <h1 id="h-c3" tabindex="-1">동의하지 않으셨어요</h1>
+    <div class="notice" role="status" style="margin-top:16px"><strong>동의 없이는 계속 이용하기 어려워요</strong>
+      <p class="small"><span class="slot">거부 후 처리 안내 [법무 L21 확인 전]</span></p>
+      <p class="small">지금은 내 정보 보기와 시청자 사이트 시청만 할 수 있어요. 방송·업로드·채팅 관리·초대 수락은 막혀요. 방송국 소유자는 폐쇄나 교체를 끝낸 뒤에만 탈퇴할 수 있어요.</p></div>
+    <ul class="acts" style="list-style:none;padding:0;margin:16px 0 0">
+      <li><a class="btn block" id="wd" href="../user-site/withdraw.html">탈퇴 안내 보기 (시청자 사이트)</a></li>
+      <li><a class="btn block" id="lo" href="index.html">로그아웃</a></li>
+      <li><button class="btn block" type="button" data-set="g:major">생각이 바뀌었어요</button></li>
+    </ul></div>
+
+  <!-- 제한 모드 안내 -->
+  <div data-show="g=restricted">
+    <h1 id="h-c4" tabindex="-1">지금은 시청만 할 수 있어요</h1>
+    <div class="notice" role="status" style="margin-top:16px"><strong>약관에 아직 동의하지 않았어요</strong>
+      <ul class="lim small" style="margin:8px 0 0;padding-left:20px"><li>할 수 있어요: 내 정보 보기, 시청자 사이트 시청, 탈퇴 안내</li><li>막혀요: 방송·업로드·채팅 관리·후원 설정·초대 수락 등 쓰기</li></ul></div>
+    <div class="acts" style="margin-top:16px"><button class="btn primary block" type="button" data-set="g:major">지금 동의하기</button>
+      <p style="text-align:center"><a class="linkbtn" data-later href="dashboard.html">대시보드로</a></p></div></div>
+
+  <div data-show="g=loading" role="status" aria-busy="true"><h1>약관이 바뀌었어요</h1><p class="muted">불러오는 중</p><div class="skeleton" style="height:64px;margin-top:12px"></div><div class="skeleton" style="height:64px;margin-top:12px"></div></div>
+  <div data-show="g=loaderr"><h1>약관이 바뀌었어요</h1><div class="notice danger" role="alert" style="margin-top:16px"><strong>약관 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="g:major">다시 시도</button></p></div></div>
+</div></main>
+<script src="mock.js"></script>
+<script>
+// 목업: 사이트별 이동 위치(목회자 복제본은 이 값만 다르다)
+var CFG = { home: 'dashboard.html' };
+document.querySelectorAll('[data-go],[data-later]').forEach(function (a) { a.href = CFG.home; });
+// 목업: 모두 동의 <-> 개별 체크, 모두 체크해야 [동의하고 계속]이 켜진다
+var all = document.getElementById('all'), reqs = [].slice.call(document.querySelectorAll('.req')), go = document.getElementById('go'), why = document.getElementById('why');
+function sync() { var ok = reqs.every(function (c) { return c.checked; }); all.checked = ok; go.disabled = !ok; why.hidden = ok; }
+all.addEventListener('change', function () { reqs.forEach(function (c) { c.checked = all.checked; }); sync(); });
+reqs.forEach(function (c) { c.addEventListener('change', sync); });
+go.addEventListener('click', function () { if (document.body.dataset.g === 'major') location.href = CFG.home; });
+sync();
+</script>
+</body>
+</html>

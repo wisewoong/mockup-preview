@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>플랫폼 공지 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+<link rel="stylesheet" href="operator-reports.css">
+</head>
+<body data-default="role:op s:normal f:all">
+<!-- D1: 일반 운영자도 공지를 게시할 수 있다(이메일 동반만 최고 관리자). 약관 개정 공지는 문서 관리와 자동 연계되는 읽기 전용 행.
+     기간·한도·분류는 모두 .slot. 방송국 공지는 목회자 사이트에서만 다룬다. -->
+<header id="site-header" data-active="notices"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>플랫폼 공지</h1>
+    <p class="muted small">사용자·목회자 사이트에 보이는 운영사 공지예요. 방송국 공지는 목회자 사이트에서 써요.</p>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:80px;margin-top:12px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>공지를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+
+    <div class="stack" data-show="s=normal|empty|saveerr">
+      <div class="notice danger" role="alert" tabindex="-1" id="ban-save" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 내용은 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
+      <p id="msg" tabindex="-1" class="notice" role="status" hidden></p>
+
+      <section aria-labelledby="h-add"><h2 id="h-add">공지 작성</h2>
+        <details class="add" id="frm-d" style="margin-top:8px"><summary id="frm-s">새 공지 쓰기</summary>
+          <form class="stack" id="frm" onsubmit="return false" aria-label="플랫폼 공지 작성" novalidate>
+            <p class="muted small" id="edit-note" hidden>게시된 공지를 고치면 목록에 「수정됨」이 표시돼요.</p>
+            <label class="field"><span class="label">제목 <span class="muted">필수</span></span><input class="input" id="f-title" aria-describedby="f-title-e"><span class="err" id="f-title-e" hidden>제목을 입력해 주세요.</span></label>
+            <label class="field"><span class="label">종류</span><select class="input" id="f-kind"><option>안내</option><option>점검</option></select><span class="help">약관 개정 공지는 문서 관리에서 자동으로 만들어져요. 여기서 쓰지 않아요.</span></label>
+            <label class="field"><span class="label">본문 <span class="muted">필수</span></span><span class="help">텍스트만 쓸 수 있어요</span><textarea class="textarea" id="f-body" rows="5" aria-describedby="f-body-e"></textarea><span class="err" id="f-body-e" hidden>본문을 입력해 주세요.</span></label>
+            <fieldset class="radios"><legend>노출 대상 <span class="muted">필수</span></legend>
+              <label><input type="radio" name="tg" value="사용자"> 사용자 사이트</label>
+              <label><input type="radio" name="tg" value="목회자"> 목회자 사이트</label>
+              <label><input type="radio" name="tg" value="둘 다" checked> 둘 다</label></fieldset>
+            <div class="field"><span class="label">게시 기간</span><span class="help">최대 기간 <span class="slot">게시 기간 한도</span></span>
+              <div class="row" style="gap:12px;flex-wrap:wrap">
+                <label class="field"><span class="label">시작일 <span class="muted">필수</span></span><input class="input" id="f-start" type="date" aria-describedby="f-start-e"></label>
+                <label class="field"><span class="label">종료일 <span class="muted">비우면 직접 종료할 때까지</span></span><input class="input" id="f-end" type="date" aria-describedby="f-end-e"></label></div>
+              <span class="err" id="f-start-e" hidden>게시 시작일을 골라 주세요.</span><span class="err" id="f-end-e" hidden>종료일은 시작일 이후로 골라 주세요.</span></div>
+            <fieldset class="radios"><legend>함께 보내기</legend>
+              <label class="check"><input type="checkbox" id="f-app"> 인앱 알림 <span class="muted small">알림 한도 <span class="slot">알림 한도</span></span></label>
+              <label class="check"><input type="checkbox" id="f-mail" data-super aria-describedby="mail-why"> 이메일 <span class="muted small">분류 <span class="slot">법무 확인 전</span></span></label>
+              <p class="help" id="mail-why" data-show="role=op">이메일 동반은 최고 관리자만 할 수 있어요</p>
+              <label class="check"><input type="checkbox" id="f-ban"> 사이트 상단 배너로 보여요</label></fieldset>
+            <div class="row"><button class="btn primary" type="button" id="pub">게시</button><button class="btn" type="button" id="dr">초안 저장</button></div>
+          </form></details></section>
+
+      <section aria-labelledby="h-list"><h2 id="h-list">공지 목록</h2>
+        <div class="chips" role="group" aria-label="상태 필터" style="margin-top:8px"><button class="chip" type="button" data-set="f:all">전체</button><button class="chip" type="button" data-set="f:live">게시 중</button><button class="chip" type="button" data-set="f:sched">예약</button><button class="chip" type="button" data-set="f:end">종료</button><button class="chip" type="button" data-set="f:draft">초안</button></div>
+        <div class="empty" style="margin-top:12px" data-show="s=empty"><p><strong>등록된 공지가 없어요</strong></p><p>위의 「새 공지 쓰기」로 첫 공지를 올려 보세요.</p></div>
+        <div class="empty" id="f-none" style="margin-top:12px" hidden><p><strong>이 조건에 맞는 공지가 없어요</strong></p><p><button class="btn" type="button" data-set="f:all">전체 보기</button></p></div>
+        <div class="tbl-wrap cards" style="margin-top:12px" data-show="s=normal|saveerr" id="tw"><table><caption class="sr">플랫폼 공지 목록 (샘플)</caption>
+          <thead><tr><th scope="col">제목</th><th scope="col">종류</th><th scope="col">노출 대상</th><th scope="col">게시 기간</th><th scope="col">상태</th><th scope="col">작성자</th><th scope="col"><span class="sr">작업</span></th></tr></thead>
+          <tbody id="rows">
+            <tr data-st="live"><th scope="row" class="c-title"><span class="tt">샘플 점검 안내</span> <span class="tag mod">수정됨</span></th><td data-label="종류">점검</td><td data-label="노출 대상">사용자 · 목회자</td><td data-label="게시 기간"><span class="slot">기간</span></td><td data-label="상태"><span class="tag ok">게시 중</span></td><td data-label="작성자">샘플 운영자</td><td><span class="more"><button class="btn ib" type="button" aria-label="샘플 점검 안내 더보기" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="mn" role="menu" hidden><button type="button" role="menuitem" data-edit>수정</button><button type="button" role="menuitem" data-act="종료">종료</button><button type="button" role="menuitem" class="red" data-act="삭제">삭제</button></div></span></td></tr>
+            <tr data-st="live"><th scope="row" class="c-title"><span class="tt">이용약관 개정 안내</span> <span class="tag off">자동 연계</span></th><td data-label="종류">약관 개정</td><td data-label="노출 대상">사용자 · 목회자</td><td data-label="게시 기간"><span class="slot">기간</span></td><td data-label="상태"><span class="tag ok">게시 중</span></td><td data-label="작성자" class="muted">시스템(자동)</td><td><a class="go" href="document-detail.html?k=terms" aria-label="이용약관 개정 안내, 약관 문서 보기">약관 문서 ›</a><span class="help" style="display:block">읽기 전용이에요</span></td></tr>
+            <tr data-st="sched"><th scope="row" class="c-title"><span class="tt">샘플 서비스 안내</span></th><td data-label="종류">안내</td><td data-label="노출 대상">사용자</td><td data-label="게시 기간"><span class="slot">기간</span></td><td data-label="상태"><span class="tag wait">예약</span></td><td data-label="작성자">샘플 운영자</td><td><span class="more"><button class="btn ib" type="button" aria-label="샘플 서비스 안내 더보기" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="mn" role="menu" hidden><button type="button" role="menuitem" data-edit>수정</button><button type="button" role="menuitem" class="red" data-act="삭제">삭제</button></div></span></td></tr>
+            <tr data-st="end"><th scope="row" class="c-title"><span class="tt">지난 안내 샘플</span></th><td data-label="종류">안내</td><td data-label="노출 대상">목회자</td><td data-label="게시 기간"><span class="slot">기간</span></td><td data-label="상태"><span class="tag off">종료</span></td><td data-label="작성자">샘플 운영자</td><td><span class="more"><button class="btn ib" type="button" aria-label="지난 안내 샘플 더보기" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="mn" role="menu" hidden><button type="button" role="menuitem" class="red" data-act="삭제">삭제</button></div></span></td></tr>
+            <tr data-st="draft"><th scope="row" class="c-title"><span class="tt">작성 중인 공지 샘플</span></th><td data-label="종류">안내</td><td data-label="노출 대상">사용자</td><td data-label="게시 기간" class="muted">—</td><td data-label="상태"><span class="tag off">초안</span></td><td data-label="작성자">샘플 운영자</td><td><span class="more"><button class="btn ib" type="button" aria-label="작성 중인 공지 샘플 더보기" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="mn" role="menu" hidden><button type="button" role="menuitem" data-edit>수정</button><button type="button" role="menuitem" class="red" data-act="삭제">삭제</button></div></span></td></tr>
+          </tbody></table></div></section>
+    </div>
+  </main>
+</div>
+
+<dialog id="pub-dlg" aria-labelledby="pub-t"><h2 id="pub-t">공지를 게시할까요?</h2>
+  <p style="margin-top:8px" id="pub-sum"></p>
+  <p style="margin-top:8px" id="pub-push" hidden><strong>보낸 알림은 취소할 수 없어요.</strong></p>
+  <div class="notice danger" role="alert" id="pub-err" style="margin-top:12px" hidden><strong>저장하지 못했어요</strong><p>입력한 내용은 그대로 두었어요.</p></div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" id="pub-go">게시</button></div></dialog>
+<dialog id="act-dlg" aria-labelledby="act-t"><h2 id="act-t">공지를 종료할까요?</h2>
+  <p style="margin-top:8px" id="act-d"></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>돌아가기</button><button class="btn danger" type="button" id="act-go">종료</button></div></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); }, editRow = null, actRow = null, actName = '';
+  function say(t) { var m = $('msg'); m.hidden = false; m.textContent = t; m.focus(); }
+  function filter() {
+    var f = b.dataset.f || 'all', n = 0;
+    document.querySelectorAll('#rows tr').forEach(function (r) { var on = f === 'all' || r.dataset.st === f; r.hidden = !on; if (on) n++; });
+    $('f-none').hidden = !(n === 0 && (b.dataset.s === 'normal' || b.dataset.s === 'saveerr'));
+    $('tw').hidden = n === 0 || !/normal|saveerr/.test(b.dataset.s);
+  }
+  window.mockAfter = function () {
+    var op = b.dataset.role !== 'super', m = $('f-mail'); m.disabled = op; if (op) m.checked = false;
+    m.closest('label').classList.toggle('off', op); filter();
+  };
+  function check() {
+    var s = $('f-start').value, e = $('f-end').value, first = null;
+    [['f-title', !$('f-title').value.trim()], ['f-body', !$('f-body').value.trim()], ['f-start', !s], ['f-end', !!(s && e && e < s)]].forEach(function (r) {
+      $(r[0] + '-e').hidden = !r[1]; $(r[0]).setAttribute('aria-invalid', String(r[1])); if (r[1] && !first) first = $(r[0]);
+    });
+    if (first) first.focus(); return !first;
+  }
+  function blocked() { if (b.dataset.s !== 'saveerr') return false; var n = $('ban-save'); n.scrollIntoView({ block: 'center' }); n.focus(); return true; }
+  function reset() { ['f-title', 'f-body', 'f-start', 'f-end'].forEach(function (i) { $(i).value = ''; $(i + '-e').hidden = true; $(i).removeAttribute('aria-invalid'); }); editRow = null; $('edit-note').hidden = true; $('frm-s').textContent = '새 공지 쓰기'; }
+
+  document.addEventListener('click', function (e) {
+    var ed = e.target.closest('[data-edit]'), ac = e.target.closest('[data-act]');
+    if (ed) { editRow = ed.closest('tr'); reset(); editRow = ed.closest('tr'); $('f-title').value = editRow.querySelector('.tt').textContent; $('f-body').value = '본문 샘플'; $('edit-note').hidden = false; $('frm-s').textContent = '공지 수정'; $('frm-d').open = true; $('f-title').focus(); }
+    if (ac) {
+      actRow = ac.closest('tr'); actName = ac.dataset.act; var t = actRow.querySelector('.tt').textContent;
+      $('act-t').textContent = actName === '삭제' ? '공지를 삭제할까요?' : '공지를 종료할까요?';
+      $('act-d').textContent = '「' + t + '」' + (actName === '삭제' ? ' 목록에서 사라져요. 기록은 서버에 남아요.' : ' 사용자 화면에서 바로 내려가요. 목록에는 「종료」로 남아요.');
+      $('act-go').textContent = actName; $('act-dlg')._opener = ac.closest('tr').querySelector('.more > button'); $('act-dlg').showModal();
+    }
+  });
+  $('act-go').addEventListener('click', function () {
+    $('act-dlg').close(); if (blocked()) return;
+    if (actName === '삭제') actRow.remove(); else { actRow.dataset.st = 'end'; actRow.querySelector('[data-label=상태]').innerHTML = '<span class="tag off">종료</span>'; }
+    var t = actRow.querySelector('.tt').textContent; actRow = null; filter(); say('「' + t + '」 ' + actName + '했어요.');
+  });
+  $('dr').addEventListener('click', function () { if (blocked()) return; say('초안으로 저장했어요. 게시 전이에요.'); });
+  $('pub').addEventListener('click', function () {
+    if (!check()) return;
+    var tg = document.querySelector('input[name=tg]:checked').value, push = $('f-app').checked || $('f-mail').checked;
+    $('pub-sum').textContent = '「' + $('f-title').value.trim() + '」 · 노출 대상 ' + tg + (editRow ? ' · 수정' : '') + ($('f-ban').checked ? ' · 상단 배너' : '');
+    $('pub-push').hidden = !push; $('pub-err').hidden = true; $('pub-dlg')._opener = this; $('pub-dlg').showModal();
+  });
+  $('pub-go').addEventListener('click', function () {
+    if (b.dataset.s === 'saveerr') { $('pub-err').hidden = false; return; }
+    var t = $('f-title').value.trim(), tg = document.querySelector('input[name=tg]:checked').value;
+    if (editRow) {
+      editRow.querySelector('.tt').textContent = t;
+      if (!editRow.querySelector('.mod')) editRow.querySelector('th').insertAdjacentHTML('beforeend', ' <span class="tag mod">수정됨</span>');
+    } else {
+      var tr = document.createElement('tr'); tr.dataset.st = 'live';
+      tr.innerHTML = '<th scope="row" class="c-title"><span class="tt"></span></th><td data-label="종류"></td><td data-label="노출 대상"></td><td data-label="게시 기간"><span class="slot">기간</span></td><td data-label="상태"><span class="tag ok">게시 중</span></td><td data-label="작성자">샘플 운영자</td><td><span class="more"><button class="btn ib" type="button" aria-label="새 공지 더보기" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="mn" role="menu" hidden><button type="button" role="menuitem" data-edit>수정</button><button type="button" role="menuitem" data-act="종료">종료</button><button type="button" role="menuitem" class="red" data-act="삭제">삭제</button></div></span></td>';
+      tr.querySelector('.tt').textContent = t; tr.children[1].textContent = $('f-kind').value; tr.children[2].textContent = tg === '둘 다' ? '사용자 · 목회자' : tg;
+      $('rows').prepend(tr);
+    }
+    $('pub-dlg').close(); reset(); $('frm-d').open = false; b.dataset.f = 'all'; window.mockRender();
+    say('「' + t + '」 공지를 게시했어요.');
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

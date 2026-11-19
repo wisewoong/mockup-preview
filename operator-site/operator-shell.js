@@ -3,8 +3,10 @@
   var b = document.body, q = new URLSearchParams(location.search), H = document.getElementById('site-header');
   var ROLE = { op: '일반 운영자', super: '최고 관리자' };
   var NAV = [
-    ['처리', [['reports', '신고·모더레이션'], ['appeals', '이의제기'], ['verification', '목회자 심사'], ['refunds', '환불·결제 오류'], ['vod-reprocess', 'VOD 재처리'], ['partners', '파트너 지정'], ['banned-words', '금칙어 관리']]],
-    ['회원·방송국', [['members', '회원 관리']]],
+    ['처리', [['reports', '신고·모더레이션'], ['appeals', '이의제기'], ['verification', '목회자 심사'], ['refunds', '환불·결제 오류'], ['inquiries', '문의 접수함'], ['vod-reprocess', 'VOD 재처리'], ['partners', '파트너 지정'], ['banned-words', '금칙어 관리']]],
+    ['회원·방송국', [['members', '회원 관리'], ['stations', '방송국 관리']]],
+    ['문서·공지', [['documents', '약관·정책 문서'], ['notices', '플랫폼 공지']]],
+    ['정산', [['settlements', '정산 목록'], ['settlement-batch', '정산 마감'], ['payout-reviews', '수령 정보 확인']]],
     ['위험 설정', [['products', '열매 충전 상품', 1], ['fees', '수수료율', 1], ['limits', '후원·TTS 한도', 1]]],
     ['기록·권한', [['audit', '감사 로그·운영자 권한']]]
   ];
@@ -30,7 +32,7 @@
   }
   if (H) {
     H.className = 'topbar';
-    var cur = act === 'index' ? '운영사 홈' : (NAV.reduce(function (a, g) { return a.concat(g[1]); }, []).filter(function (n) { return n[0] === act; })[0] || [0, ''])[1];
+    var cur = H.dataset.title || (act === 'index' ? '운영사 홈' : (NAV.reduce(function (a, g) { return a.concat(g[1]); }, []).filter(function (n) { return n[0] === act; })[0] || [0, ''])[1]);
     H.innerHTML = '<div class="wrap hd-d"><a class="brand" href="index.html">말씀<b>ON</b> <small>운영사</small></a><span style="flex:1"></span>' +
       '<span class="who"><strong>샘플 운영자</strong> <span class="tag role"></span></span>' +
       '<button class="btn ib hbtn" type="button" data-open="me-dlg" aria-label="내 정보" title="내 정보"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></button></div>' +

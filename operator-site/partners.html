@@ -31,6 +31,7 @@
   <main class="op-main stack">
     <h1>파트너 지정</h1>
     <p class="muted small">파트너 지정은 플랫폼 운영자가 해요. 지정·해제할 때는 사유를 적고, 담당자와 시각이 기록으로 남아요. 지정 자격 조건: <span class="slot">자격 조건</span></p>
+    <p class="muted small">인증이 취소되거나 소유자가 바뀌면 파트너는 자동으로 해제되지 않고 “해제 검토 대기”로 올라와요. 운영자가 검토해 해제하며, 검토 기한은 <span class="slot">검토 기한(정책)</span>이에요. 해제는 미리 알리고 다음 정산 기간부터 적용돼요 <span class="slot">사전 고지 기간(정책)</span></p>
 
     <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:120px"></div></section>
     <div class="notice danger" role="alert" data-show="s=loaderr"><strong>목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
@@ -61,12 +62,12 @@
 (function () {
   var b = document.body, $ = function (i) { return document.getElementById(i); };
   // 상태: before 지정 전 / on 지정됨 / off 해제됨
-  var R = [['샘플 방송국 가', '샘플 목회자 A', 1, 'before'], ['샘플 방송국 나', '샘플 목회자 B', 1, 'on'], ['샘플 방송국 다', '샘플 목회자 C', 0, 'before'], ['샘플 방송국 라', '샘플 목회자 D', 1, 'off']];
-  var LBL = { before: '지정 전', on: '지정됨', off: '해제됨' }, cur = -1;
+  var R = [['샘플 방송국 가', '샘플 목회자 A', 1, 'before'], ['샘플 방송국 나', '샘플 목회자 B', 1, 'on'], ['샘플 방송국 다', '샘플 목회자 C', 0, 'before'], ['샘플 방송국 라', '샘플 목회자 D', 1, 'off'], ['샘플 방송국 마', '샘플 목회자 E', 0, 'review']];
+  var LBL = { before: '지정 전', on: '지정됨', off: '해제됨', review: '해제 검토 대기' }, cur = -1;
   function draw() {
     $('rows').innerHTML = R.map(function (r, i) {
-      var on = r[3] === 'on';
-      return '<tr><th scope="row" class="c-title">' + r[0] + '</th><td data-label="소유자">' + r[1] + '</td><td data-label="인증 여부">' + (r[2] ? '인증' : '미인증') + '</td><td class="c-tag"><span class="tag' + (r[3] == 'on' ? ' ok' : ' off') + '">' + LBL[r[3]] + '</span></td>' +
+      var on = r[3] === 'on' || r[3] === 'review';
+      return '<tr><th scope="row" class="c-title">' + r[0] + '</th><td data-label="소유자">' + r[1] + '</td><td data-label="인증 여부">' + (r[2] ? '인증' : '미인증') + '</td><td class="c-tag"><span class="tag' + (r[3] == 'on' ? ' ok' : r[3] == 'review' ? ' wait' : ' off') + '">' + LBL[r[3]] + '</span></td>' +
         '<td data-label="파트너 요율">' + (on ? '<span class="slot">V3</span>' : '<span class="muted">—</span>') + '</td><td class="c-act">' +
         (r[2] || on ? '' : '<p class="help" id="why' + i + '">인증 목회자만 지정할 수 있어요</p>') + (on ? '<button class="btn bad" type="button" data-act="off" data-i="' + i + '">해제</button>'
           : '<button class="btn" type="button" data-act="on" data-i="' + i + '"' + (r[2] ? '' : ' disabled aria-describedby="why' + i + '"') + '>지정</button>') + '</td></tr>';

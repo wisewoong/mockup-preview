@@ -9,6 +9,7 @@
   .sw { display: inline-block; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: var(--radius); vertical-align: middle; margin-right: 8px; }
   table { border-collapse: collapse; width: 100%; } th, td { text-align: left; padding: 8px 12px; border-top: 1px solid var(--line); vertical-align: top; }
   .tw { overflow-x: auto; }
+  li { overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -52,12 +53,16 @@
       <tr><td>--muted</td><td>#625F57</td><td>#A2A19C</td><td>보조 글</td></tr>
       <tr><td>--line</td><td>#E2DED3</td><td>#2C2C2F</td><td>얇은 구분선</td></tr>
       <tr><td>--accent</td><td><span class="sw" style="background:#0F6B4A"></span>#0F6B4A</td><td><span class="sw" style="background:#5FD39E"></span>#5FD39E</td><td>포인트 1색 (깊은 초록, 성공색 겸용). 주 버튼, 선택 상태, 현재 위치</td></tr>
-      <tr><td>--on-accent</td><td>#FFFFFF</td><td>#04170E</td><td>초록 위 글자</td></tr>
+      <tr><td>--pri-bg / --pri-fg</td><td><span class="sw" style="background:#0F6B4A"></span>#0F6B4A / #FFFFFF</td><td><span class="sw" style="background:#5FD39E"></span>#5FD39E / #04170E</td><td>주 버튼 채움과 그 위 글자(화면당 1개). 초록은 주 버튼·성공·선택 컨트롤 채움에만</td></tr>
+      <tr><td>--info</td><td><span class="sw" style="background:#1D4ED8"></span>#1D4ED8</td><td><span class="sw" style="background:#7AA7FF"></span>#7AA7FF</td><td>링크·정보·안내, 고스트 버튼 글자, 처리 중 상태</td></tr>
+      <tr><td>--warn</td><td><span class="sw" style="background:#8A5A00"></span>#8A5A00</td><td><span class="sw" style="background:#E8B64C"></span>#E8B64C</td><td>후원·열매·대기·주의</td></tr>
+      <tr><td>--host</td><td><span class="sw" style="background:#0E7490"></span>#0E7490</td><td><span class="sw" style="background:#5CC8DD"></span>#5CC8DD</td><td>인증 배지·방송국 목록의 방송자 태그(청록)</td></tr>
       <tr><td>--danger</td><td>(styles.css 참고)</td><td>(styles.css 참고)</td><td>오류 글자 전용 (포인트 아님)</td></tr>
     </table></div>
     <ul style="margin-top:16px">
       <li>글꼴: 제목 Sora, 본문 Noto Sans KR(팔레트 3 Emerald, mock.js가 주입). 본문 17px.</li>
       <li>카드·패널 모서리 14~18px, 버튼은 알약형. 터치 타겟 최소 48px. 버튼은 화면당 채움 1개, 나머지는 글자형.</li>
+      <li>상태 태그는 점+글자로 통일: 접수·대기 <code>.wait</code>(앰버), 처리 중 <code>.wip</code>(파랑), 완료 <code>.ok</code>(초록), 불가·반려 <code>.bad</code>(빨강), 종료 <code>.off</code>(회색). 탭·칩 선택은 --strong 글자+2px 밑줄. 채팅방 역할색·후원 금색은 채팅 전용 토큰이다.</li>
       <li>상태는 색만으로 구분하지 않고 텍스트를 함께 둔다. 점+글자 또는 "선택됨" 같은 글자를 병기.</li>
       <li>다이얼: VARIANCE 3, MOTION 2(hover와 active의 1px 이동뿐), DENSITY 5.</li>
       <li>목록의 방송 이미지는 Unsplash 무료 사진(img/)이며 실제 방송이 아니다.</li>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>운영팀 문의 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  legend { font-weight: 700; color: var(--strong); margin-bottom: 6px; padding: 0; }
+  .qrow { padding: 4px 0; border-top: 1px solid var(--line); }
+  .qrow summary { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; min-height: var(--tap); padding: 8px 0; cursor: pointer; list-style: none; }
+  .qrow summary::-webkit-details-marker { display: none; }
+  .qrow .ans { padding: 0 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+</style>
+</head>
+<body data-default="role:owner s:normal stn:3">
+<!-- 운영팀 문의. 진입은 내 정보 메뉴 한 곳(하단 탭 4항목 규칙), data-active="inquiry"는 NAV에 없는 값이라 메뉴 강조 없음이 의도.
+     역할: 소유자=모든 유형, 관리자=방송국·구성원·콘텐츠만(제재·정산은 소유자만), 매니저=문의 권한 없음. 형식·용량·번호는 슬롯.
+     요청자에게 보이는 상태: 접수 / 확인 중 / 답변 왔어요 / 종결. 목록은 본인이 쓴 문의만 -->
+<header id="site-header" data-active="inquiry"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:empty">내 문의 0건</button><button data-set="s:nokind">유형 미선택</button><button data-set="s:sending">접수 중</button><button data-set="s:done">접수 완료</button><button data-set="s:dup">중복 접수</button><button data-set="s:fail">실패</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
+  <div class="group"><b>방송국 수</b><button data-set="stn:3">여러 개</button><button data-set="stn:1">하나</button></div>
+  <p class="muted">제재 안내에서 오면 주소에 ?from=sanc 가 붙고 유형이 미리 채워져요(소유자만).</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>문의 권한이 없어요</strong></p><p>매니저는 운영팀에 문의할 수 없어요. 필요하면 방송국 관리자나 소유자에게 알려 주세요.</p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<div class="stack" data-show="role=owner|adm0|admall">
+  <div class="mem-head"><h1 id="h-inq" tabindex="-1">운영팀 문의</h1></div>
+  <p class="help">답변 목표 <span class="slot">시간(정책)</span> · 본인이 쓴 문의만 아래 '내 문의'에 보여요</p>
+
+  <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
+  <div class="notice danger" role="alert" data-show="s=loaderr"><strong>문의 화면을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+
+  <div class="stack" data-show="s=normal|empty|nokind|sending|done|dup|fail">
+    <div class="notice" role="status" data-show="s=done"><strong>문의를 접수했어요</strong><p>접수번호 <span class="slot">번호</span>. 답변은 알림으로 알려 드리고, 아래 '내 문의'에서 볼 수 있어요.</p></div>
+    <div class="notice" role="status" data-show="s=dup"><strong>같은 내용의 문의가 이미 접수돼 있어요</strong><p style="margin-top:8px"><a class="btn lnk" href="#mine">처리 상태 보기</a></p></div>
+    <div class="notice danger" role="alert" data-show="s=fail"><strong>문의를 접수하지 못했어요</strong><p class="small">입력한 내용과 파일은 그대로예요.</p><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+    <div class="notice danger" role="alert" data-show="s=nokind"><strong>입력을 확인해 주세요 (1곳)</strong></div>
+
+    <form class="stack" id="f" onsubmit="return false" novalidate aria-label="운영팀 문의">
+      <div class="field" id="stn-f"><label class="label" for="stn-s">방송국</label>
+        <select class="input" id="stn-s" data-show="stn=3"><option>샘플 방송국</option><option>은혜 방송국</option><option>소망 방송국</option></select>
+        <p data-show="stn=1"><strong>샘플 방송국</strong> <span class="muted small">하나뿐이라 자동으로 골랐어요</span></p></div>
+
+      <fieldset aria-describedby="e-kind kind-h" id="kinds">
+        <legend>문의 유형 <span class="muted">필수</span></legend>
+        <label class="check" data-show="role=owner"><input type="radio" name="kind" value="sanc"><span>제재·이의 기한 관련</span></label>
+        <label class="check" data-show="role=owner"><input type="radio" name="kind" value="settle"><span>정산</span></label>
+        <label class="check" data-show="role=owner"><input type="radio" name="kind" value="verify"><span>목사 인증</span></label>
+        <label class="check" data-show="role=owner"><input type="radio" name="kind" value="owner"><span>소유자 교체</span></label>
+        <label class="check"><input type="radio" name="kind" value="station"><span>방송국 설정</span></label>
+        <label class="check"><input type="radio" name="kind" value="member"><span>구성원</span></label>
+        <label class="check"><input type="radio" name="kind" value="content"><span>콘텐츠(영상)</span></label>
+        <label class="check" data-show="role=owner"><input type="radio" name="kind" value="other"><span>기타</span></label>
+        <p class="help" id="kind-h" data-show="role=adm0|admall">제재·정산 문의는 소유자만 할 수 있어요</p>
+        <p class="err" id="e-kind" role="alert" hidden>문의 유형을 선택해 주세요.</p>
+      </fieldset>
+
+      <div class="field"><label class="label" for="rel">관련 항목 <span class="muted">선택</span></label>
+        <select class="input" id="rel"><option>해당 없음</option><option>샘플 조치 (제재 안내)</option><option>샘플 영상</option><option>샘플 정산 월</option></select></div>
+
+      <div class="field"><label class="label" for="body">내용 <span class="muted">필수</span></label>
+        <textarea class="textarea" id="body" rows="6" aria-describedby="body-h body-e"></textarea>
+        <p class="help" id="body-h">계좌·전화번호는 쓰지 마세요</p>
+        <p class="err" id="body-e" role="alert" hidden>내용을 입력해 주세요.</p></div>
+
+      <div class="field"><label class="label" for="att">첨부 <span class="muted">선택</span></label>
+        <input class="input" type="file" id="att" aria-describedby="att-h"><p class="help" id="att-h"><span class="slot">형식·용량 미정</span></p></div>
+
+      <button class="btn primary block" type="submit" id="go" data-show="s=normal|empty|nokind|done|dup|fail">문의 접수</button>
+      <button class="btn primary block" type="submit" disabled aria-busy="true" data-show="s=sending">접수하는 중</button>
+    </form>
+
+    <section id="mine" aria-labelledby="h-mine" style="margin-top:24px">
+      <h2 id="h-mine">내 문의</h2>
+      <div class="empty" data-show="s=empty" style="margin-top:12px"><p><strong>접수한 문의가 없어요</strong></p></div>
+      <ul class="plain" style="margin-top:8px" data-show="s=normal|nokind|sending|done|dup|fail">
+        <li class="qrow"><details><summary><span><strong>결제 이후 정산 내역이 달라 보여요</strong><br><span class="muted small">11월 13일 접수 · 정산</span></span><span class="tag wip">확인 중</span></summary><p class="ans muted">아직 답변이 없어요. 답변이 오면 알림으로 알려 드려요.</p></details></li>
+        <li class="qrow" data-show="role=owner"><details><summary><span><strong>이의제기 기간이 지났어요</strong><br><span class="muted small">11월 5일 접수 · 제재·이의 기한 관련</span></span><span class="tag ok">답변 왔어요</span></summary><p class="ans">샘플 답변 내용입니다 (가상).</p></details></li>
+        <li class="qrow"><details><summary><span><strong>방송국 소개를 바꾸고 싶어요</strong><br><span class="muted small">11월 1일 접수 · 방송국 설정</span></span><span class="tag off">종결</span></summary><p class="ans">샘플 답변 내용입니다 (가상).</p></details></li>
+      </ul>
+    </section>
+  </div>
+</div>
+</div></main>
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); }, q = new URLSearchParams(location.search);
+  function kinds() { return [].slice.call(document.querySelectorAll('#kinds input')); }
+  function chk() { return kinds().filter(function (x) { return x.checked; })[0]; }
+  // 제재 안내에서 오면 유형을 미리 채운다(소유자만 고를 수 있는 유형)
+  function pre() { if (q.get('from') === 'sanc' && b.dataset.role === 'owner' && !chk()) kinds()[0].checked = true; }
+  window.mockAfter = function () {
+    pre();
+    var nk = b.dataset.s === 'nokind' && !chk();
+    $('e-kind').hidden = !nk; $('kinds').querySelectorAll('input').forEach(function (x) { x.setAttribute('aria-invalid', String(nk)); });
+    var r = b.dataset.role; if (r !== 'owner' && chk() && chk().closest('[hidden]')) chk().checked = false;
+  };
+  $('f').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var k = !chk(), t = !$('body').value.trim();
+    $('e-kind').hidden = !k; $('body-e').hidden = !t; $('body').setAttribute('aria-invalid', String(t));
+    if (k) { kinds().filter(function (x) { return !x.closest('[hidden]'); })[0].focus(); return; } if (t) { $('body').focus(); return; }
+    b.dataset.s = 'done'; $('body').value = ''; window.mockRender(); $('h-inq').focus();
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

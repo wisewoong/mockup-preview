@@ -16,7 +16,7 @@
   <div class="group"><b>처리 상태</b><button data-set="pr:run">처리 중</button><button data-set="pr:ready">준비 완료</button><button data-set="pr:failed">실패</button><button data-set="pr:retrying">다시 처리 중</button><button data-set="pr:failedagain">다시 실패</button><button data-set="pr:reqsent">요청 접수</button><button data-set="pr:opproc">운영자 처리 중</button><button data-set="pr:opdone">운영자 완료</button><button data-set="pr:opfail">처리 불가</button></div>
   <div class="group"><b>공개 범위</b><button data-set="vis:private">비공개</button><button data-set="vis:link">링크 공개</button><button data-set="vis:public">전체 공개</button><b>권리 확인</b><button data-set="rt:need">필요</button><button data-set="rt:done">완료</button><b>출처</b><button data-set="src:auto">자동 녹화</button><button data-set="src:upload">업로드</button><b>운영 조치</b><button data-set="op:none">없음</button><button data-set="op:blocked">차단</button></div>
   <div class="group"><b>상세·대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:detail">상세 열림</button><button data-set="dlg:rc">권리 확인 게이트</button><button data-set="dlg:pub">공개 변경 확인</button><button data-set="dlg:reject">서버 거절</button><button data-set="dlg:saveerr">저장 실패</button><button data-set="dlg:conflict">동시 변경</button><button data-set="dlg:ok">성공</button></div>
-  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 상세 시트는 어느 행의 [관리]를 눌러도 막대 값(첫 행)을 보여 주는 목업이에요. 사용자 결정 전: 운영자 재처리 요청의 수신 화면, 구독 알림 여부.</p>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 상세 시트는 어느 행의 [관리]를 눌러도 막대 값(첫 행)을 보여 주는 목업이에요. 사용자 결정 전: 운영자 재처리 요청의 수신 화면. 구독 알림은 체크박스(최초 공개 1회, 05 Q49).</p>
 </div></div>
 
 <main class="wrap"><div class="col">
@@ -114,7 +114,8 @@
 <!-- 공개 범위 변경 확인 -->
 <dialog id="pub-dlg" aria-labelledby="pub-t"><h2 id="pub-t">공개 범위를 바꿀까요?</h2>
   <p style="margin-top:8px"><strong id="pub-to">전체 공개</strong>로 바꿔요.</p>
-  <p class="small muted" style="margin-top:8px">구독자에게 알림이 가는지: <span class="slot">정책 확정 전</span></p>
+  <label class="check" style="margin-top:12px"><input type="checkbox" id="pub-notify" checked><span>구독자에게 알림 보내기</span></label>
+  <p class="help">새 영상 알림은 최초 공개 때 한 번만 보낼 수 있어요. 이미 보낸 영상은 다시 보내지 않아요 <span class="slot">알림 규칙</span></p>
   <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="pub-ok">바꾸기</button></div>
 </dialog>
 

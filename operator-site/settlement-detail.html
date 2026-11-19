@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>정산 상세 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-settlements.css">
+</head>
+<body data-default="role:super s:normal st:closed hold:none adj:none rcv:ok dlg:closed">
+<!-- 정산 상세. 마감 후 금액 수정 입력 없음(조정 거래만). 보류는 여기서만. 지급은 최고 관리자 수동 기록. 금액·세율·기한은 슬롯 -->
+<header id="site-header" data-active="settlements"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:conflict">충돌</button></div>
+  <div class="group"><b>진행</b><button data-set="st:collecting">집계 중</button><button data-set="st:closed">마감</button><button data-set="st:ready">지급 대기</button><button data-set="st:paid">지급 완료</button><button data-set="st:fail">지급 실패</button></div>
+  <div class="group"><b>보류</b><button data-set="hold:none">없음</button><button data-set="hold:on">보류 중</button><b>조정</b><button data-set="adj:none">없음</button><button data-set="adj:on">있음</button><b>수령 정보</b><button data-set="rcv:none">미제출</button><button data-set="rcv:wait">확인 대기</button><button data-set="rcv:ok">확인됨</button><button data-set="rcv:rej">반려</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <p class="small"><a href="settlements.html">‹ 정산 목록</a></p>
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:160px;margin-top:12px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>정산 상세를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+
+    <div class="stack" data-show="s=normal|saveerr|conflict">
+      <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 값은 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
+      <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 운영자가 먼저 바꿨어요</strong><p>입력한 값은 그대로 두었어요. 새로 불러온 뒤 다시 확인해 주세요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">새로 불러오기</button></p></div>
+
+      <header class="stack">
+        <h1><a href="station-detail.html">샘플 방송국 A</a> <span class="muted small">정산 <span class="slot">샘플 기간</span></span></h1>
+        <p class="tags" id="h-tags"></p>
+      </header>
+
+      <div class="notice" id="blk"></div>
+      <div class="notice" data-show="role=op"><strong>읽기 전용</strong><p class="small">마감·조정·보류·지급은 최고 관리자만 해요. 값과 이력은 볼 수 있어요.</p></div>
+
+      <section aria-labelledby="h-amt"><h2 id="h-amt">금액 요약</h2>
+        <div class="cur" style="margin-top:8px">
+          <div><span class="muted">후원 합계</span><span class="v"><span class="slot">금액</span></span></div>
+          <div><span class="muted">수수료</span><span class="v"><span class="slot">금액</span></span></div>
+          <div><span class="muted">조정</span><span class="v" id="a-adj"><span class="slot">금액</span></span></div>
+          <div><span class="muted">세금</span><span class="v"><span class="slot">금액</span></span></div>
+          <div><span class="muted">보류 금액</span><span class="v" id="a-hold"><span class="slot">금액</span></span></div>
+          <div><span class="muted">지급 예정</span><span class="v"><span class="slot">금액</span></span></div>
+          <p class="muted small" style="flex-basis:100%">목회자 정산 내역과 같은 항목·순서예요. 후원자는 후원 ID로만 보여요. 식별 열람은 별도 경로로만 해요 <span class="slot">PY-22</span></p>
+        </div></section>
+
+      <section aria-labelledby="h-cmp"><h2 id="h-cmp">구성 항목</h2>
+        <div class="tbl-wrap cards" style="margin-top:8px"><table><caption class="sr">정산 구성 항목(후원)</caption>
+          <thead><tr><th scope="col">구분</th><th scope="col">건수</th><th scope="col">금액</th></tr></thead>
+          <tbody><tr><td data-label="구분">후원</td><td data-label="건수"><span class="slot">건수</span></td><td data-label="금액"><span class="slot">금액</span></td></tr></tbody></table></div>
+        <details style="margin-top:8px"><summary>환산 근거</summary>
+          <p class="small" style="margin-top:8px">환산은 후원 시점의 구매 기록(상품 스냅샷)에서 구해요. 열매는 먼저 산 구매분부터 쓰는 선입선출이에요. 별도 환산 정책 버전은 없어요. 유효기간 만료분 처리는 <span class="slot">정책 확정 전</span>.</p>
+          <ul class="plain"><li style="padding:8px 0;border-bottom:1px solid var(--line)">후원 ID <span class="slot">샘플 #1</span> · 구매 기록 <span class="slot">상품 스냅샷</span> · <span class="slot">금액</span></li></ul></details></section>
+
+      <section aria-labelledby="h-fee"><h2 id="h-fee">적용 수수료율</h2>
+        <ul class="plain" style="margin-top:8px"><li style="padding:8px 0;border-bottom:1px solid var(--line)">기본 <span class="slot">V2</span> · 적용 시작일 <span class="slot">샘플 날짜</span></li>
+          <li style="padding:8px 0;border-bottom:1px solid var(--line)">파트너 <span class="slot">V3</span> · 적용 시작일 <span class="slot">샘플 날짜</span> · <span class="muted small">파트너 여부는 정산 기간 단위로 정해요 <span class="slot">ST-14</span></span></li></ul>
+        <p class="small" style="margin-top:4px"><a href="fees.html">수수료율 버전 보기 ›</a></p></section>
+
+      <section aria-labelledby="h-adj"><h2 id="h-adj">조정 거래 이력</h2>
+        <p class="muted small" style="margin:4px 0 8px">이력은 추가만 돼요. 수정·삭제는 없어요.</p>
+        <p class="muted" id="adj-none">조정 거래가 없어요</p>
+        <ul class="plain" id="adj-list" hidden><li style="padding:8px 0;border-bottom:1px solid var(--line)"><strong>샘플 사유 <span class="slot">ST-12</span></strong> · <span class="slot">금액</span> · 연결 건 <a href="refunds.html">환불 샘플 #1</a> · <span class="muted small">다음 배치에서 차감·이월 · 이월 한도 <span class="slot">D6</span></span><br><span class="muted small">샘플 운영자 · 샘플 시각</span></li></ul></section>
+
+      <section aria-labelledby="h-hld"><h2 id="h-hld">보류 이력</h2>
+        <p class="muted" id="hld-none">보류 이력이 없어요</p>
+        <ul class="plain" id="hld-list" hidden><li style="padding:8px 0;border-bottom:1px solid var(--line)"><strong>정산 보류 중</strong> · 범위 <span class="slot">전체/일부 금액</span> · 사유 <span class="slot">샘플 사유</span> · 증거 <span class="slot">제재·이의 ID</span><br><span class="muted small">샘플 운영자 · 샘플 시각</span><br>
+          <button class="linkbtn" type="button" data-open="release-dlg" data-role="super" aria-describedby="ro-why">보류 해제</button></li></ul></section>
+
+      <section aria-labelledby="h-pay"><h2 id="h-pay">지급</h2>
+        <div class="limit" style="margin-top:8px"><dl>
+          <dt>수령 정보</dt><dd id="p-rv"></dd>
+          <dt>은행·계좌</dt><dd><span class="mask">샘플은행 •••• 1234</span> <span class="muted small">예금주 샘플 이름</span></dd>
+          <dt>지급 기록</dt><dd id="p-rec"></dd></dl></div>
+        <p class="muted small" style="margin-top:4px">지급 상태는 운영사가 수동으로 기록해요. 이체 연동은 없어요. 전체 계좌 열람은 <a href="payout-reviews.html">수령 정보 확인</a>에서만 해요.</p>
+        <ul class="plain" id="p-fail" hidden style="margin-top:8px"><li style="padding:8px 0;border-bottom:1px solid var(--line)"><strong>지급 실패</strong> · 사유 코드 <span class="slot">ST-10</span> · 샘플 시각</li></ul></section>
+
+      <section aria-labelledby="h-act"><h2 id="h-act" class="sr">작업</h2>
+        <div class="act-bar">
+          <button class="btn primary" type="button" id="b-pay" data-open="pay-dlg" data-role="super" aria-describedby="pay-why">지급 실행</button>
+          <button class="btn" type="button" id="b-retry" data-open="retry-dlg" data-role="super" aria-describedby="pay-why">재시도</button>
+          <span class="more"><button class="btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="더 보기">⋯ 더 보기</button>
+            <div class="mn" role="menu" hidden>
+              <button role="menuitem" type="button" data-open="adj-dlg" data-role="super" id="m-adj">조정 거래 추가</button>
+              <button role="menuitem" type="button" data-open="hold-dlg" data-role="super" id="m-hold">정산 보류</button>
+              <button role="menuitem" type="button" data-open="fail-dlg" data-role="super" id="m-fail">지급 실패 기록</button></div></span>
+        </div>
+        <p class="help" id="ro-why" data-show="role=op">최고 관리자만 할 수 있어요</p>
+        <p class="help" id="pay-why"></p></section>
+    </div>
+  </main>
+</div>
+
+<dialog id="adj-dlg" aria-labelledby="adj-t"><h2 id="adj-t">조정 거래를 추가할까요?</h2>
+  <form class="stack" onsubmit="return false" style="margin-top:12px" aria-label="조정 거래">
+    <label class="field"><span class="label">사유 코드 <span class="muted">필수</span></span><select class="input" data-req aria-describedby="adj-a-e"><option value="">고르세요</option><option>환불 반영 (ST-12)</option><option>오류 정정 (ST-12)</option><option>기타 (ST-12)</option></select><span class="err" id="adj-a-e" hidden>사유 코드를 골라 주세요.</span></label>
+    <label class="field"><span class="label">금액 (원, 음수 가능) <span class="muted">필수</span></span><input class="input" inputmode="text" data-amt data-req aria-describedby="adj-b-e" autocomplete="off"><span class="err" id="adj-b-e" hidden>금액을 입력해 주세요.</span></label>
+    <label class="field"><span class="label">연결 건 <span class="muted">필수</span></span><input class="input" data-req placeholder="환불 건 번호 등" aria-describedby="adj-c-e"><span class="err" id="adj-c-e" hidden>연결 건을 입력해 주세요.</span></label>
+    <label class="field"><span class="label">메모 <span class="muted">필수</span></span><textarea class="textarea" rows="3" data-req aria-describedby="adj-d-e"></textarea><span class="err" id="adj-d-e" hidden>메모를 입력해 주세요.</span></label>
+    <h3>변경 전 → 후</h3>
+    <div class="tbl-wrap"><table><caption class="sr">조정 전후 비교</caption><thead><tr><th scope="col">항목</th><th scope="col">현재</th><th scope="col">조정 후</th></tr></thead>
+      <tbody><tr><th scope="row">지급 예정</th><td><span class="slot">금액</span></td><td><span class="slot">금액</span></td></tr></tbody></table></div>
+    <p class="small">마감된 금액은 고치지 않아요. 조정은 다음 배치에서 차감하거나 이월해요 <span class="slot">이월 한도</span>.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" data-go="adj">조정 추가</button></div>
+  </form></dialog>
+
+<dialog id="hold-dlg" aria-labelledby="hold-t"><h2 id="hold-t">이 정산을 보류할까요?</h2>
+  <p class="small" style="margin-top:8px">신고 건수만으로 보류하지 않아요. 사유와 증거가 있어야 해요. 담당자와 시각은 자동으로 기록돼요.</p>
+  <form class="stack" onsubmit="return false" style="margin-top:12px" aria-label="정산 보류">
+    <label class="field"><span class="label">사유 <span class="muted">필수</span></span><textarea class="textarea" rows="3" data-req aria-describedby="hold-a-e"></textarea><span class="err" id="hold-a-e" hidden>사유를 입력해 주세요.</span></label>
+    <fieldset class="radios"><legend>범위 <span class="muted">필수</span></legend>
+      <label class="check"><input type="radio" name="hs" checked> 전체</label><label class="check"><input type="radio" name="hs"> 일부 금액</label></fieldset>
+    <label class="field"><span class="label">증거 (첨부 이름 또는 제재·이의 ID) <span class="muted">필수</span></span><input class="input" data-req aria-describedby="hold-b-e"><span class="err" id="hold-b-e" hidden>증거를 입력해 주세요.</span></label>
+    <p class="muted small">보류 알림은 목회자에게 가요 <span class="slot">문구 확정 전</span>.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" data-go="hold">정산 보류</button></div>
+  </form></dialog>
+
+<dialog id="release-dlg" aria-labelledby="rel-t"><h2 id="rel-t">보류를 해제할까요?</h2>
+  <form class="stack" onsubmit="return false" style="margin-top:12px" aria-label="보류 해제">
+    <label class="field"><span class="label">해제 사유 <span class="muted">필수</span></span><textarea class="textarea" rows="3" data-req aria-describedby="rel-a-e"></textarea><span class="err" id="rel-a-e" hidden>사유를 입력해 주세요.</span></label>
+    <p class="muted small">해제자와 시각이 기록돼요.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" data-go="release">보류 해제</button></div>
+  </form></dialog>
+
+<dialog id="pay-dlg" aria-labelledby="pay-t"><h2 id="pay-t">지급했다고 기록할까요?</h2>
+  <div class="limit" style="margin-top:12px"><dl><dt>지급 예정</dt><dd><span class="slot">금액</span></dd><dt>받는 계좌</dt><dd><span class="mask">샘플은행 •••• 1234</span></dd></dl></div>
+  <p class="small" style="margin-top:8px">수령 정보가 확인됨일 때만 지급해요. 이체는 이 화면 밖에서 하고, 여기엔 결과만 기록해요.</p>
+  <form class="stack" onsubmit="return false" style="margin-top:12px" aria-label="지급 기록">
+    <label class="field"><span class="label">지급일 <span class="muted">필수</span></span><input class="input" type="date" data-req aria-describedby="pay-a-e"><span class="err" id="pay-a-e" hidden>지급일을 골라 주세요.</span></label>
+    <label class="check"><input type="checkbox" data-req aria-describedby="pay-b-e"> 받는 계좌와 금액을 확인했어요</label><span class="err" id="pay-b-e" hidden>확인에 체크해 주세요.</span>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" data-go="pay">지급 기록</button></div>
+  </form></dialog>
+
+<dialog id="fail-dlg" aria-labelledby="fail-t"><h2 id="fail-t">지급 실패로 기록할까요?</h2>
+  <form class="stack" onsubmit="return false" style="margin-top:12px" aria-label="지급 실패 기록">
+    <label class="field"><span class="label">실패 사유 코드 <span class="muted">필수</span></span><select class="input" data-req aria-describedby="fail-a-e"><option value="">고르세요</option><option>계좌 오류 (ST-10)</option><option>예금주 불일치 (ST-10)</option><option>기타 (ST-10)</option></select><span class="err" id="fail-a-e" hidden>사유 코드를 골라 주세요.</span></label>
+    <label class="field"><span class="label">메모</span><textarea class="textarea" rows="2"></textarea></label>
+    <p class="muted small">목회자에게 지급 실패가 알려져요 <span class="slot">문구 확정 전</span>.</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" data-go="fail">실패 기록</button></div>
+  </form></dialog>
+
+<dialog id="retry-dlg" aria-labelledby="rt-t"><h2 id="rt-t">지급을 다시 시도할까요?</h2><p class="muted small" style="margin-top:8px">지급 대기로 돌아가요. 수령 정보가 확인됨이고 보류가 없어야 지급할 수 있어요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" data-go="retry">재시도</button></div></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); };
+  var PR = { collecting: ['wip', '집계 중'], closed: ['off', '마감'], ready: ['wait', '지급 대기'], paid: ['ok', '지급 완료'], fail: ['bad', '지급 실패'] };
+  var RV = { none: ['off', '미제출'], wait: ['wait', '확인 대기'], ok: ['ok', '확인됨'], rej: ['bad', '반려'] };
+  function eff() { return d.st === 'ready' && (d.rcv !== 'ok' || d.hold === 'on') ? 'closed' : d.st; }
+  function tag(m) { return '<span class="tag ' + m[0] + '">' + m[1] + '</span>'; }
+  window.mockAfter = function () {
+    document.querySelectorAll('[data-role="super"]').forEach(function (x) { x.disabled = d.role !== 'super'; });
+    var e = eff(), pr = PR[e], rv = RV[d.rcv], hold = d.hold === 'on', closed = e !== 'collecting';
+    $('h-tags').innerHTML = tag(pr) + (hold ? '<span class="tag bad">정산 보류</span>' : '') + tag([rv[0], '수령 정보 ' + rv[1]]);
+    var blk = $('blk'), t, p;
+    if (hold) { t = '보류 중이에요'; p = '해제하기 전에는 지급하지 않아요. 아래 보류 이력에서 해제할 수 있어요.'; blk.className = 'notice danger'; }
+    else if (e === 'fail') { t = '지급에 실패했어요'; p = '실패 사유를 확인하고 재시도하거나 수령 정보를 다시 확인해 주세요.'; blk.className = 'notice danger'; }
+    else if (closed && d.rcv !== 'ok') { t = '수령 정보가 확인되지 않았어요'; p = '확인되기 전에는 지급하지 않아요. 마감은 그대로 유지돼요. 수령 정보 확인 화면에서 처리해 주세요.'; blk.className = 'notice'; }
+    else if (!closed) { t = '집계 중이에요'; p = '마감 전에는 금액이 바뀔 수 있어요. 마감은 정산 마감 화면에서 해요.'; blk.className = 'notice'; }
+    else { t = '막힌 곳이 없어요'; p = e === 'paid' ? '지급이 끝났어요.' : '지급 실행을 할 수 있어요.'; blk.className = 'notice'; }
+    blk.innerHTML = '<strong>' + t + '</strong><p class="small">' + p + (d.rcv !== 'ok' && !hold && e !== 'fail' && closed ? ' <a href="payout-reviews.html">수령 정보 확인 ›</a>' : '') + '</p>';
+    $('a-adj').innerHTML = d.adj === 'on' ? '<span class="slot">금액</span>' : '<span class="muted">없음</span>';
+    $('a-hold').innerHTML = hold ? '<span class="slot">금액</span>' : '<span class="muted">없음</span>';
+    $('adj-none').hidden = d.adj === 'on'; $('adj-list').hidden = d.adj !== 'on';
+    $('hld-none').hidden = hold; $('hld-list').hidden = !hold;
+    $('p-rv').innerHTML = tag(rv);
+    $('p-rec').innerHTML = e === 'paid' ? '지급일 <span class="slot">샘플 날짜</span> · 기록자 샘플 운영자' : e === 'fail' ? '지급 실패 · <span class="slot">샘플 시각</span>' : '<span class="muted">아직 지급 기록이 없어요</span>';
+    $('p-fail').hidden = e !== 'fail';
+    var can = e === 'ready';
+    $('b-pay').hidden = e === 'fail' || e === 'paid'; $('b-retry').hidden = e !== 'fail';
+    $('b-pay').disabled = d.role !== 'super' || !can;
+    $('m-adj').disabled = d.role !== 'super' || !closed; $('m-hold').disabled = d.role !== 'super' || hold;
+    $('m-fail').disabled = d.role !== 'super' || !can;
+    $('pay-why').textContent = d.role !== 'super' ? '' : e === 'collecting' ? '마감 후에 지급할 수 있어요' : hold ? '보류를 해제해야 지급할 수 있어요' : d.rcv !== 'ok' && e !== 'fail' && e !== 'paid' ? '수령 정보가 확인됨일 때만 지급해요' : '';
+    var m = document.querySelector('dialog[open]');
+    if (d.dlg !== 'closed' && !m && $(d.dlg + '-dlg')) $(d.dlg + '-dlg').showModal();
+  };
+  var NEXT = { adj: ['adj', 'on'], hold: ['hold', 'on'], release: ['hold', 'none'], pay: ['st', 'paid'], fail: ['st', 'fail'], retry: ['st', 'ready'] };
+  document.addEventListener('input', function (e) {
+    if (e.target.hasAttribute('data-amt')) { var v = e.target.value.replace(/[^\d-]/g, ''), neg = v[0] === '-'; v = v.replace(/-/g, ''); e.target.value = (neg ? '-' : '') + (v ? Number(v).toLocaleString('ko-KR') : ''); }
+  });
+  document.addEventListener('click', function (e) {
+    var g = e.target.closest('[data-go]'); if (!g) return;
+    var dl = g.closest('dialog'), first = null;
+    dl.querySelectorAll('[data-req]').forEach(function (f) {
+      var bad = f.type === 'checkbox' ? !f.checked : !f.value.trim(), er = $(f.getAttribute('aria-describedby'));
+      if (er) er.hidden = !bad; f.setAttribute('aria-invalid', String(bad)); if (bad && !first) first = f;
+    });
+    if (first) { first.focus(); return; }
+    g.disabled = true;
+    setTimeout(function () { var n = NEXT[g.dataset.go]; d[n[0]] = n[1]; g.disabled = false; d.dlg = 'closed'; dl.close(); window.mockRender(); }, 500);
+  });
+  document.querySelectorAll('dialog').forEach(function (x) { x.addEventListener('close', function () { d.dlg = 'closed'; }); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

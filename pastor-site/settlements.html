@@ -6,7 +6,7 @@
 <title>정산 내역 - 말씀ON 목회자</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body data-default="role:owner s:normal st:confirmed adj:none hold:none pay:none dlg:closed">
+<body data-default="role:owner rcv:ok s:normal st:confirmed adj:none hold:none pay:none dlg:closed">
 <!-- 정산 내역(DESIGN-REMAINING 2묶음). 소유자만, 읽기 전용. 금액·날짜·사유·요율 기간은 모두 슬롯, 계산·지급은 수동(구조만) -->
 <header id="site-header" data-active="settlements"></header>
 
@@ -15,8 +15,9 @@
   <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
   <div class="group"><b>최근 정산</b><button data-set="st:collecting">집계 중</button><button data-set="st:confirmed">확정</button><button data-set="st:payready">지급 대기</button><button data-set="st:paid">지급 완료</button></div>
   <div class="group"><b>조정</b><button data-set="adj:none">없음</button><button data-set="adj:on">있음</button><b>보류</b><button data-set="hold:none">없음</button><button data-set="hold:on">보류 중</button><b>지급</b><button data-set="pay:none">정상</button><button data-set="pay:fail">지급 실패</button></div>
+  <div class="group"><b>수령 정보</b><button data-set="rcv:none">미제출</button><button data-set="rcv:wait">확인 대기</button><button data-set="rcv:ok">확인됨</button><button data-set="rcv:rej">반려</button></div>
   <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:detail">상세 열림</button></div>
-  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 상태 막대는 맨 위 월에 적용돼요. 상품명·금액·날짜·사유는 모두 샘플 슬롯이에요. 사용자 결정 전: 수령 주체, 세금 처리, 지급 상태 입력 경로.</p>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 상태 막대는 맨 위 월에 적용돼요. 상품명·금액·날짜·사유는 모두 샘플 슬롯이에요. 사용자 결정 전: 수령 주체, 세금 처리.</p>
 </div></div>
 
 <main class="wrap"><div class="col">
@@ -33,15 +34,18 @@
 
 <div class="stack" data-show="s=normal">
   <div class="notice danger" role="alert" data-show="hold=on"><strong>이 정산은 보류 중이에요</strong>
-    <p class="small">사유 <span class="slot">사유</span> · 범위 <span class="slot">범위</span> · 시각 <span class="slot">시각</span> · 처리: 운영사</p>
+    <p class="small">사유 <span class="slot">사유</span> · 범위(전체/일부 금액) <span class="slot">범위</span> · 시각 <span class="slot">시각</span> · 처리자 <span class="slot">운영사 담당자</span></p>
     <p class="help">신고가 접수됐다는 이유만으로 보류하지 않아요 <span class="slot">정책 확정 전</span></p>
     <p style="margin-top:8px"><a class="btn lnk" href="sanctions.html">이의제기</a></p></div>
   <div class="notice danger" role="alert" data-show="pay=fail"><strong>지급하지 못했어요. 운영사가 확인 중이에요</strong>
     <p class="small">실패 사유 <span class="slot">사유</span> · 재시도 이력 <span class="slot">이력</span></p></div>
 
+  <p class="notice" data-show="rcv=none|rej" id="rcv-warn"><strong id="rcv-t"></strong> <a class="btn lnk" href="payout-info.html">수령 정보 입력 ›</a></p>
+  <p class="small" data-show="rcv=wait|ok"><span id="rcv-l"></span> <a href="payout-info.html">수령 정보 ›</a></p>
   <section class="limit" aria-label="현재 상태"><dl>
     <dt>가장 최근 정산 월</dt><dd><span class="slot">월</span></dd>
     <dt>상태</dt><dd id="c-st"></dd>
+    <dt>지급 상태</dt><dd id="c-pay"></dd>
     <dt>지급 예정 금액</dt><dd id="c-amt"></dd>
   </dl></section>
 
@@ -84,6 +88,9 @@
   window.mockAfter = function () {
     if (d.role !== 'owner') return;
     var r = rows(), x = r[0];
+    var RVL = { none: '수령 정보를 아직 제출하지 않았어요. 제출하기 전에는 지급되지 않아요', wait: '수령 정보 확인 대기', ok: '수령 정보 확인됨', rej: '수령 정보가 반려됐어요. 다시 제출해 주세요' };
+    $('rcv-t').textContent = RVL[d.rcv] || ''; $('rcv-l').textContent = RVL[d.rcv] || '';
+    $('c-pay').innerHTML = x.fail ? '<span class="tag bad">지급 실패</span>' : x.st === 'paid' ? '<span class="tag ok">지급 완료</span> <span class="slot">지급일</span>' : x.st === 'payready' ? '<span class="tag wait">지급 대기</span>' : '<span class="muted">아직 지급 전이에요</span>';
     $('c-st').innerHTML = tag(x); $('c-amt').innerHTML = a(x); $('d-st').innerHTML = tag(x); $('d-amt').innerHTML = a(x);
     $('tb').innerHTML = r.map(function (y, i) { return '<tr><th scope="row"><span class="slot">월</span></th><td>' + tag(y) + '</td><td>' + a(y) + '</td><td>' + a(y) + '</td><td>' + (y.adj ? AMT : '<span class="muted">없음</span>') + '</td><td>' + a(y) + '</td><td>' + (y.hold ? AMT : '<span class="muted">없음</span>') + '</td><td>' + a(y) + '</td><td>' + btn(i) + '</td></tr>'; }).join('');
     $('cards').innerHTML = r.map(function (y, i) { return '<div class="mc"><p><strong><span class="slot">월</span></strong> ' + tag(y) + '</p><p class="big">' + a(y) + '</p><p class="small muted">지급 예정</p><div class="limit" style="margin-top:8px"><dl><dt>후원 합계</dt><dd>' + a(y) + '</dd><dt>수수료</dt><dd>' + a(y) + '</dd><dt>조정</dt><dd>' + (y.adj ? AMT : '없음') + '</dd><dt>세금</dt><dd>' + a(y) + '</dd><dt>보류 금액</dt><dd>' + (y.hold ? AMT : '없음') + '</dd></dl></div><div class="mem-acts">' + btn(i) + '</div></div>'; }).join('');

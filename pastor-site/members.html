@@ -82,7 +82,7 @@
   function me() { return b.dataset.role === 'owner' ? 'owner' : 'adm'; }
   function acts(x) {
     var o = me() === 'owner', h = '', t = function (s) { return '<span class="help" style="margin:0">' + s + '</span>'; };
-    if (x.r === 'owner') return t('변경할 수 없어요 · 소유자 교체는 운영사에 문의');
+    if (x.r === 'owner') return t('변경할 수 없어요 · 소유자 교체는 <a href="inquiry.html">운영팀 문의</a>로');
     if (x.st === 'd') return '<span class="sr">작업 없음</span>—';
     var M = function (l) { return window.moreMenu('더보기', l); }, D = function (k) { return 'data-a="' + k + '" data-id="' + x.id + '"'; };
     if (x.st === 'x') return B('다시 보내기', 'lnk', x.id, 'resend');

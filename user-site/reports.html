@@ -11,30 +11,34 @@
   .item.rep .st { text-align: right; }
   @media (max-width: 640px) { .item.rep { grid-template-columns: 1fr; gap: 8px; } .item.rep .st { text-align: left; } }
   .kv { display: grid; grid-template-columns: 96px 1fr; gap: 6px 12px; margin: 12px 0 0; }
+  .rp-ell strong { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
   .kv dt { color: var(--muted); } .kv dd { margin: 0; }
 </style>
 </head>
-<body data-default="s:normal ev:yes">
+<body data-default="s:normal ev:yes kind:other">
 <!-- 내 신고 처리 상태. 결과 문구는 슬롯이고 조치 내용·제재 여부를 단정하지 않는다. 조치 종류 공개 범위·신고 철회 제공 여부는 사용자 결정 전. -->
 <header id="site-header"></header>
 
 <div class="mockbar"><div class="wrap">
   <div class="group"><b>상태</b>
-    <button data-set="s:normal">정상 4건</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button><button data-set="s:moreerr">더 보기 실패</button><button data-set="s:guest">비로그인</button><button data-set="s:detail">상세</button>
+    <button data-set="s:normal">정상 5건</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button><button data-set="s:moreerr">더 보기 실패</button><button data-set="s:guest">비로그인</button><button data-set="s:detail">상세</button>
   </div>
+  <div class="group" data-show="s=detail"><b>대상</b><button data-set="kind:other">방송</button><button data-set="kind:chat">채팅 메시지</button><button data-set="kind:don">후원 메시지</button></div>
   <div class="group" data-show="s=detail"><b>증빙</b><button data-set="ev:yes">첨부 있음</button><button data-set="ev:none">첨부 없음</button></div>
   <p class="muted">조치 종류 공개 범위와 신고 철회 제공 여부, 상태 이름, 신고자에게 "조치 없음"을 보일지는 사용자 결정 전이에요. 증빙의 미리보기·다운로드, 열람 범위, 보존 기간, 삭제 요청 가능 여부도 사용자 결정 전이에요. 목록의 모든 행은 같은 샘플 상세로 이동해요.</p>
 </div></div>
 
 <main class="wrap"><div class="col">
   <h1 id="h-rep" tabindex="-1">내 신고</h1>
-  <p class="muted" style="margin-top:4px">신고 건수만으로 자동 조치되지 않고, 운영자가 확인해서 처리해요.</p>
+  <p class="muted" style="margin-top:4px">접수된 신고는 운영자가 검토해요. 바로 처리되지 않을 수 있고, 결과와 시점은 달라질 수 있어요.</p>
 
   <div data-show="s=normal|moreerr" style="margin-top:16px">
-    <p role="status" class="muted small">신고 4건</p>
+    <p role="status" class="muted small">신고 6건</p>
     <ul style="list-style:none;margin:8px 0 0;padding:0">
       <li class="item rep"><div><a class="name" href="reports.html?s=detail"><strong>로마서 8장 강해 12회</strong></a> · 방송<br><span class="muted small">외부 후원 유도 · 11월 14일 접수 · 첨부 2개</span></div><div class="st"><span class="badge plain wait">접수</span><br><span class="small"><span class="slot">처리 결과 안내 문구</span></span></div></li>
       <li class="item rep"><div><a class="name" href="reports.html?s=detail"><strong>주일 예배 다시보기</strong></a> · 다시보기<br><span class="muted small">부적절한 내용 · 11월 12일 접수 · 첨부 없음</span></div><div class="st"><span class="badge plain wip">검토 중</span><br><span class="small"><span class="slot">처리 결과 안내 문구</span></span></div></li>
+      <li class="item rep"><div><a class="name rp-ell" href="reports.html?s=detail&amp;kind=chat"><strong>“본문 몇 절인가요? 계좌로 보내 주시면…”</strong></a><br><span class="small">채팅 메시지</span><br><span class="muted small">외부 후원 유도 · 방송 「로마서 8장 강해 12회」 · 11월 15일 접수 · 첨부 1개</span></div><div class="st"><span class="badge plain wait">접수</span><br><span class="small"><span class="slot">처리 결과 안내 문구</span></span></div></li>
+      <li class="item rep"><div><a class="name rp-ell" href="reports.html?s=detail&amp;kind=don"><strong>“수요 모임 기도 부탁드립니다. 계좌로 후원하시면…”</strong></a><br><span class="small">후원 메시지</span><br><span class="muted small">외부 후원 유도 · 방송 「로마서 8장 강해 12회」 · 11월 16일 접수 · 첨부 1개</span></div><div class="st"><span class="badge plain wait">접수</span><br><span class="small"><span class="slot">처리 결과 안내 문구</span></span></div></li>
       <li class="item rep"><div><a class="name" href="reports.html?s=detail"><strong>볼 수 없는 내용</strong></a> · 채팅<br><span class="muted small">욕설·비방 · 11월 9일 접수 · 첨부 1개</span></div><div class="st"><span class="badge plain ok">처리 완료</span><br><span class="small"><span class="slot">처리 결과 안내 문구</span></span></div></li>
       <li class="item rep"><div><a class="name" href="reports.html?s=detail"><strong>새벽 기도회 라이브</strong></a> · 댓글<br><span class="muted small">스팸 · 11월 3일 접수 · 첨부 없음</span></div><div class="st"><span class="badge plain off">종결</span><br><span class="small"><span class="slot">처리 결과 안내 문구</span></span></div></li>
     </ul>
@@ -44,13 +48,35 @@
   <!-- 신고 상세(s:detail). 증빙은 파일명·개수만 보인다(권고안). 미리보기·다운로드·열람 범위·보존 기간은 사용자 결정 전이라 슬롯 -->
   <div data-show="s=detail" style="margin-top:16px">
     <p><a href="reports.html">내 신고 목록으로</a></p>
-    <h2 style="margin-top:12px">로마서 8장 강해 12회</h2>
+    <h2 style="margin-top:12px" data-show="kind=other">로마서 8장 강해 12회</h2>
+    <h2 style="margin-top:12px" data-show="kind=chat">채팅 메시지 신고</h2>
+    <h2 style="margin-top:12px" data-show="kind=don">후원 메시지 신고</h2>
     <dl class="kv">
-      <dt>신고 대상</dt><dd>방송</dd>
+      <dt>신고 대상</dt><dd data-show="kind=other">방송</dd><dd data-show="kind=chat">채팅 메시지</dd><dd data-show="kind=don">후원 메시지</dd>
       <dt>사유</dt><dd>외부 후원 유도</dd>
       <dt>접수일</dt><dd>11월 14일</dd>
       <dt>상태</dt><dd><span class="badge plain wait">접수</span> <span class="small"><span class="slot">처리 결과 안내 문구</span></span></dd>
     </dl>
+    <div data-show="kind=chat" style="margin-top:24px">
+      <h2>신고한 메시지</h2>
+      <dl class="kv">
+        <dt>작성자</dt><dd>하늘바람</dd>
+        <dt>보낸 시각</dt><dd><span class="slot">보낸 시각</span></dd>
+        <dt>방송</dt><dd><a href="live.html">로마서 8장 강해 12회</a></dd>
+      </dl>
+      <blockquote class="rp-q">본문 몇 절인가요? 계좌로 보내 주시면 안내해 드려요.</blockquote>
+      <p class="help">접수 당시 내용이에요. 원문이 숨겨졌거나 보존 기간이 지나면 이 자리에 <span class="slot">원문 표시 여부 사용자 결정 전</span></p>
+    </div>
+    <div data-show="kind=don" style="margin-top:24px">
+      <h2>신고한 후원 메시지</h2>
+      <dl class="kv">
+        <dt>작성자</dt><dd>든든한반석 <span class="muted small">(익명 후원이면 "익명")</span></dd>
+        <dt>보낸 시각</dt><dd><span class="slot">보낸 시각</span></dd>
+        <dt>방송</dt><dd><a href="live.html">로마서 8장 강해 12회</a></dd>
+      </dl>
+      <blockquote class="rp-q">수요 모임 기도 부탁드립니다. 계좌로 후원하시면 안내해 드려요.</blockquote>
+      <p class="help">접수 당시 내용이에요. 후원 금액과 후원 번호는 이 화면에 보이지 않아요. 원문이 숨겨졌거나 보존 기간이 지나면 이 자리에 <span class="slot">원문 표시 여부 사용자 결정 전</span></p>
+    </div>
     <h2 style="margin-top:24px">내가 올린 증빙</h2>
     <div data-show="ev=yes">
       <p role="status" class="muted small" style="margin-top:4px">첨부 2개</p>

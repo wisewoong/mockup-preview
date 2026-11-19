@@ -47,13 +47,13 @@
   <div data-show="m=login">
     <div class="notice danger" role="alert" data-show="s=fail" style="margin-top:16px"><strong>이메일이나 비밀번호가 맞지 않아요</strong><p class="muted small">다시 확인해 주세요. 계속 안 되면 비밀번호를 다시 설정할 수 있어요.</p></div>
     <div class="notice danger" role="alert" data-show="s=net" style="margin-top:16px"><strong>연결이 불안정해요</strong><p class="muted small">잠시 후 다시 시도해 주세요. 입력한 내용은 그대로 있어요.</p></div>
-    <div class="notice danger" role="alert" data-show="s=suspended" style="margin-top:16px"><strong>이용이 제한된 계정이에요</strong><p class="muted small">사유와 이의제기 방법은 안내 화면에서 볼 수 있어요.</p><p><a class="btn" href="#" style="margin-top:8px">제한 안내와 이의제기</a></p></div>
+    <div class="notice danger" role="alert" data-show="s=suspended" style="margin-top:16px"><strong>이용이 제한된 계정이에요</strong><p class="muted small">사유와 이의제기 방법은 안내 화면에서 볼 수 있어요.</p><p><a class="btn" aria-disabled="true" href="#" style="margin-top:8px">제한 안내와 이의제기</a> <span class="slot">화면 미작성</span></p></div>
     <form onsubmit="return false" data-show="s=normal|loading|fail|net">
       <label class="field"><span class="label">이메일</span><input class="input" type="email" autocomplete="email" inputmode="email" value="sample@example.com"></label>
       <div class="field"><label class="label" for="pw1">비밀번호</label><div class="pw"><input class="input" id="pw1" type="password" autocomplete="current-password" value="password1"><button class="btn" type="button" data-toggle aria-pressed="false" data-on="숨기기" data-off="보기">보기</button></div></div>
       <button class="btn primary" type="submit" data-show="s=normal|fail|net">로그인</button>
       <button class="btn primary" type="submit" disabled aria-busy="true" data-show="s=loading">로그인하는 중</button>
-      <p class="small" style="text-align:center"><a href="#">비밀번호를 잊었어요</a></p>
+      <p class="small" style="text-align:center"><a aria-disabled="true" href="#">비밀번호를 잊었어요</a> <span class="slot">화면 미작성</span></p>
     </form>
   </div>
 
@@ -73,9 +73,9 @@
         <p class="help"><span class="slot">생년월일 사용 목적 [법무 7-2 확인 전]</span></p>
         <p class="help">만 19세 미만은 시청·구독·채팅·댓글은 되지만 충전·후원은 할 수 없어요. <span class="slot">법무 7-2 확인 전</span></p>
         <p class="err" id="e-bd" data-show="s=missing">생년월일을 입력해 주세요.</p><p class="err" id="e-bd2" data-show="s=baddate">올바른 생년월일을 입력해 주세요. 오늘 이후 날짜는 쓸 수 없어요.</p></div>
-      <div class="field"><label class="check"><input type="checkbox" data-inv="missing" data-err="e-tm"><span><span class="slot">이용약관 동의 [약관 7-3 확인 전]</span> (필수) <a href="#">보기</a></span></label>
+      <div class="field"><label class="check"><input type="checkbox" data-inv="missing" data-err="e-tm"><span><span class="slot">이용약관 동의 [약관 7-3 확인 전]</span> (필수) <a href="terms.html?k=terms" target="_blank" rel="noopener" aria-label="이용약관 보기 (새 창)">보기</a> <span class="slot">버전·시행일</span></span></label>
         <p class="err" id="e-tm" data-show="s=missing">이용약관에 동의해 주세요.</p></div>
-      <label class="check"><input type="checkbox"><span><span class="slot">개인정보 처리방침 동의 [법무 7-2 확인 전]</span> (필수) <a href="#">보기</a></span></label>
+      <label class="check"><input type="checkbox"><span><span class="slot">개인정보 처리방침 동의 [법무 7-2 확인 전]</span> (필수) <a href="terms.html?k=privacy" target="_blank" rel="noopener" aria-label="개인정보 처리방침 보기 (새 창)">보기</a> <span class="slot">버전·시행일</span></span></label>
       <p class="muted small">시청 이력으로 방송을 추천받는 설정은 가입 뒤 <a href="reco-settings.html">추천 설정</a>에서 바꿀 수 있어요. <span class="slot">추천·시청 이력 수집 동의 방식 [법무 Q15·Q16 회신 후]</span></p>
       <button class="btn primary" type="submit" data-show="s=normal|missing|dupemail|dupnick|shortpw|baddate|under14">가입하기</button>
       <button class="btn primary" type="submit" disabled aria-busy="true" data-show="s=loading">가입하는 중</button>

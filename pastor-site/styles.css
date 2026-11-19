@@ -188,9 +188,6 @@ a { color: inherit; }
 
 /* 칩 */
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.chip { min-height: var(--tap); padding: 0 16px; border-radius: var(--radius); border: 1px solid var(--muted); background: var(--bg); color: var(--text); font: inherit; cursor: pointer; display: inline-flex; align-items: center; }
-.chip:hover { background: var(--bg-sub); }
-.chip[aria-pressed="true"] { border-color: var(--strong); background: var(--strong); color: var(--bg); font-weight: 700; }
 
 /* 방송 카드: 위계가 필요한 곳만 테두리 없이 이미지+텍스트 */
 .card { display: block; text-decoration: none; }
@@ -268,7 +265,6 @@ a { color: inherit; }
 .hsearch label { font-size: .9rem; color: var(--muted); }
 .hsearch .input { width: 200px; }
 .hide-d { display: none; }
-.tag { display: inline-block; font-size: .8rem; font-weight: 700; padding: 0 6px; border: 1px solid var(--muted); border-radius: var(--radius); color: var(--text); margin-right: 6px; line-height: 1.5; vertical-align: 1px; }
 .vstage { aspect-ratio: 16 / 9; background: #141415; color: #F5F4F1; border-radius: var(--radius); display: grid; place-items: center; text-align: center; padding: 16px; }
 .vstage p + p, .vstage p + .btn, .vstage p + a { margin-top: 8px; }
 .vstage .btn { background: #F5F4F1; color: #141412; border-color: #F5F4F1; }
@@ -353,16 +349,11 @@ dialog::backdrop { background: rgba(0, 0, 0, .55); }
 /* 알림 종 옆 안 읽음 숫자(색 점 금지, 글자로 표시) */
 .btn.ib.hasn { width: auto; padding: 0 12px; gap: 4px; }
 .bellbtn .cnt { font-size: .9rem; font-weight: 700; }
-.chip { gap: 4px; }
 .btn.primary .slot { color: inherit; border-color: currentColor; }
 
 /* 글자 위계(designer-typo): 라벨은 --muted, 값은 --strong 700, 본문 링크는 --accent + 밑줄 */
 p a:not(.btn):not(.card), .help a { color: var(--strong); text-decoration: underline; font-weight: 600; }
 strong, .cnt, .viewers { font-variant-numeric: tabular-nums; }
-.tag.host { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.tag.adm { color: var(--role-admin); border-color: var(--role-admin); }
-.tag.mgr { color: var(--role-mgr); border-color: var(--role-mgr); }
-.tag.bad, .badge.plain.bad { color: var(--danger); border-color: var(--danger); }
 .btn.primary .slot { font-weight: 700; border-style: solid; }
 .price { font-size: 1.1rem; }
 p a.nm-link:not(.btn):not(.card) { color: var(--strong); }
@@ -513,10 +504,6 @@ input[type="checkbox"]:not([role="switch"]):disabled, input[type="radio"]:disabl
 .ok { color: var(--strong); font-weight: 700; }
 .ok::before { content: "✓ "; }
 .me { color: var(--role-me); font-weight: 700; }
-.tag.ok { color: var(--strong); border-color: var(--strong); background: var(--bg-sub); }
-.tag.wip { color: var(--strong); border-color: var(--muted); }
-.tag.off { color: var(--muted); border-color: var(--line); font-weight: 600; }
-.tag.bad { background: var(--danger-bg); }
 table th[scope="row"] { color: var(--strong); font-weight: 700; }
 table.mem td:nth-child(4), table.mem td:nth-child(5), table.hist td:nth-child(n+3) { color: var(--text); }
 .nm-link, a.btn.bad { font-weight: 600; }
@@ -542,7 +529,7 @@ h1 { font-size: 1.75rem; font-weight: 700; }
 .bottombar a[aria-current="page"] { color: var(--strong); box-shadow: inset 0 2px 0 var(--strong); }
 
 /* 버튼: 기본은 고스트(테두리·채움 없음). 채움은 .primary 하나 */
-.btn { min-height: 40px; min-width: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: var(--text); font-weight: 600; font-size: .95rem; transition: background .2s, color .2s; }
+.btn { min-height: var(--tap); min-width: var(--tap); padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: var(--text); font-weight: 600; font-size: .95rem; transition: background .2s, color .2s; }
 .btn:hover { background: var(--s2); }
 .btn:active { transform: none; }
 .btn.lnk { color: var(--info); font-weight: 700; }
@@ -572,7 +559,7 @@ h1 { font-size: 1.75rem; font-weight: 700; }
 
 /* 필터: 밑줄 탭 + 글자형 셀렉트 + 토글 */
 .chips { display: flex; gap: 22px; flex-wrap: nowrap; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
-.chip { min-height: 40px; padding: 0 2px; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; color: var(--muted); font-weight: 500; font-size: .95rem; white-space: nowrap; transition: .2s; }
+.chip { font: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 2px; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; color: var(--muted); font-weight: 500; font-size: .95rem; white-space: nowrap; transition: .2s; }
 .chip:hover { background: none; color: var(--text); }
 .chip[aria-pressed="true"] { background: none; border: 0; border-bottom: 2px solid var(--strong); color: var(--strong); font-weight: 700; }
 .fbar2 { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 28px; padding: 14px 20px; background: var(--bg-sub); border: 1px solid var(--line); border-radius: 14px; }
@@ -787,8 +774,8 @@ body[data-bar="off"] .mockbar { display: none; } /* 캡처용: ?bar=off */
 @media (max-width: 767px) { .lc-grid .panel.stack > h2 + * { margin-top: 0; } }
 /* live-control 모바일 보강: 권한·모드별 표시 */
 @media (max-width: 767px) {
-  body[data-mode="worship"] #c-list li.don, body[data-role="mgr"] #c-list li.don, body[data-role="adm0"] #c-list li.don { display: none; } /* 예배 모드(S3 미확정)·후원 권한 없음: 채팅 안 후원 카드 숨김 */
-  body:not([data-mode="worship"]) #d-list .ck-w { display: none; } /* 확인 버튼은 예배 모드에서만(S3 slot) */
+  body[data-mode="worship"][data-dm="dash"] #c-list li.don, body[data-role="mgr"] #c-list li.don, body[data-role="adm0"] #c-list li.don { display: none; } /* 예배+대시보드 확인(dm)·후원 권한 없음: 채팅 안 후원 카드 숨김 */
+  body:not([data-mode="worship"]) #d-list .ck-w, body[data-dm="chat"] #d-list .ck-w { display: none; } /* 확인 버튼은 예배+대시보드 확인일 때만 */
   .mv-list .ck-w { display: inline-flex; align-items: center; padding: 0 2px; }
   .mv-list .ck-w .btn.ck { padding: 0 10px; }
   body:not([data-role="owner"]) .mv-list .btn.mm.staff { display: none; } /* 방송자·관리자·매니저 행의 관리는 소유자만 */
@@ -796,3 +783,12 @@ body[data-bar="off"] .mockbar { display: none; } /* 캡처용: ?bar=off */
   #sl .err, #sl .help { margin-top: 2px; }
 }
 @media (max-width: 767px) { #msg-body { overflow-wrap: anywhere; } }
+
+/* 주소 접두(방송국 만들기·설정 공통, 인라인 style에서 이동) */
+.pre { display: flex; align-items: stretch; gap: 0; }
+.pre .px { display: flex; align-items: center; padding: 0 10px; border: 1px solid var(--line); border-right: 0; border-radius: 8px 0 0 8px; background: var(--bg-sub); white-space: nowrap; }
+.pre .input { border-radius: 0 8px 8px 0; min-width: 0; flex: 1; }
+.clamp2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.cs-save { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.cs-form { padding-bottom: 96px; }
+@media (max-width: 700px) { .pre .px { font-size: .85em; } .cs-form .btn.primary { width: 100%; min-height: 48px; } }

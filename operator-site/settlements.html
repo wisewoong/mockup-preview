@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>정산 목록 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-settlements.css">
+</head>
+<body data-default="role:op s:normal f:all rv:all">
+<!-- 정산 목록. 상태 세 축(진행·보류·수령 정보)을 따로 보인다. 금액·기한은 슬롯. 정렬: 지급 실패>보류>지급 대기>마감>집계 중>지급 완료 -->
+<header id="site-header" data-active="settlements"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:partial">일부만 표시</button><button data-set="s:noperm">권한 없음</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>정산 목록</h1>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:80px"></div><div class="skeleton" style="height:160px;margin-top:12px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>정산 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=noperm"><p><strong>이 화면을 볼 권한이 없어요</strong></p><p>정산은 운영자만 볼 수 있어요. <a href="index.html">운영사 홈으로</a></p></div>
+
+    <div class="stack" data-show="s=normal|empty|partial">
+      <div class="notice" data-show="s=partial"><strong>일부만 표시하고 있어요</strong><p class="small">일부 방송국의 정산을 불러오지 못했어요. 표시된 목록은 정확해요. <button class="linkbtn" type="button" data-set="s:normal">다시 불러오기</button></p></div>
+      <div class="notice" data-show="role=op"><strong>조회만 할 수 있어요</strong><p class="small">마감·조정·보류·지급은 최고 관리자만 해요. 수령 정보 확인은 일반 운영자도 할 수 있어요.</p></div>
+
+      <section aria-labelledby="h-sum"><h2 id="h-sum" class="sr">요약</h2>
+        <div class="cur">
+          <button class="sum" type="button" data-set="f:ready" aria-describedby="h-sum"><span class="muted lbl">지급 대기</span><span class="v"><span class="slot">건수</span></span></button>
+          <button class="sum" type="button" data-set="f:hold"><span class="muted lbl">보류 중</span><span class="v"><span class="slot">건수</span></span></button>
+          <button class="sum" type="button" data-set="f:fail"><span class="muted lbl">지급 실패</span><span class="v"><span class="slot">건수</span></span></button>
+          <button class="sum" type="button" data-set="rv:unchk"><span class="muted lbl">수령 정보 미확인</span><span class="v"><span class="slot">건수</span></span></button>
+        </div></section>
+
+      <section aria-labelledby="h-flt"><h2 id="h-flt" class="sr">필터</h2>
+        <div class="chips" role="group" aria-label="진행 상태" id="chips">
+          <button class="chip" type="button" data-set="f:all">전체</button><button class="chip" type="button" data-set="f:wip">집계 중</button><button class="chip" type="button" data-set="f:closed">마감</button><button class="chip" type="button" data-set="f:ready">지급 대기</button><button class="chip" type="button" data-set="f:paid">지급 완료</button><button class="chip" type="button" data-set="f:fail">지급 실패</button><button class="chip" type="button" data-set="f:hold">보류 중만</button>
+        </div>
+        <div class="sf" style="margin-top:12px">
+          <label class="field"><span class="label">수령 정보</span><select class="input" id="rv-sel"><option value="all">전체</option><option value="unchk">미확인(미제출·확인 대기)</option><option value="ok">확인됨</option><option value="rej">반려</option></select></label>
+          <label class="field"><span class="label">정산 기간</span><input class="input" type="month" id="mon" value="2026-10"></label>
+          <label class="field"><span class="label">방송국 검색</span><input class="input" type="search" id="q" placeholder="방송국 이름"></label>
+        </div></section>
+
+      <div class="empty" data-show="s=empty"><p><strong>이 조건에 맞는 정산이 없어요</strong></p><p>첫 정산은 <span class="slot">첫 마감 시점</span> 마감 후 생겨요. <a href="settlement-batch.html">정산 마감</a></p></div>
+      <div class="empty" id="none" hidden><p><strong>이 조건에 맞는 정산이 없어요</strong></p><p><button class="btn" type="button" data-set="f:all">필터 풀기</button></p></div>
+
+      <div class="tbl-wrap cards" data-show="s=normal|partial"><table><caption class="sr">정산 목록</caption>
+        <thead><tr><th scope="col">정산 기간</th><th scope="col">방송국</th><th scope="col">진행</th><th scope="col">보류</th><th scope="col">수령 정보</th><th scope="col">지급 예정</th><th scope="col"><span class="sr">상세</span></th></tr></thead>
+        <tbody id="tb"></tbody></table></div>
+    </div>
+  </main>
+</div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var PR = { wip: ['wip', '집계 중'], closed: ['off', '마감'], ready: ['wait', '지급 대기'], paid: ['ok', '지급 완료'], fail: ['bad', '지급 실패'] };
+  var RV = { none: ['off', '미제출'], wait: ['wait', '확인 대기'], ok: ['ok', '확인됨'], rej: ['bad', '반려'] };
+  // [진행, 보류, 수령 정보, 방송국, 상세 st]
+  var ROWS = [['fail', 0, 'ok', '샘플 방송국 A'], ['closed', 1, 'ok', '샘플 방송국 B'], ['ready', 0, 'ok', '샘플 방송국 C'], ['closed', 0, 'wait', '샘플 방송국 D'], ['closed', 0, 'rej', '샘플 방송국 E'], ['wip', 0, 'none', '샘플 방송국 F'], ['paid', 0, 'ok', '샘플 방송국 G']];
+  function match(r) {
+    var f = b.dataset.f, v = b.dataset.rv, q = $('q').value.trim();
+    if (f === 'hold' ? !r[1] : f !== 'all' && r[0] !== f) return false;
+    if (v === 'unchk' ? (r[2] !== 'none' && r[2] !== 'wait') : v !== 'all' && r[2] !== v) return false;
+    return !q || r[3].indexOf(q) > -1;
+  }
+  window.mockAfter = function () {
+    var rows = b.dataset.s === 'partial' ? ROWS.slice(0, 5) : ROWS, out = rows.filter(match);
+    $('tb').innerHTML = out.map(function (r) {
+      var p = PR[r[0]], v = RV[r[2]], mis = r[0] === 'closed' && r[2] !== 'ok';
+      var href = 'settlement-detail.html?st=' + r[0] + '&hold=' + (r[1] ? 'on' : 'none') + '&rcv=' + r[2];
+      return '<tr><td data-label="정산 기간"><span class="slot">샘플 월</span></td><td data-label="방송국"><strong>' + r[3] + '</strong></td>' +
+        '<td data-label="진행"><span class="tag ' + p[0] + '">' + p[1] + '</span>' + (mis && !r[1] ? ' <span class="tag off">수령 정보 미확인</span>' : '') + '</td>' +
+        '<td data-label="보류">' + (r[1] ? '<span class="tag bad">정산 보류</span>' : '<span class="muted">없음</span>') + '</td>' +
+        '<td data-label="수령 정보"><span class="tag ' + v[0] + '">' + v[1] + '</span></td>' +
+        '<td data-label="지급 예정">' + (r[0] === 'wip' ? '<span class="muted">집계 후 표시돼요</span>' : '<span class="slot">금액</span>') + '</td>' +
+        '<td class="c-act"><a class="btn" href="' + href + '" aria-label="' + r[3] + ' 정산 상세">상세 ›</a></td></tr>';
+    }).join('');
+    $('none').hidden = !(b.dataset.s === 'normal' && !out.length);
+    $('rv-sel').value = b.dataset.rv;
+    document.querySelectorAll('#chips .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.set === 'f:' + b.dataset.f)); });
+  };
+  $('rv-sel').addEventListener('change', function () { b.dataset.rv = this.value; window.mockRender(); });
+  $('q').addEventListener('input', function () { window.mockRender(); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

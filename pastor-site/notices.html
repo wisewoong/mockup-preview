@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방송국 공지 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nl { list-style: none; margin: 0; padding: 0; }
+  .nl > li { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .nl .tt { color: var(--strong); font-weight: 700; overflow-wrap: anywhere; }
+  .nl .mt { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 4px; }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+</style>
+</head>
+<body data-default="role:owner s:normal edit:none">
+<!-- 방송국 공지 관리(소유자·관리자 작성·수정·삭제·고정, 매니저는 메뉴 숨김+직접 접근 시 안내). 시청자는 방송국 공지 탭에서 구독 없이 열람한다(user-site/channel.html).
+     알림은 월 한도 안에서만(값은 슬롯), 정지·제한 방송국도 게시는 허용하고 알림만 막는다(D12). 삭제는 목록에서만 보이지 않게 하고 서버에는 보존(D4). 외부 후원 유도 탐지는 저장만 막고 제재하지 않는다. -->
+<header id="site-header" data-active="notices"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:empty">공지 0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">실패</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:blocked">외부 후원 유도 감지</button><button data-set="s:nolimit">알림 한도 소진</button><button data-set="s:restricted">방송국 제한·정지</button></div>
+  <div class="group"><b>작성 폼</b><button data-set="edit:none">닫힘</button><button data-set="edit:new">새 공지</button><button data-set="edit:edit">수정</button></div>
+  <p class="muted">알림 한도 소진과 방송국 제한·정지에서는 공지는 올릴 수 있고 알림 체크만 꺼져요(D12). 숫자는 모두 슬롯이에요.</p>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=mgr"><div class="empty"><p><strong>이 화면은 <span class="slot">관리자 이상</span>만 쓸 수 있어요</strong></p><p>방송국 공지는 소유자와 관리자가 관리해요.</p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<div class="stack" data-show="role=owner|adm0|admall">
+  <div class="mem-head"><h1 id="h-nt" tabindex="-1">방송국 공지</h1>
+    <button class="btn primary" type="button" id="new1" data-show="edit=none">새 공지 쓰기</button>
+    <button class="btn lnk" type="button" id="new2" data-show="edit=new|edit" data-set="edit:none">작성 닫기</button></div>
+  <p class="small">구독자에게 알림을 보낼 수 있는 횟수는 한 달에 <span class="slot">N회</span>예요 · 고정 공지는 최대 <span class="slot">N개</span>까지 둘 수 있어요 · 공지는 구독하지 않아도 누구나 볼 수 있어요.</p>
+  <div class="notice" data-show="s=nolimit"><strong>이번 달 알림을 모두 보냈어요</strong><p class="small">공지는 올릴 수 있지만 구독자 알림은 보낼 수 없어요. 다시 보낼 수 있는 시점 <span class="slot">날짜</span></p></div>
+  <div class="notice" data-show="s=restricted"><strong>이 방송국은 일부 기능이 제한돼 있어요</strong><p class="small">공지는 올릴 수 있지만 구독자 알림은 보낼 수 없어요. 제한 내용은 <a href="sanctions.html">제재 안내</a>에서 볼 수 있어요.</p></div>
+  <p class="notice" role="status" id="flash" hidden></p>
+
+  <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div><div class="skeleton" style="height:72px;margin-top:12px"></div></section>
+  <div class="notice danger" role="alert" data-show="s=loaderr"><strong>공지를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+
+  <!-- 작성·수정 폼 -->
+  <section class="panel" data-show="edit=new|edit s=normal|empty|saveerr|blocked|nolimit|restricted" aria-labelledby="f-t">
+    <h2 id="f-t">새 공지 쓰기</h2>
+    <form class="stack" id="nt-form" onsubmit="return false" novalidate style="margin-top:12px">
+      <div class="notice danger" role="alert" data-show="s=saveerr"><strong>공지를 게시하지 못했어요</strong><p class="small">입력한 내용은 그대로예요. 잠시 후 다시 시도해 주세요.</p></div>
+      <div class="field"><label class="label" for="nt-title">제목 <span class="muted">필수</span></label>
+        <input class="input" id="nt-title" type="text" autocomplete="off" aria-describedby="e-title"><span class="err" id="e-title" role="alert" hidden></span></div>
+      <div class="field"><label class="label" for="nt-body">본문 <span class="muted">필수</span></label>
+        <textarea class="textarea" id="nt-body" rows="6" aria-describedby="h-body e-body"></textarea>
+        <p class="help" id="h-body">글자만 쓸 수 있어요. 계좌번호·전화번호·외부 결제 링크는 쓸 수 없어요.</p>
+        <span class="err" id="e-body" role="alert" hidden></span>
+        <p class="help" id="e-help" hidden>자동 확인만으로 제재하지 않아요. 잘못 감지됐다면 <a href="inquiry.html">운영팀 문의</a>로 알려 주세요.</p></div>
+      <label class="check"><input type="checkbox" id="nt-pin"><span>목록 맨 위에 고정해요 (최대 <span class="slot">N개</span>)</span></label>
+      <div id="nt-send-w"><label class="check"><input type="checkbox" id="nt-send" aria-describedby="nt-why"><span>구독자에게 알림 보내기</span></label>
+        <p class="help" id="nt-why"></p></div>
+      <p class="help" id="nt-edit-h" hidden>수정해도 알림은 다시 보내지 않아요. 목록에 '수정됨'으로 표시돼요.</p>
+      <div class="row" style="justify-content:flex-end"><button class="btn lnk" type="button" data-set="edit:none">취소</button><button class="btn primary" type="submit" id="nt-go">게시하기</button></div>
+    </form>
+  </section>
+
+  <!-- 목록 -->
+  <section aria-labelledby="l-t" data-show="s=normal|saveerr|blocked|nolimit|restricted">
+    <h2 id="l-t" class="sr">공지 목록</h2>
+    <p class="muted small">고정 공지가 먼저, 그다음 최신순이에요.</p>
+    <ul class="nl" id="nl"></ul>
+  </section>
+  <div class="empty" data-show="s=empty"><p><strong>아직 올린 공지가 없어요</strong></p><p>구독자에게 알리고 싶은 소식을 공지로 남겨 보세요.</p><p><button class="btn lnk" type="button" data-set="edit:new">첫 공지 쓰기</button></p></div>
+</div>
+</div></main>
+
+<dialog id="nt-dlg" aria-labelledby="nt-t"><h2 id="nt-t">구독자에게 알림을 보낼까요?</h2>
+  <p style="margin-top:8px">게시와 함께 구독자에게 알림이 나가요. <strong>보낸 알림은 취소할 수 없어요.</strong></p>
+  <p class="muted small" style="margin-top:8px">이번 달 남은 횟수 <span class="slot">N회</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="nt-ok">알림 보내고 게시</button></div>
+</dialog>
+<dialog id="del-dlg" aria-labelledby="del-t"><h2 id="del-t">이 공지를 삭제할까요?</h2>
+  <p style="margin-top:8px">삭제하면 공지 목록에서 보이지 않아요. 이미 보낸 알림은 그대로 남아요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn bad" type="button" id="del-ok">삭제</button></div>
+</dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); };
+  var HIT = /(\d{2,4}[-\s]?\d{3,4}[-\s]?\d{4})|https?:\/\/|계좌|입금/;
+  var MSG = '외부 후원·결제를 안내하는 내용은 올릴 수 없어요. 해당 부분을 고쳐 주세요';
+  var ROWS = [{ id: 'a', t: '샘플 공지 1', pin: 1, ed: 0, sent: 1 }, { id: 'b', t: '샘플 공지 2', pin: 1, ed: 0, sent: 0 }, { id: 'c', t: '샘플 공지 3', pin: 0, ed: 1, sent: 1 }, { id: 'd', t: '샘플 공지 4', pin: 0, ed: 0, sent: 0 }];
+  var cur = null, last = 'none', seq = 0, delId = null;
+  function flash(t) { var f = $('flash'); f.textContent = t; f.hidden = !t; }
+  function list() {
+    var L = ROWS.slice().sort(function (x, y) { return y.pin - x.pin; });
+    $('nl').innerHTML = L.map(function (r) {
+      var m = window.moreMenu('공지 ' + r.t + ' 더보기', [['수정', '', 'data-a="edit" data-id="' + r.id + '"'], [r.pin ? '고정 해제' : '고정', '', 'data-a="pin" data-id="' + r.id + '"'], ['삭제', 'bad', 'data-a="del" data-id="' + r.id + '"']]);
+      return '<li><div><p class="tt">' + r.t + '</p><div class="mt">' + (r.pin ? '<span class="tag wip">고정</span>' : '') + '<span class="tag ok">게시 중' + (r.ed ? ' · 수정됨' : '') + '</span>' + (r.sent ? '<span class="tag">알림 보냄</span>' : '<span class="tag off">알림 안 보냄</span>') + '<span class="muted small">게시일 <span class="slot">날짜</span></span></div></div>' + m + '</li>';
+    }).join('');
+  }
+  function err(id, msg) {
+    var e = $('e-' + id), f = $('nt-' + id);
+    e.hidden = !msg; e.textContent = msg ? '오류: ' + msg : '';
+    if (msg) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid');
+    if (id === 'body') $('e-help').hidden = msg !== MSG;
+  }
+  function form() {
+    var e = d.edit, noti = d.s === 'nolimit' || d.s === 'restricted';
+    if ((d.s === 'blocked' || d.s === 'saveerr') && e === 'none') { d.edit = e = 'new'; window.mockRender(); return; }
+    if (e !== last) { // 열릴 때 내용 채우기
+      var r = ROWS.filter(function (x) { return x.id === cur; })[0];
+      $('nt-title').value = e === 'edit' && r ? r.t : ''; $('nt-body').value = e === 'edit' ? '샘플 본문' : (d.s === 'blocked' ? '입금 계좌 안내 (샘플)' : ''); $('nt-pin').checked = e === 'edit' && r ? !!r.pin : false; $('nt-send').checked = false;
+      err('title', ''); err('body', ''); last = e;
+    }
+    $('f-t').textContent = e === 'edit' ? '공지 수정' : '새 공지 쓰기';
+    $('nt-send-w').hidden = e === 'edit'; $('nt-edit-h').hidden = e !== 'edit';
+    $('nt-send').disabled = noti; if (noti) $('nt-send').checked = false;
+    $('nt-why').textContent = d.s === 'nolimit' ? '이번 달 알림 횟수를 모두 써서 보낼 수 없어요' : d.s === 'restricted' ? '방송국이 제한돼 있어 알림은 보낼 수 없어요' : '기본은 꺼져 있어요. 켜면 게시할 때 한 번 더 확인해요';
+    if (d.s === 'blocked' && e !== 'none') err('body', MSG); else if (d.s !== 'blocked' && $('e-body').textContent === '오류: ' + MSG && !HIT.test($('nt-body').value)) err('body', '');
+    $('nt-go').disabled = false;
+  }
+  window.mockAfter = function () { list(); form(); };
+  function publish(sent) {
+    var t = $('nt-title').value.trim(), pin = $('nt-pin').checked;
+    if (d.edit === 'edit') { ROWS.forEach(function (r) { if (r.id === cur) { r.t = t; r.pin = pin ? 1 : 0; r.ed = 1; } }); flash('공지를 수정했어요'); }
+    else { ROWS.push({ id: 'n' + (++seq), t: t, pin: pin ? 1 : 0, ed: 0, sent: sent ? 1 : 0 }); ROWS.unshift(ROWS.pop()); flash(sent ? '공지를 게시했고 구독자에게 알림을 보냈어요' : '공지를 게시했어요'); }
+    last = 'none'; d.edit = 'none'; window.mockRender(); $('flash').scrollIntoView({ block: 'nearest' });
+  }
+  $('nt-form').addEventListener('submit', function () {
+    var t = $('nt-title').value.trim(), bd = $('nt-body').value.trim(), first = null;
+    err('title', t ? '' : '제목을 입력해 주세요'); if (!t) first = $('nt-title');
+    var m = !bd ? '본문을 입력해 주세요' : HIT.test(t + ' ' + bd) ? MSG : d.s === 'blocked' ? MSG : '';
+    err('body', m); if (m && !first) first = $('nt-body');
+    if (first) { first.focus(); return; }
+    if (d.s === 'saveerr') { flash(''); $('nt-go').focus(); return; } // 목업: 저장 실패 시연(안내는 폼 위에 이미 보임)
+    if ($('nt-send').checked && !$('nt-send').disabled && d.edit === 'new') { var dl = $('nt-dlg'); dl._opener = $('nt-go'); dl.showModal(); return; }
+    publish(false);
+  });
+  $('nt-ok').addEventListener('click', function () { $('nt-dlg').close(); publish(true); });
+  $('del-ok').addEventListener('click', function () {
+    ROWS = ROWS.filter(function (r) { return r.id !== delId; }); $('del-dlg').close(); flash('공지를 삭제했어요'); window.mockRender(); $('h-nt').focus();
+  });
+  function openForm(btn, id) { cur = id || null; flash(''); d.edit = id ? 'edit' : 'new'; window.mockRender(); $('nt-title').focus(); }
+  document.addEventListener('click', function (e) {
+    var n = e.target.closest('#new1,[data-set="edit:new"]'); if (n && !e.target.closest('.mockbar')) { openForm(n); return; }
+    var m = e.target.closest('.mi[data-a]'); if (!m) return;
+    var id = m.dataset.id, a = m.dataset.a, more = m.closest('.more-w').querySelector('.more');
+    if (a === 'edit') { cur = id; flash(''); last = 'none'; d.edit = 'edit'; window.mockRender(); $('nt-title').focus(); }
+    if (a === 'pin') { ROWS.forEach(function (r) { if (r.id === id) { r.pin = r.pin ? 0 : 1; flash(r.pin ? '고정했어요' : '고정을 풀었어요'); } }); window.mockRender(); }
+    if (a === 'del') { delId = id; var dl = $('del-dlg'); dl._opener = more; dl.showModal(); }
+  });
+  $('nt-dlg').addEventListener('close', function () { var o = $('nt-dlg')._opener; if (o && o.offsetParent) o.focus(); });
+  $('del-dlg').addEventListener('close', function () { var o = $('del-dlg')._opener; if (o && o.isConnected && o.offsetParent) o.focus(); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

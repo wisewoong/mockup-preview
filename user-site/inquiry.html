@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>환불·결제 오류 문의 - 말씀ON</title>
+<title>문의하기 - 말씀ON</title>
 <link rel="stylesheet" href="styles.css">
 <style>
   .col { max-width: 680px; margin: 0 auto; padding: 24px 0 64px; }
@@ -12,22 +12,25 @@
   .qrow { align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 </style>
 </head>
-<body data-default="s:normal">
-<!-- 환불·결제 오류 문의. 환불 요건·처리 결과 문구는 슬롯이고 환불 가능 여부를 단정하지 않는다. 문의 종류 3개·환불 요청을 이 폼에서 받을지는 사용자 결정 전. -->
+<body data-default="s:normal k:none">
+<!-- 문의하기. 환불 요건·처리 결과 문구는 슬롯이고 환불 가능 여부를 단정하지 않는다. 환불 요청을 이 폼에서 받을지는 사용자 결정 전(결제 유형 3종).
+     생년월일 정정은 폼에서 생년월일을 받지 않는다(접수 후 운영자가 열람 사유를 거쳐 확인). 쿼리 ?k=pay|blocked|birth 로 유형을 미리 고른다.
+     상태 글자: 접수 / 확인 중 / 답변 왔어요 / 종결 -->
 <header id="site-header"></header>
 
 <div class="mockbar"><div class="wrap">
   <div class="group"><b>상태</b>
-    <button data-set="s:normal">기본</button><button data-set="s:prefill">결제 미리 채움</button><button data-set="s:nokind">종류 미선택</button><button data-set="s:sending">접수 중</button><button data-set="s:done">접수 완료</button><button data-set="s:dup">중복 접수</button><button data-set="s:fail">실패</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button><button data-set="s:guest">비로그인</button><button data-set="s:nolist">내 문의 0건</button>
+    <button data-set="s:normal">기본</button><button data-set="s:prefill">결제 미리 채움</button><button data-set="s:nokind">종류 미선택</button><button data-set="s:sending">접수 중</button><button data-set="s:done">접수 완료</button><button data-set="s:dup">중복 접수</button><button data-set="s:fail">실패</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button><button data-set="s:guest">비로그인</button><button data-set="s:nolist">내 문의 0건</button><button data-set="s:limit">정정 한도 도달</button>
   </div>
-  <p class="muted">문의 종류 3개와 환불 요청을 이 폼에서 받을지는 사용자 결정 전이에요.</p>
+  <div class="group"><b>유형</b><button data-set="k:none">미선택</button><button data-set="k:pay">결제</button><button data-set="k:general">일반</button><button data-set="k:birth">생년월일 정정</button><button data-set="k:blocked">차단</button></div>
+  <p class="muted">환불 요청을 이 폼에서 받을지는 사용자 결정 전이에요.</p>
 </div></div>
 
 <main class="wrap"><div class="col">
-  <h1 id="h-inq" tabindex="-1">환불·결제 오류 문의</h1>
-  <p class="muted" style="margin-top:4px"><span class="slot">S2 환불 요건: 미사용 열매 환불 가능 기간·조건</span></p>
+  <h1 id="h-inq" tabindex="-1">문의하기</h1>
+  <p class="muted" style="margin-top:4px" data-show="k=pay"><span class="slot">S2 환불 요건: 미사용 열매 환불 가능 기간·조건</span></p>
 
-  <div data-show="s=normal|prefill|nokind|sending|fail|done|dup|nolist" class="stack" style="margin-top:16px">
+  <div data-show="s=normal|prefill|nokind|sending|fail|done|dup|nolist|limit" class="stack" style="margin-top:16px">
     <div class="notice" role="status" data-show="s=done"><strong>문의를 접수했어요</strong><p>접수번호 <span class="slot">번호</span>. 결과는 이 화면의 '내 문의'에서 볼 수 있어요.</p></div>
     <div class="notice" role="status" data-show="s=dup"><strong>이미 접수된 문의가 있어요</strong><p style="margin-top:8px"><a class="btn" href="#mine">처리 상태 보기</a></p></div>
     <div class="notice danger" role="alert" data-show="s=fail"><strong>문의를 접수하지 못했어요</strong><p class="muted small">입력한 내용은 그대로 있어요.</p><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep>다시 시도</button></p></div>
@@ -35,41 +38,57 @@
     <form onsubmit="return false" class="stack" id="f">
       <fieldset aria-describedby="e-kind">
         <legend>문의 종류 (필수)</legend>
-        <label class="check"><input type="radio" name="kind"><span>결제했는데 열매가 안 들어왔어요</span></label>
-        <label class="check"><input type="radio" name="kind"><span>같은 결제가 두 번 된 것 같아요</span></label>
-        <label class="check"><input type="radio" name="kind"><span>미사용 열매 환불을 요청해요</span></label>
+        <label class="check"><input type="radio" name="kind" value="pay"><span>결제했는데 열매가 안 들어왔어요</span></label>
+        <label class="check"><input type="radio" name="kind" value="pay"><span>같은 결제가 두 번 된 것 같아요</span></label>
+        <label class="check"><input type="radio" name="kind" value="pay"><span>미사용 열매 환불을 요청해요</span></label>
+        <label class="check"><input type="radio" name="kind" value="general"><span>일반 문의</span></label>
+        <label class="check"><input type="radio" name="kind" value="birth"><span>생년월일 정정</span></label>
+        <label class="check"><input type="radio" name="kind" value="blocked"><span>차단 문의</span></label>
         <p class="err" id="e-kind" data-show="s=nokind">문의 종류를 선택해 주세요.</p>
       </fieldset>
-      <fieldset>
+      <fieldset data-show="k=pay">
         <legend>관련 결제</legend>
         <label class="check"><input type="radio" name="pay" id="pay1"><span>11월 9일 · <span class="slot">V1 상품명</span> · 결제 <span class="slot">V1 가격</span>원 (확인 중)</span></label>
         <label class="check"><input type="radio" name="pay"><span>11월 8일 · <span class="slot">V1 상품명</span> · 결제 <span class="slot">V1 가격</span>원 (실패)</span></label>
         <label class="check"><input type="radio" name="pay"><span>11월 12일 · <span class="slot">V1 상품명</span> · 결제 <span class="slot">V1 가격</span>원 (완료)</span></label>
         <label class="check"><input type="radio" name="pay" id="paynone" checked><span>해당 없음</span></label>
       </fieldset>
-      <div class="field"><label class="label" for="body">내용 (선택)</label><textarea class="textarea" id="body" aria-describedby="body-h"></textarea><p class="help" id="body-h">계좌번호나 카드번호는 쓰지 마세요.</p></div>
-      <button class="btn primary block" type="submit" data-show="s=normal|prefill|nokind|fail|done|dup|nolist">문의 접수</button>
+      <p class="help" data-show="k=birth">생년월일은 여기에 적지 않아요. 접수하면 운영자가 확인 절차를 거쳐 확인해요 <span class="slot">증빙 안내</span></p>
+      <div class="notice" role="status" data-show="s=limit k=birth"><strong>정정 횟수 한도에 도달했어요</strong><p>더 접수할 수 없어요 (한도 <span class="slot">횟수</span>). 사정이 있으면 일반 문의로 알려 주세요.</p></div>
+      <div class="field" data-show="k=blocked"><label class="label" for="why">궁금한 점 (선택)</label><input class="input" id="why" aria-describedby="why-h"><p class="help" id="why-h">계좌번호나 카드번호는 쓰지 마세요.</p></div>
+      <div class="field" data-show="k=none|pay|general|birth"><label class="label" for="body">내용 (선택)</label><textarea class="textarea" id="body" aria-describedby="body-h"></textarea><p class="help" id="body-h">계좌번호나 카드번호는 쓰지 마세요.</p></div>
+      <button class="btn primary block" type="submit" id="go" data-show="s=normal|prefill|nokind|fail|done|dup|nolist|limit">문의 접수</button>
       <button class="btn primary block" type="submit" disabled aria-busy="true" data-show="s=sending">접수하는 중</button>
     </form>
   </div>
   <div data-show="s=loading" role="status" aria-busy="true" style="margin-top:16px"><p class="muted">불러오는 중</p><div class="skeleton" style="height:48px;margin-top:12px"></div><div class="skeleton" style="height:48px;margin-top:12px"></div></div>
   <div class="notice danger" role="alert" data-show="s=loaderr" style="margin-top:16px"><strong>문의 화면을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" data-icon="retry" data-keep>다시 시도</button></p></div>
   <div class="notice" data-show="s=guest" style="margin-top:16px"><strong>로그인하면 문의할 수 있어요</strong><p style="margin-top:8px"><a class="btn primary" href="login.html?next=inquiry.html">로그인</a></p></div>
-  <section class="section" id="mine" aria-labelledby="h-mine" data-show="s=normal|prefill|nokind|sending|fail|done|dup|nolist">
+  <section class="section" id="mine" aria-labelledby="h-mine" data-show="s=normal|prefill|nokind|sending|fail|done|dup|nolist|limit">
     <h2 id="h-mine">내 문의</h2>
     <div class="empty" data-show="s=nolist" style="margin-top:12px"><p><strong>접수한 문의가 없어요</strong></p></div>
-    <ul style="list-style:none;margin:8px 0 0;padding:0" data-show="s=normal|prefill|nokind|sending|fail|done|dup">
+    <ul style="list-style:none;margin:8px 0 0;padding:0" data-show="s=normal|prefill|nokind|sending|fail|done|dup|limit">
       <li class="qrow"><span><strong>결제했는데 열매가 안 들어왔어요</strong><br><span class="muted small">11월 13일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain wip">확인 중</span></li>
-      <li class="qrow"><span><strong>미사용 열매 환불을 요청해요</strong><br><span class="muted small">11월 5일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain ok">처리 완료</span></li>
-      <li class="qrow"><span><strong>같은 결제가 두 번 된 것 같아요</strong><br><span class="muted small">11월 1일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain bad">처리하지 않음</span></li>
+      <li class="qrow"><span><strong>미사용 열매 환불을 요청해요</strong><br><span class="muted small">11월 5일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain ok">답변 왔어요</span></li>
+      <li class="qrow"><span><strong>같은 결제가 두 번 된 것 같아요</strong><br><span class="muted small">11월 1일 접수 · <span class="slot">처리 결과 문구</span></span></span><span class="badge plain">종결</span></li>
     </ul>
   </section>
 </div></main>
 <script src="mock.js"></script>
 <script>
-// 목업: 결제 미리 채움(?pay=행ID 진입 상태)
-function sync() { var b = document.body.dataset.s; document.getElementById(b === 'prefill' ? 'pay1' : 'paynone').checked = true; }
-document.addEventListener('click', function () { setTimeout(sync, 0); });
+// 목업: 결제 미리 채움(?pay=행ID 진입 상태), 유형 라디오 ↔ k 키 연동(?k= 로 미리 선택)
+function sync() {
+  var d = document.body.dataset;
+  if (d.s === 'prefill') { d.k = 'pay'; document.getElementById('pay1').checked = true; }
+  if (d.s === 'limit') d.k = 'birth';
+  var cur = document.querySelector('input[name=kind]:checked');
+  if (d.k === 'none') { if (cur) cur.checked = false; }
+  else if (!cur || cur.value !== d.k) { var r = document.querySelector('input[name=kind][value=' + d.k + ']'); if (r) r.checked = true; }
+  document.getElementById('go').disabled = d.s === 'limit' && d.k === 'birth';
+  if (window.mockRender) window.mockRender();
+}
+document.addEventListener('change', function (e) { if (e.target.name === 'kind') { document.body.dataset.k = e.target.value; if (window.mockRender) window.mockRender(); } });
+document.addEventListener('click', function (e) { if (e.target.closest('[data-set]')) setTimeout(sync, 0); });
 sync();
 </script>
 </body>

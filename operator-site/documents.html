@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>약관·정책 문서 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
+</head>
+<body data-default="role:op s:normal g:notice r:before">
+<!-- 문서 3종 고정(이용약관·개인정보 처리방침·운영정책). 숫자·기간·본문은 모두 슬롯. g=첫 행(이용약관)의 고지 상태 샘플, r=재동의 집계(시행 전/후). -->
+<header id="site-header" data-active="documents"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:partial">일부 실패</button><button data-set="s:noperm">권한 없음</button></div>
+  <div class="group"><b>이용약관 고지 상태</b><button data-set="g:none">예정 없음</button><button data-set="g:wait">승인 대기</button><button data-set="g:before">고지 전</button><button data-set="g:notice">고지 중</button><button data-set="g:due">기한 임박</button><button data-set="g:late">기한 지남</button><button data-set="g:partial">일부 발송 실패</button></div>
+  <div class="group"><b>재동의 집계</b><button data-set="r:before">시행 전</button><button data-set="r:after">시행 후</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <h1>약관·정책 문서</h1>
+      <p class="muted small"><span class="slot">기준 시각 샘플</span></p>
+    </div>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:64px"></div><div class="skeleton" style="height:64px;margin-top:12px"></div><div class="skeleton" style="height:64px;margin-top:12px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>문서 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=noperm"><p><strong>문서를 볼 권한이 없어요</strong></p><p>운영자 권한이 필요해요. 최고 관리자에게 문의해 주세요.</p></div>
+
+    <div class="stack" data-show="s=normal|empty|partial">
+      <div class="notice" data-show="role=op"><strong>초안과 승인 요청까지 할 수 있어요</strong><p class="small">승인·예약은 최고 관리자만 해요 <span class="slot">승인 권한 범위</span></p></div>
+      <div class="notice danger" role="alert" data-show="s=partial"><strong>일부 문서의 고지 상태를 불러오지 못했어요</strong><p class="small">고지 열의 「다시 시도」로 행마다 다시 불러올 수 있어요.</p></div>
+
+      <div class="empty" data-show="s=empty"><p><strong>등록된 문서가 없어요</strong></p><p>사용자에게 보여줄 문서가 없어요. 첫 버전을 등록해 주세요.</p><p><a class="btn primary" id="first" href="document-detail.html?k=terms&amp;s=empty">첫 버전 등록</a></p></div>
+
+      <div class="tbl-wrap cards" data-show="s=normal|partial"><table><caption class="sr">약관·정책 문서 3종 (샘플)</caption>
+        <thead><tr><th scope="col">문서</th><th scope="col">현재 적용 버전·시행일</th><th scope="col">예정 버전</th><th scope="col">고지 상태</th><th scope="col">재동의</th><th scope="col"><span class="sr">열기</span></th></tr></thead>
+        <tbody id="rows"></tbody></table></div>
+
+      <section aria-labelledby="h-n" class="panel stack"><h2 id="h-n">관련 화면</h2>
+        <p>플랫폼 공지 게시 중 샘플 N건 · 예약 샘플 N건 <a class="go" href="notices.html">공지 관리 ›</a></p>
+        <p>문서·공지 변경 기록은 감사 로그에서 봐요 <a class="go" href="audit.html">감사 로그 ›</a></p>
+        <p class="muted small">사용자에게 보이는 약관 화면: <span class="slot">화면 작성 예정</span></p></section>
+    </div>
+  </main>
+</div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, q = new URLSearchParams(location.search);
+  function href(h) { // 셸의 링크 재작성은 이 화면의 동적 행보다 먼저 돌아서 직접 붙인다
+    var u = new URL(h, location.href); u.searchParams.set('role', b.dataset.role);
+    if (q.get('theme')) u.searchParams.set('theme', q.get('theme'));
+    return u.pathname.split('/').pop() + u.search;
+  }
+  // 고지 상태 → 태그 (점+글자). 색만으로 전달하지 않는다
+  var G = {
+    none: '<span class="tag off">예정 없음</span>',
+    wait: '<span class="tag wait">승인 대기</span>',
+    before: '<span class="tag wait">고지 전</span><br><span class="small muted">고지 기한 <span class="slot">날짜</span></span>',
+    notice: '<span class="tag wip">고지 중</span>',
+    due: '<span class="tag wait">고지 기한 임박</span>',
+    late: '<span class="tag bad">고지 기한 지남</span>',
+    partial: '<span class="tag bad">일부 발송 실패</span>'
+  };
+  var DOCS = [
+    { k: 'terms', n: '이용약관', m: 'major' },
+    { k: 'privacy', n: '개인정보 처리방침', m: 'minor', g: 'wait' },
+    { k: 'policy', n: '운영정책', m: 'major', g: 'none' }
+  ];
+  function re(d, g) {
+    if (g === 'none') return '<span class="muted">—</span>';
+    if (d.m === 'minor') return '해당 없음 <span class="muted small">(고지만)</span>';
+    if (b.dataset.r === 'after') return '동의 <span class="slot">샘플 N건</span> / 미동의 <span class="slot">샘플 N건</span>';
+    return '<span class="muted">시행일 이후 집계돼요</span>';
+  }
+  function build() {
+    var s = b.dataset.s, T = document.getElementById('rows'); if (!T) return;
+    T.innerHTML = DOCS.map(function (d, i) {
+      var g = i === 0 ? (b.dataset.g || 'notice') : d.g, fail = s === 'partial' && i === 1;
+      var pv = g === 'none' ? '<span class="muted">없음</span>' : '버전 <span class="slot">샘플</span> · 시행일 <span class="slot">날짜</span>';
+      var cell = fail ? '<span class="tag bad">불러오지 못했어요</span> <button class="linkbtn" type="button" data-retry aria-label="' + d.n + ' 고지 상태 다시 시도">다시 시도</button>' : G[g];
+      var open = href('document-detail.html?k=' + d.k + '&p=' + g + '&m=' + d.m);
+      return '<tr><th scope="row" class="c-title">' + d.n + '</th>' +
+        '<td data-label="현재 적용 버전·시행일"><span class="tag ok">적용 중</span> 버전 <span class="slot">샘플</span> · 시행일 <span class="slot">날짜</span></td>' +
+        '<td data-label="예정 버전">' + pv + '</td><td data-label="고지 상태">' + cell + '</td>' +
+        '<td data-label="재동의">' + (fail ? '<span class="muted">—</span>' : re(d, g)) + '</td>' +
+        '<td><a class="go" href="' + open + '" aria-label="' + d.n + ' 열기">열기 ›</a></td></tr>';
+    }).join('');
+    var f = document.getElementById('first'); if (f) f.setAttribute('href', href('document-detail.html?k=terms&s=empty'));
+  }
+  window.mockAfter = build;
+  document.addEventListener('click', function (e) {
+    var r = e.target.closest('[data-retry]'); if (r) { b.dataset.s = 'normal'; window.mockRender(); }
+  });
+  build();
+})();
+</script>
+</body>
+</html>

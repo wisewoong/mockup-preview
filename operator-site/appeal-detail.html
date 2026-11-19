@@ -44,7 +44,7 @@
     <div class="empty" data-show="s=notfound"><p><strong>이의제기를 찾을 수 없어요</strong></p><a class="btn" href="appeals.html">목록으로</a></div>
 
     <div class="stack" data-show="s=normal|noreason|saveerr|locked|self|saved">
-      <p class="row"><span class="tag k-name"></span><span class="tag" id="st-tag"></span><span class="muted">접수일 샘플 날짜</span><span class="muted">처리 기한 <span class="slot">처리 기한 미정</span></span></p>
+      <p class="row"><span class="tag k-name"></span><span class="tag" id="st-tag"></span><span class="muted">접수일 샘플 날짜</span><span class="muted">처리 기한 <span class="slot">처리 기한(정책)</span></span></p>
       <p class="only-m" data-show="st=sent|resub|review|more"><a class="linkbtn" href="#frm">처리하기 ↓</a></p>
 
       <div class="notice" data-show="s=locked" role="status"><strong>다른 운영자가 처리 중이에요 (샘플 운영자2)</strong><p>먼저 연 운영자가 담당해요. 지금은 읽기만 할 수 있어요. <span class="slot">잠금 해제 방식 미정</span></p></div>
@@ -127,7 +127,7 @@
             <dt>담당자</dt><dd class="u-who">샘플 운영자3</dd>
             <dt>시각</dt><dd class="u-when">샘플 시각</dd>
           </dl>
-          <p class="muted small"><span class="slot">추가 이의제기 가능 여부 미정</span></p>
+          <p class="muted small"><span data-show="st=no">새 증빙이 있으면 재이의 1회까지 받을 수 있어요 <span class="slot">재이의 기한(정책)</span></span><span data-show="st=ok">인용된 건은 재이의 대상이 아니에요</span></p>
           <p><button class="linkbtn" type="button" id="fix" aria-describedby="fix-h" style="padding-left:0">결과 정정</button></p>
           <p class="help" id="fix-h" style="margin-top:0"></p>
         </section>
@@ -190,7 +190,7 @@
     $('nx-rel').textContent = rel(); $('nx-chg-l').hidden = settle;
     if (settle) document.querySelector('input[name=nx][value=rel]').checked = true;
     $('nx-sel-f').hidden = val('nx') !== 'chg';
-    $('nx-h').textContent = settle ? '마감된 정산은 고치지 않아요. 필요하면 조정 거래를 생성해요(환불 화면)' : '저장하면 조치 해제·변경이 함께 처리돼요';
+    $('nx-h').innerHTML = settle ? '마감된 정산은 고치지 않아요. 보류 해제와 조정 거래는 <a href="settlement-detail.html?st=closed&hold=on&dlg=release">정산 상세</a>에서 해요' : '저장하면 조치 해제·변경이 함께 처리돼요';
     $('ev-f').hidden = !(b.dataset.kind === 'station-c' && r === 'no');
     $('why-l').innerHTML = (r ? RES[r][2] : '사유') + ' <span class="muted">필수</span>';
   }

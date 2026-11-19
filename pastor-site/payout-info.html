@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>수령 정보 - 말씀ON 목회자</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-default="role:owner s:normal rv:none mode:view dlg:closed">
+<!-- 수령 정보(후원 수령만). 소유자만. 헌금 수령 주체는 미정이라 슬롯 한 줄. 진입: 정산 내역 상단 안내·방송국 설정 하단 링크(내비 항목 없음) -->
+<header id="site-header" data-active="settlements"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:conflict">충돌</button></div>
+  <div class="group"><b>수령 정보</b><button data-set="rv:none">미제출</button><button data-set="rv:wait">확인 대기</button><button data-set="rv:ok">확인됨</button><button data-set="rv:rej">반려</button></div>
+  <div class="group"><b>모드</b><button data-set="mode:view">보기</button><button data-set="mode:edit">입력</button><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:submit">제출 확인</button></div>
+</div></div>
+
+<main class="wrap"><div class="col">
+<section data-show="role=adm0|admall|mgr"><div class="empty"><p><strong>수령 정보는 소유자만 볼 수 있어요</strong></p><p><a class="btn" href="dashboard.html">대시보드로</a></p></div></section>
+
+<div class="stack" data-show="role=owner">
+  <p class="small"><a href="settlements.html">‹ 정산 내역</a></p>
+  <div class="mem-head"><h1>수령 정보</h1></div>
+  <p class="help">후원을 받는 계좌예요. 헌금 수령 주체는 <span class="slot">미정</span>이라 여기서 받지 않아요.</p>
+
+  <section role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:72px"></div></section>
+  <div class="notice danger" role="alert" data-show="s=loaderr"><strong>수령 정보를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" data-set="s:normal">다시 시도</button></p></div>
+
+  <div class="stack" data-show="s=normal|saveerr|conflict">
+    <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 값은 그대로 두었어요. 잠시 뒤 다시 제출해 주세요.</p></div>
+    <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 곳에서 먼저 바뀌었어요</strong><p>입력한 값은 그대로 두었어요. 새로 불러온 뒤 다시 확인해 주세요.</p><p style="margin-top:8px"><button class="btn lnk" type="button" data-set="s:normal">새로 불러오기</button></p></div>
+
+    <div class="notice" data-show="rv=none"><strong>수령 정보를 제출해 주세요</strong><p class="small">확인되기 전에는 지급되지 않아요 <span class="slot">확인 소요 시점</span></p></div>
+    <div class="notice" data-show="rv=wait"><strong>운영사가 확인 중이에요</strong><p class="small">확인되기 전에는 지급되지 않아요 <span class="slot">확인 소요 시점</span></p></div>
+    <div class="notice" data-show="rv=ok"><strong>확인된 수령 정보예요</strong><p class="small">정산이 지급 대기가 되면 이 계좌로 지급돼요.</p></div>
+    <div class="notice danger" role="alert" data-show="rv=rej"><strong>반려됐어요</strong><p class="small">사유: <span class="slot">운영사가 쓴 반려 사유</span></p><p style="margin-top:8px"><button class="btn lnk" type="button" data-set="mode:edit">다시 제출</button></p></div>
+
+    <section class="limit" aria-label="현재 수령 정보" data-show="rv=wait|ok|rej"><dl>
+      <dt>은행</dt><dd><span class="slot">샘플은행</span></dd><dt>계좌번호</dt><dd>•••• 1234</dd><dt>예금주</dt><dd>샘플 이름</dd><dt>상태</dt><dd id="st-tag"></dd></dl>
+      <p style="margin-top:8px" data-show="mode=view"><button class="btn lnk" type="button" data-set="mode:edit">변경하기</button></p></section>
+
+    <form class="stack panel" id="frm" onsubmit="return false" aria-label="수령 정보 입력" data-show="mode=edit">
+      <h2>수령 정보 입력</h2>
+      <p class="help">수령인 구분 <span class="slot">T1</span> · 세무 항목 <span class="slot">T1·T2</span> · 증빙 <span class="slot">L5</span></p>
+      <div class="field"><label class="label" for="bk">은행 (필수)</label>
+        <select class="input" id="bk" aria-describedby="bk-e" required><option value="">고르세요</option><option>샘플은행 A</option><option>샘플은행 B</option></select><span class="err" id="bk-e" hidden>은행을 골라 주세요.</span></div>
+      <div class="field"><label class="label" for="ac">계좌번호 (필수)</label>
+        <input class="input" id="ac" inputmode="numeric" autocomplete="off" aria-describedby="ac-h ac-e" required><span class="help" id="ac-h">숫자만 입력해 주세요</span><span class="err" id="ac-e" hidden>계좌번호를 숫자로 입력해 주세요.</span></div>
+      <div class="field"><label class="label" for="ow">예금주 (필수)</label>
+        <input class="input" id="ow" value="샘플 이름" autocomplete="off" aria-describedby="ow-h ow-e" required><span class="help" id="ow-h">계정 실명이 미리 들어 있어요. 다르면 반려될 수 있어요.</span><span class="err" id="ow-e" hidden>예금주를 입력해 주세요.</span></div>
+      <p class="help">개인정보 처리 안내 <span class="slot">L5</span></p>
+      <div class="cs-save"><button class="btn primary" type="button" id="go">제출</button><button class="btn lnk" type="button" data-set="mode:view">취소</button></div>
+    </form>
+
+    <section aria-labelledby="h-his"><h2 id="h-his">제출 이력</h2>
+      <p class="muted" data-show="rv=none">아직 제출한 적이 없어요</p>
+      <ul class="plain" data-show="rv=wait|ok|rej"><li class="mc"><span class="slot">제출일</span> · 제출 · <span class="slot">유형</span></li></ul></section>
+  </div>
+</div>
+</div></main>
+
+<dialog id="sub-dlg" aria-labelledby="sub-t"><h2 id="sub-t">수령 정보를 제출할까요?</h2>
+  <p style="margin-top:8px">확인 전에는 수정할 수 없어요 <span class="slot">정책 확정 전</span>.</p>
+  <p class="small" data-show="rv=ok|wait|rej" style="margin-top:8px">변경 제출은 새 값이 확인될 때까지 지급이 멈춰요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" id="sub-ok">제출</button></div></dialog>
+
+<script src="mock.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); };
+  var RV = { wait: ['wait', '확인 대기'], ok: ['ok', '확인됨'], rej: ['bad', '반려'] };
+  window.mockAfter = function () {
+    if (d.role !== 'owner') return;
+    var v = RV[d.rv]; if (v) $('st-tag').innerHTML = '<span class="tag ' + v[0] + '">' + v[1] + '</span>';
+    var m = $('sub-dlg');
+    if (d.dlg === 'submit' && !m.open) m.showModal();
+    if (d.dlg === 'closed' && m.open) m.close();
+  };
+  $('sub-dlg').addEventListener('close', function () { d.dlg = 'closed'; window.mockRender(); });
+  $('go').addEventListener('click', function () {
+    var first = null;
+    [['bk', !$('bk').value], ['ac', !/^\d{6,}$/.test($('ac').value.trim())], ['ow', !$('ow').value.trim()]].forEach(function (p) {
+      $(p[0] + '-e').hidden = !p[1]; $(p[0]).setAttribute('aria-invalid', String(p[1])); if (p[1] && !first) first = $(p[0]);
+    });
+    if (first) { first.focus(); return; }
+    d.dlg = 'submit'; window.mockRender();
+  });
+  $('sub-ok').addEventListener('click', function () { d.rv = 'wait'; d.mode = 'view'; d.dlg = 'closed'; window.mockRender(); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

@@ -13,7 +13,7 @@
 <div class="mockbar"><div class="wrap">
   <div data-rolebar></div>
   <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button></div>
-  <div class="group"><b>조치 종류(맨 위 줄)</b><button data-set="kind:station-l">방송국 제한</button><button data-set="kind:station-s">방송국 정지</button><button data-set="kind:station-c">방송국 폐쇄</button><button data-set="kind:content">영상 공개 제한</button><button data-set="kind:settle">정산 보류</button><button data-set="kind:ext">외부 후원 정보 검토</button></div>
+  <div class="group"><b>조치 종류(맨 위 줄)</b><button data-set="kind:station-l">방송국 제한</button><button data-set="kind:station-s">방송국 정지</button><button data-set="kind:station-p">방송국 폐쇄 예정</button><button data-set="kind:station-c">방송국 폐쇄</button><button data-set="kind:content">영상 공개 제한</button><button data-set="kind:settle">정산 보류</button><button data-set="kind:ext">외부 후원 정보 검토</button></div>
   <div class="group"><b>이의제기</b><button data-set="appeal:none">폼</button><button data-set="appeal:sent">접수</button><button data-set="appeal:review">검토 중</button><button data-set="appeal:ok">받아들여짐</button><button data-set="appeal:no">받아들여지지 않음</button><button data-set="appeal:more">보완 요청</button><button data-set="appeal:fail">보내기 실패</button><button data-set="appeal:late">기간 지남</button></div>
   <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:detail">상세 열림</button></div>
   <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 이의제기 상태는 맨 위 줄 상세에 보여요. 사유·증거·기간·형식·용량은 모두 샘플 슬롯이에요.</p>
@@ -45,19 +45,20 @@
     <p class="notice" id="s-note"></p>
     <div class="limit"><dl><dt>사유</dt><dd><span class="slot">사유</span></dd><dt>조치 일시</dt><dd><span class="slot">일시</span></dd><dt>처리</dt><dd>운영사</dd>
       <dt>증거 요약</dt><dd><span class="slot">증거 요약(제3자 정보 제외)</span></dd><dt>신고 건수</dt><dd><span class="slot">건수</span> <span class="small muted">(조치 근거 아님)</span></dd></dl></div>
+    <div id="s-items" hidden></div>
     <p id="s-go"></p>
 
     <section class="stack" aria-labelledby="ap-h" data-show="role=adm0|admall"><h3 id="ap-h">이의제기</h3><p class="help">이의제기는 소유자만 할 수 있어요</p></section>
 
     <section class="stack" aria-labelledby="ap-h2" id="ap" data-show="role=owner">
       <h3 id="ap-h2">이의제기</h3>
-      <p class="help" id="ap-closed" hidden>이 방송국은 더 쓸 수 없어요. 문의는 <span class="slot">운영팀 문의 경로</span>로 해 주세요.</p>
+      <p class="help" id="ap-closed" hidden>이 방송국은 더 쓸 수 없어요. 문의는 <a href="inquiry.html?from=sanc">운영팀 문의</a>로 해 주세요.</p>
       <div class="notice" role="status" id="n-sent" tabindex="-1" data-show="appeal=sent|review"><strong>이의제기를 접수했어요. 결과는 알림으로 알려 드려요</strong><p class="small"><span class="tag wait" data-show="appeal=review">검토 중</span></p></div>
       <div class="notice" role="status" data-show="appeal=ok"><strong><span class="tag ok">받아들여짐</span> 조치를 풀었어요</strong><p class="small">해제 시각 <span class="slot">시각</span></p></div>
       <div class="notice" role="status" data-show="appeal=no"><strong><span class="tag bad">받아들여지지 않음</span></strong><p class="small">사유 <span class="slot">사유</span></p><p class="small">다른 의견이 있으면 <span class="slot">추가 이의제기 가능 여부</span></p></div>
       <div class="notice" role="status" data-show="appeal=more"><strong>내용을 더 보내 주세요</strong><p class="small">요청 내용 <span class="slot">요청 내용</span></p></div>
       <div class="notice danger" role="alert" id="n-fail" tabindex="-1" data-show="appeal=fail"><strong>오류: 보내지 못했어요. 입력한 내용과 파일은 그대로예요</strong><p style="margin-top:8px"><button class="btn lnk" type="button" id="ap-retry" data-icon="retry" data-keep>다시 시도</button></p></div>
-      <p class="help" data-show="appeal=late">이의제기할 수 있는 기간이 지났어요 <span class="slot">기간</span>. 문의는 <span class="slot">운영팀 문의 경로</span>로 해 주세요.</p>
+      <p class="help" data-show="appeal=late">이의제기할 수 있는 기간이 지났어요 <span class="slot">기간</span>. 문의는 <a href="inquiry.html?from=sanc">운영팀 문의</a>로 해 주세요.</p>
 
       <div class="stack panel" data-show="appeal=sent|review|ok|no|more"><h3>내가 보낸 내용</h3><p class="small"><span class="slot">내가 쓴 사유</span></p><p class="small">파일 <span class="slot">파일명</span></p></div>
 
@@ -83,7 +84,8 @@
 (function () {
   var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); }, files = [];
   var K = {
-    'station-l': ['방송국 제한', '방송국이 제한 중이에요. <span class="slot">제한 범위</span>', ''],
+    'station-l': ['방송국 제한', '방송국이 제한 중이에요. <span class="slot">제한 범위</span>', '', '<p class="small muted">제한 항목 (샘플)</p><ul class="plain"><li>신규 방송 시작 <span class="tag wait">제한 중</span></li><li>후원 수령 <span class="tag wait">제한 중</span></li><li>TTS <span class="tag off">허용</span></li><li>업로드 <span class="tag off">허용</span></li></ul>'],
+    'station-p': ['방송국 폐쇄 예정', '방송국이 폐쇄될 예정이에요. 폐쇄 전까지 안내에 따라 정산·영상 보관을 정리해야 해요. <span class="slot">폐쇄 전 안내 범위</span>', '', '<p class="small muted">폐쇄 예정 (샘플)</p><ul class="plain"><li>폐쇄 예정일 <span class="slot">날짜</span></li><li>진행 단계 <span class="slot">단계</span></li><li>최소 고지 기간 <span class="slot">기간</span></li></ul>'],
     'station-s': ['방송국 정지', '방송국이 정지됐어요. <span class="slot">정지 중 제한 사항</span>', ''],
     'station-c': ['방송국 폐쇄', '방송국을 더 쓸 수 없어요', ''],
     content: ['영상 공개 제한', '이 영상은 운영 조치로 공개할 수 없어요.', '<a class="btn lnk" href="videos.html">영상 관리로</a>'],
@@ -91,10 +93,10 @@
     ext: ['외부 후원 정보 검토', '운영자가 검토 중이에요. 확정된 조치가 아니에요', '']
   };
   function rows() {
-    var k = d.kind, st = d.appeal === 'ok' ? 'done' : k === 'ext' ? 'rev' : 'on';
+    var k = d.kind, st = d.appeal === 'ok' ? 'done' : k === 'ext' ? 'rev' : k === 'station-p' ? 'plan' : 'on';
     return [{ k: k, st: st }, { k: 'content', st: 'done' }];
   }
-  function tag(st) { return st === 'on' ? '<span class="tag bad">적용 중</span>' : st === 'rev' ? '<span class="tag wait">검토 중</span>' : '<span class="tag ok">해제됨</span>'; }
+  function tag(st) { return st === 'plan' ? '<span class="tag wait">폐쇄 예정</span>' : st === 'on' ? '<span class="tag bad">적용 중</span>' : st === 'rev' ? '<span class="tag wait">검토 중</span>' : '<span class="tag ok">해제됨</span>'; }
   function btn(i, n) { return '<button class="btn lnk" type="button" data-d="' + i + '" aria-label="' + n + ' (대상 샘플) 상세 보기">자세히</button>'; }
   function vis(e) { return e && e.offsetParent !== null; }
   function fl() {
@@ -107,7 +109,7 @@
     $('tb').innerHTML = r.map(function (y, i) { return '<tr><th scope="row">' + K[y.k][0] + '</th><td><span class="slot">대상</span></td><td><span class="slot">일시</span></td><td>' + tag(y.st) + '</td><td>' + btn(i, K[y.k][0]) + '</td></tr>'; }).join('');
     $('cards').innerHTML = r.map(function (y, i) { return '<div class="mc"><p><strong>' + K[y.k][0] + '</strong> ' + tag(y.st) + '</p><div class="limit" style="margin-top:8px"><dl><dt>대상</dt><dd><span class="slot">대상</span></dd><dt>조치 일시</dt><dd><span class="slot">일시</span></dd></dl></div><div class="mem-acts">' + btn(i, K[y.k][0]) + '</div></div>'; }).join('');
     var k = K[d.kind], closed = d.kind === 'station-c';
-    $('s-kind').textContent = k[0]; $('s-tag').innerHTML = tag(rows()[0].st); $('s-note').innerHTML = k[1]; $('s-go').innerHTML = k[2]; $('s-go').hidden = !k[2];
+    $('s-kind').textContent = k[0]; $('s-tag').innerHTML = tag(rows()[0].st); $('s-note').innerHTML = k[1]; $('s-go').innerHTML = k[2]; $('s-go').hidden = !k[2]; $('s-items').innerHTML = k[3] || ''; $('s-items').hidden = !k[3];
     $('ap-closed').hidden = !closed;
     var m = $('s-dlg');
     if (d.dlg === 'detail' && d.s !== 'normal') d.dlg = 'closed';

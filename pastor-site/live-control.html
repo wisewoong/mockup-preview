@@ -6,26 +6,26 @@
 <title>방송 관리 - 말씀ON 목회자</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body data-default="role:owner s:normal sig:ok mode:normal send:browser chat:open tts:on don:some end:none dlg:closed msgs:some act:ok">
-<!-- 송출 중·채팅 관리(DESIGN-REMAINING). 후원 금액은 어느 역할에도 표시하지 않는다. 예배 중 후원 메시지 표시 방식은 슬롯(S3). 시간·간격 숫자는 슬롯 -->
+<body data-default="role:owner s:normal sig:ok mode:normal dm:dash send:browser chat:open tts:on don:some end:none dlg:closed msgs:some act:ok">
+<!-- 송출 중·채팅 관리(DESIGN-REMAINING). 후원 금액은 어느 역할에도 표시하지 않는다. 예배 중 후원 메시지 표시 방식(dm)은 임시 설정: 방송별 목회자 선택. 시간·간격 숫자는 슬롯 -->
 <header id="site-header" data-active="live"></header>
 
 <div class="mockbar"><div class="wrap">
   <div data-rolebar></div>
-  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:unsupported">미지원 기기</button></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">기본</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:unsupported">폰에서 송출 시도</button></div>
   <div class="group"><b>송출</b><button data-set="sig:ok">정상</button><button data-set="sig:unstable">불안정</button><button data-set="sig:cut">끊김</button><button data-set="sig:recon">재연결 중</button><button data-set="sig:reconfail">재연결 실패</button><b>방식</b><button data-set="send:browser">브라우저</button><button data-set="send:obs">OBS</button></div>
-  <div class="group"><b>방송 모드</b><button data-set="mode:normal">일반</button><button data-set="mode:worship">예배</button><b>채팅</b><button data-set="chat:open">열림</button><button data-set="chat:slow">느린 모드</button><button data-set="chat:closed">닫힘</button></div>
+  <div class="group"><b>방송 모드</b><button data-set="mode:normal">일반</button><button data-set="mode:worship">예배</button><b>예배 중 후원 메시지</b><button data-set="dm:dash">대시보드에서만</button><button data-set="dm:chat">채팅에 표시</button><b>채팅</b><button data-set="chat:open">열림</button><button data-set="chat:slow">느린 모드</button><button data-set="chat:closed">닫힘</button></div>
   <div class="group"><b>TTS</b><button data-set="tts:on">정상</button><button data-set="tts:muted">긴급 음소거</button><button data-set="tts:fail">공급자 장애</button><b>후원 메시지</b><button data-set="don:some">있음</button><button data-set="don:none">0건</button></div>
   <div class="group"><b>종료</b><button data-set="end:none">방송 중</button><button data-set="end:confirm">종료 확인</button><button data-set="end:wait">서버 확인 대기</button><button data-set="end:fail">종료 실패</button><button data-set="end:done">종료 후 요약</button></div>
   <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:msg">메시지 관리</button><button data-set="dlg:ban">전체 차단 확인</button><button data-set="dlg:mode">예배 전환 확인</button></div>
   <div class="group"><b>모바일</b><button data-set="msgs:some">채팅 목록 있음</button><button data-set="msgs:none">0건</button><b>조치 적용</b><button data-set="act:ok">정상</button><button data-set="act:fail">실패</button><button data-set="act:stale">이미 바뀜</button><button type="button" id="m-sim">새 항목 도착</button><button type="button" id="m-99">후원 배지 99+</button></div>
-  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 채팅·후원 메시지·닉네임은 모두 샘플이에요. 사용자 결정 전: 예배 중 후원 메시지 표시 방식, 재연결 실패 시간, 관리자 부분 부여.</p>
+  <p class="muted">대화상자가 열려 있으면 이 막대는 눌리지 않아요. 먼저 닫아 주세요. 채팅·후원 메시지·닉네임은 모두 샘플이에요. 사용자 결정 전: 재연결 실패 시간, 관리자 부분 부여.</p>
 </div></div>
 
 <main class="wrap">
 <section class="stack" style="padding-top:24px" role="status" aria-busy="true" data-show="s=loading"><p class="muted">불러오는 중</p><div class="skeleton" style="height:56px"></div><div class="skeleton" style="height:200px"></div></section>
 <section style="padding-top:24px" data-show="s=loaderr"><div class="notice danger" role="alert"><strong>방송 정보를 불러오지 못했어요</strong><p class="small">방송에는 영향이 없어요. 다시 시도해 주세요.</p><p style="margin-top:8px"><button class="btn lnk" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div></section>
-<section style="padding-top:24px" data-show="s=unsupported"><div class="notice"><strong>이 기기에서는 방송 관리 화면을 쓸 수 없어요</strong><p class="small">컴퓨터 같은 다른 기기에서 열어 확인해 주세요.</p><p style="margin-top:8px"><a class="btn lnk" href="dashboard.html">대시보드로</a></p></div></section>
+<section style="padding-top:24px" data-show="s=unsupported"><div class="notice"><strong>휴대폰에서는 방송을 시작할 수 없어요</strong><p class="small">컴퓨터에서 방송을 시작해 주세요. 이 화면에서는 채팅을 관리할 수 있어요.</p><p class="row" style="margin-top:8px"><button class="btn lnk" type="button" data-set="s:normal">채팅 관리 보기</button><a class="btn lnk" href="dashboard.html">대시보드로</a></p></div></section>
 
 <!-- 종료 후 요약 -->
 <section class="col stack" data-show="s=normal end=done" aria-label="방송 요약">
@@ -88,11 +88,12 @@
     <h2>후원 메시지</h2>
     <p class="help" data-show="role=adm0">후원 메시지 확인은 소유자가 권한을 주면 쓸 수 있어요</p>
     <p class="help" data-show="role=mgr">후원 메시지는 관리자 이상만 볼 수 있어요</p>
-    <p class="help" data-show="mode=worship">예배 중 후원 메시지 표시: <span class="slot">방송 설정에서 확정 예정</span></p>
+    <p class="help" data-show="mode=worship dm=chat">예배 중 후원 메시지는 채팅에 표시돼요 <span class="slot">임시 설정</span></p>
+    <p class="help" data-show="mode=worship dm=dash">예배 중 후원 메시지는 여기서만 확인해요 <span class="slot">임시 설정</span></p>
     <p class="help m-only" data-show="role=owner|admall mode=normal">후원 메시지는 채팅에도 함께 보여요</p>
     <fieldset id="fs-don" style="border:0;padding:0;margin:0"><legend class="sr">후원 메시지 목록</legend>
       <div class="empty" data-show="don=none"><p>아직 후원 메시지가 없어요</p></div>
-      <ul class="msg-list" data-show="don=some"><li><span><strong>샘플닉네임3</strong><br>샘플 후원 메시지예요</span></li><li><span><strong>샘플닉네임4</strong><br>샘플 응원 메시지예요</span></li></ul>
+      <ul class="msg-list" data-show="don=some"><li><span><strong>샘플닉네임3</strong><br>샘플 후원 메시지예요</span><button class="btn lnk" type="button" data-show="mode=worship dm=dash" aria-label="샘플닉네임3 후원 메시지 확인">확인</button></li><li><span><strong>샘플닉네임4</strong><br>샘플 응원 메시지예요</span><button class="btn lnk" type="button" data-show="mode=worship dm=dash" aria-label="샘플닉네임4 후원 메시지 확인">확인</button></li></ul>
       <div class="mv-wrap m-only" data-show="don=some"><div class="mv-scroll" id="d-scroll" tabindex="0" role="region" aria-label="후원 메시지 목록"><ul class="mv-list" id="d-list"></ul></div></div>
     </fieldset>
     <p class="help" id="don-no" hidden>후원 메시지는 권한이 있는 관리자 이상만 볼 수 있어요.</p>
@@ -111,6 +112,7 @@
       <li><span><strong>샘플닉네임1</strong> <span class="tag" id="s-m1" hidden></span><br>안녕하세요, 샘플 채팅이에요</span><button class="btn lnk" type="button" data-m="m1" aria-label="샘플닉네임1 메시지 관리">관리</button></li>
       <li><span><strong>샘플닉네임2</strong> <span class="tag" id="s-m2" hidden></span><br>샘플 채팅 메시지예요</span><button class="btn lnk" type="button" data-m="m2" aria-label="샘플닉네임2 메시지 관리">관리</button></li>
       <li><span><strong>샘플매니저1</strong> <span class="tag mgr">매니저</span><br>샘플 매니저 메시지예요</span></li>
+      <li data-show="role=owner|admall mode=worship dm=chat"><span><strong>샘플닉네임3</strong> <span class="tag dn">후원</span><br>샘플 후원 메시지예요</span></li>
     </ul>
   </section>
 
@@ -152,6 +154,7 @@
     <div><button class="tg" type="button" id="m-slow" aria-pressed="false" aria-describedby="m-slow-why"><i></i>느린 모드 <span class="slot">간격</span></button><p class="help" id="m-slow-why" hidden>채팅이 닫혀 있어서 바꿀 수 없어요</p></div>
     <div><button class="btn lnk" type="button" id="m-chat-tg"></button></div>
     <div class="notice" id="m-ask" role="group" aria-label="채팅 닫기 확인" hidden><p>시청자는 채팅을 쓸 수 없게 돼요</p><div class="m-ask-a"><button class="btn" type="button" id="m-ask-no">취소</button><button class="btn bad" type="button" id="m-ask-ok">채팅 닫기</button></div></div>
+    <div id="m-end-w" hidden><hr style="border:0;border-top:1px solid var(--line);margin:8px 0 16px"><button class="btn bad" type="button" id="m-end">송출이 끊긴 방송 종료</button><p class="help" id="m-end-why" hidden>송출이 끊겼을 때만 폰에서 종료할 수 있어요</p></div>
     <p class="err" id="cs-err" role="alert" hidden>적용하지 못했어요. 잠시 뒤 다시 시도해 주세요.</p>
     <p class="help" id="cs-stale" role="status" hidden>이미 바뀌었어요. 최신 상태로 보여 드려요.</p>
   </div>
@@ -188,7 +191,7 @@
   }
   function donRow(m, i) {
     var id = 'd' + i; MSG[id] = [m[0], m[1]];
-    return '<li class="don"><div class="mc-b"><div class="mc-n"><strong class="nm">' + m[0] + '</strong><span class="tag dn">후원</span></div><p class="mc-t">' + m[1] + '</p></div><span class="slot ck-w"><button class="btn ck" type="button" aria-label="' + m[0] + ' 후원 메시지 확인">확인</button></span></li>'; // 예배 모드에서만 보임(S3 확정 전)
+    return '<li class="don"><div class="mc-b"><div class="mc-n"><strong class="nm">' + m[0] + '</strong><span class="tag dn">후원</span></div><p class="mc-t">' + m[1] + '</p></div><span class="ck-w"><button class="btn ck" type="button" aria-label="' + m[0] + ' 후원 메시지 확인">확인</button></span></li>'; // 예배+대시보드 확인(dm=dash)에서만 보임(CSS)
   }
   $('c-list').innerHTML = CH.map(chatRow).join(''); $('d-list').innerHTML = DN.map(donRow).join('');
   function fit() { // 모바일: 상태 줄 높이(하위 탭 sticky 위치)와 목록 높이(화면 − 위쪽 요소 − 하단 탭 56px)
@@ -223,6 +226,7 @@
     $('m-chat-t').textContent = $('chat-t').textContent; $('m-chat-t').className = 'tag ' + (cl ? 'off' : d.chat === 'slow' ? 'wait' : 'ok');
     $('m-slow').disabled = cl; $('m-slow').setAttribute('aria-pressed', String(d.chat === 'slow')); $('m-slow-why').hidden = !cl;
     $('m-chat-tg').textContent = cl ? '채팅 열기' : '채팅 닫기';
+    var cutS = d.sig === 'cut' || d.sig === 'reconfail'; $('m-end-w').hidden = !c; $('m-end').hidden = !cutS; $('m-end-why').hidden = cutS; // 긴급 종료: 소유자·전체 권한 관리자, 송출 끊김·재연결 실패에서만
     // 전체 차단은 소유자·관리자만
     $('act-all').disabled = mgr; $('all-why').hidden = !mgr;
     // 모바일 탭
@@ -257,6 +261,7 @@
   });
   function open(id, key, val, op) { $(id)._opener = op; d[key] = val; window.mockRender(); }
   $('end').onclick = function () { open('end-dlg', 'end', 'confirm', this); };
+  $('m-end').onclick = function () { $('chat-dlg').close(); open('end-dlg', 'end', 'confirm', $('m-more')); };
   $('md-btn').onclick = function () { open('mode-dlg', 'dlg', 'mode', this); };
   function R(v) { return document.querySelector('input[name=act][value=' + v + ']'); }
   function openMsg(x) {
@@ -295,7 +300,7 @@
   $('m-ask-no').onclick = function () { $('m-ask').hidden = true; $('m-chat-tg').focus(); };
   $('m-ask-ok').onclick = function () { if (!note('cs-err', 'cs-stale')) return; $('m-ask').hidden = true; d.chat = 'closed'; window.mockRender(); $('m-chat-tg').focus(); };
   $('chat-dlg').addEventListener('close', function () { $('m-ask').hidden = true; $('cs-err').hidden = $('cs-stale').hidden = true; if (this._opener && document.contains(this._opener)) this._opener.focus(); });
-  $('d-list').addEventListener('click', function (e) { var b = e.target.closest('.ck'); if (!b) return; var li = b.closest('li'), t = document.createElement('span'); t.className = 'ck-done'; t.textContent = '확인함'; b.replaceWith(t); li.tabIndex = -1; li.focus(); }); // 목업: 확인 방식은 S3 확정 전
+  $('d-list').addEventListener('click', function (e) { var b = e.target.closest('.ck'); if (!b) return; var li = b.closest('li'), t = document.createElement('span'); t.className = 'ck-done'; t.textContent = '확인함'; b.replaceWith(t); li.tabIndex = -1; li.focus(); }); // 목업: 확인 방식은 임시 설정(dm)
   var cs = $('c-scroll');
   function atEnd() { return cs.scrollHeight - cs.scrollTop - cs.clientHeight < 40; }
   cs.addEventListener('scroll', function () { if (atEnd()) { unread = 0; $('m-new').hidden = true; } });

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>문의 상세 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-reports.css">
+<link rel="stylesheet" href="operator-verify.css">
+<link rel="stylesheet" href="operator-inquiries.css">
+</head>
+<body data-default="role:op s:normal st:new k:pay u:member dlg:closed a:none ag:up re:0">
+<!-- 문의 상세·답변. 개인정보 최소 노출(닉네임·내부 회원 번호만). 생년월일·첨부는 열람 사유를 거쳐 열고 열람 기록이 남는다.
+     이력은 고칠 수 없다. 숫자·기간·한도는 슬롯, 날짜·이름은 샘플. 요청자에게 보이는 상태: 접수/확인 중/답변 왔어요/종결.
+     권한 가정(리드 확인 필요): 생년월일 정정 [반영]·배정 변경은 최고 관리자만 -->
+<header id="site-header" data-active="inquiries"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:notfound">없는 건</button><button data-set="s:saveerr">저장 실패</button><button data-set="s:conflict">충돌</button><button data-set="s:sent">답변 보냄</button><button data-set="s:notifyfail">통지 일부 실패</button><button data-set="s:self">내가 조치한 제재</button></div>
+  <div class="group"><b>건 상태</b><button data-set="st:new">접수</button><button data-set="st:wip">처리 중</button><button data-set="st:hold">보류</button><button data-set="st:answered">답변 완료</button><button data-set="st:closed">종결</button></div>
+  <div class="group"><b>유형</b><button data-set="k:pay">결제</button><button data-set="k:general">일반</button><button data-set="k:birth">생년월일 정정</button><button data-set="k:blocked">차단</button><button data-set="k:late">이의 기한 경과</button><button data-set="k:station">방송국</button><button data-set="k:settle">정산</button><button data-set="k:other">기타</button></div>
+  <div class="group"><b>요청자</b><button data-set="u:member">회원</button><button data-set="u:pastor">목회자</button></div>
+  <div class="group"><b>담당</b><button data-set="a:none">없음</button><button data-set="a:me">나</button><button data-set="a:other">다른 운영자</button></div>
+  <div class="group"><b>연령 판정</b><button data-set="ag:up">구간 상승</button><button data-set="ag:same">같거나 내려감</button></div>
+  <div class="group"><b>재문의</b><button data-set="re:0">아님</button><button data-set="re:1">재문의 건</button></div>
+  <div class="group"><b>대화상자</b><button data-set="dlg:closed">닫힘</button><button data-set="dlg:why">열람 사유</button><button data-set="dlg:close">종결 확인</button><button data-set="dlg:birthapply">정정 반영 확인</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <p><a href="inquiries.html">← 문의 접수함</a></p>
+    <h1>문의 상세</h1>
+
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:160px;margin-top:8px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>문의를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+    <div class="empty" data-show="s=notfound"><p><strong>문의를 찾을 수 없어요</strong></p><a class="btn" href="inquiries.html">목록으로</a></div>
+
+    <div class="stack" data-show="s=normal|saveerr|conflict|sent|notifyfail|self">
+      <div class="notice danger" role="alert" data-show="s=conflict"><strong>다른 운영자가 이미 처리했어요</strong><p>지금은 읽기만 할 수 있어요. 새로고침하면 처리된 내용을 볼 수 있어요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">새로고침</button></p></div>
+      <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 답변은 그대로 있어요. 잠시 뒤 다시 보내 주세요.</p></div>
+      <div class="notice" role="status" id="sent" tabindex="-1" data-show="s=sent"><strong>답변을 보냈어요</strong><p>요청자에게 알림을 보냈어요. <span class="slot">알림 방식 미정</span></p></div>
+      <div class="notice danger" role="alert" data-show="s=notifyfail"><strong>알림 발송 일부 실패</strong><p>답변은 저장됐어요. 알림 <span class="slot">실패한 방식</span>이 가지 않았어요.</p><p style="margin-top:8px"><button class="btn" type="button" data-set="s:sent">다시 보내기</button></p></div>
+      <div class="notice" role="status" data-show="s=self"><strong>내가 조치한 제재에 관한 문의예요</strong><p>다른 운영자가 처리해요. 읽기만 할 수 있어요. <span class="slot">운영자가 1명일 때 처리 방법 미정</span></p></div>
+
+      <!-- ① 머리 -->
+      <section class="stack" aria-labelledby="h-hd">
+        <h2 id="h-hd" class="sr">문의 요약</h2>
+        <p class="row" style="flex-wrap:wrap"><span class="muted"><span class="slot">접수번호 샘플</span></span><span class="tag" id="k-tag"></span><span class="tag" id="st-tag"></span><span class="tag" id="dl-tag"></span></p>
+        <p class="muted small">요청자 화면에는 <strong id="rq-st"></strong>로 보여요 · 접수일 샘플 날짜</p>
+        <p class="muted small" id="hold-line" hidden></p>
+        <p class="small" data-show="re=1">이전 문의에서 이어진 재문의예요 · <a href="inquiry-detail.html?st=closed&amp;k=pay">이전 문의 (<span class="slot">접수번호 샘플</span>)</a></p>
+      </section>
+
+      <!-- ② 담당 -->
+      <section class="stack" aria-labelledby="h-as"><h2 id="h-as">담당자</h2>
+        <p class="row iq-row" style="gap:8px 16px;flex-wrap:wrap"><strong id="asg-t"></strong>
+          <button class="linkbtn" type="button" id="asg-me" data-show="a=none st=new|wip|hold|answered">나에게 배정</button>
+          <button class="linkbtn" type="button" id="asg-off" data-show="a=me st=new|wip|hold|answered">배정 해제</button></p>
+        <p class="help" id="asg-h"></p>
+        <details class="why" data-show="role=super st=new|wip|hold|answered"><summary>다른 운영자에게 배정</summary>
+          <div class="stack" style="margin-top:8px">
+            <label class="field"><span class="label">운영자</span><select class="input" id="asg-sel"><option>샘플 운영자2</option><option>샘플 운영자3</option></select></label>
+            <p class="row"><button class="btn" type="button" id="asg-go">배정</button></p></div></details>
+        <p class="sr" role="status" id="asg-live"></p>
+      </section>
+
+      <!-- ③ 원문 -->
+      <section class="panel stack" aria-labelledby="h-q"><h2 id="h-q">문의 원문</h2>
+        <dl class="kv">
+          <dt>요청자</dt><dd>샘플닉네임 <span class="tag" id="u-tag"></span> <span class="muted small">회원 번호 샘플</span></dd>
+          <dt id="stn-dt">방송국</dt><dd id="stn-dd">샘플 방송국</dd>
+          <dt>제목</dt><dd id="q-t"></dd>
+        </dl>
+        <p class="iq-body" id="q-b"></p>
+        <div><h3>첨부</h3>
+          <p class="muted" id="att-none" hidden>첨부가 없어요</p>
+          <ul class="plain files" id="att"><li><span>샘플 첨부 1.jpg <span class="muted small">이미지 · <span class="slot">형식·용량</span></span></span> <button class="btn" type="button" data-open="why-dlg" data-reveal="att-v" aria-label="샘플 첨부 1.jpg 열기">열기</button></li></ul>
+          <div class="shot" id="att-v" hidden>샘플 첨부 이미지 (가상)</div>
+          <p class="help">열면 열람 기록이 남아요</p></div>
+      </section>
+
+      <details style="margin-top:8px" class="why"><summary>열람 기록</summary>
+          <div class="tbl-wrap" style="margin-top:8px"><table><caption class="sr">열람 기록</caption>
+            <thead><tr><th scope="col">시각</th><th scope="col">운영자</th><th scope="col">사유</th></tr></thead>
+            <tbody id="log"><tr><td>샘플 시각</td><td>샘플 운영자2</td><td>정정 요청 확인</td></tr></tbody></table></div></details>
+
+      <!-- 생년월일 정정 처리 -->
+      <section class="panel stack" aria-labelledby="h-bd" data-show="k=birth"><h2 id="h-bd">생년월일 정정 처리</h2>
+        <p class="muted small">회원 정보는 닉네임·내부 회원 번호만 보여요. 정정 횟수 한도 <span class="slot">횟수 한도(정책)</span> · 증빙 <span class="slot">증빙 종류</span></p>
+        <dl class="kv"><dt>현재 값</dt><dd><span id="bd-cur" hidden>샘플 생년월일 (가상)</span><button class="btn" type="button" id="bd-open" data-open="why-dlg" data-reveal="bd-cur">생년월일 보기</button></dd>
+          <dt>정정 요청 값</dt><dd><span class="slot">요청 값(열람 사유 후 표시)</span></dd></dl>
+        <p><strong id="bd-j"></strong></p>
+        <p class="help" id="bd-h"></p>
+        <p class="iq-act" data-show="role=super"><button class="btn bad" type="button" id="bd-go" data-open="birthapply-dlg" aria-describedby="bd-h">반영</button></p>
+        <p class="help" data-show="role=op">최고 관리자가 처리해요. 일반 운영자는 읽기만 할 수 있어요.</p>
+        <p class="muted small" id="bd-done" role="status" hidden>정정을 반영했어요 (샘플)</p>
+      </section>
+
+      <!-- ④ 관련 링크 -->
+      <section aria-labelledby="h-rl"><h2 id="h-rl">관련 항목</h2>
+        <ul class="plain">
+          <li><a href="member-detail.html">계정: 샘플닉네임 (회원 번호 샘플)</a></li>
+          <li data-show="k=blocked|late|station|settle"><a href="station-detail.html">방송국: 샘플 방송국</a></li>
+          <li data-show="k=pay"><a href="refunds.html">결제: 샘플 결제 #1 (환불·결제 오류)</a></li>
+          <li data-show="k=late"><a href="appeal-detail.html">이의제기: 샘플 건</a></li>
+        </ul></section>
+
+      <!-- ⑤ 이력 -->
+      <section aria-labelledby="h-h"><h2 id="h-h">처리 이력</h2>
+        <p class="muted small">이력은 고칠 수 없어요</p>
+        <ol class="tl" style="margin-top:8px">
+          <li data-show="st=closed"><strong>종결</strong> · 샘플 운영자 · 샘플 시각</li>
+          <li data-show="st=answered|closed"><strong>답변</strong> · 샘플 운영자 · 샘플 시각<br>샘플 답변 내용 (가상)</li>
+          <li data-show="st=hold"><strong>보류</strong> · 샘플 운영자 · 샘플 시각<br>사유: <span class="hold-r">샘플 사유</span></li>
+          <li data-show="re=1"><strong>재문의</strong> · 요청자 · 샘플 시각</li>
+          <li class="dyn"><strong>배정</strong> · <span class="asg-n">샘플 운영자</span> · 샘플 시각</li>
+          <li><strong>접수</strong> · 요청자 · 샘플 시각</li>
+        </ol></section>
+
+      <!-- ⑥ 내부 메모 -->
+      <section class="panel stack" aria-labelledby="h-m"><h2 id="h-m">내부 메모</h2>
+        <p class="muted small">요청자에게는 보이지 않아요</p>
+        <ul class="plain" id="memos"><li><span class="muted small">샘플 운영자2 · 샘플 시각</span><br>샘플 메모 (가상)</li></ul>
+        <div class="stack" data-show="st=new|wip|hold|answered">
+          <label class="field"><span class="label">메모</span><textarea class="textarea" id="memo" rows="3" aria-describedby="memo-e"></textarea><span class="err" id="memo-e" hidden>메모를 입력해 주세요</span></label>
+          <p class="row"><button class="btn" type="button" id="memo-add">메모 추가</button></p>
+          <p class="muted small" role="status" id="memo-ok" hidden>메모를 추가했어요 (샘플)</p></div>
+      </section>
+
+      <!-- 종결: 읽기 전용 -->
+      <div class="notice" role="status" data-show="st=closed"><strong>종결된 문의예요</strong><p>읽기만 할 수 있어요. 요청자가 다시 문의하면 새 접수번호로 받고 이 건과 이어서 보여요.</p></div>
+
+      <!-- ⑦ 답변 작성 -->
+      <form class="panel stack" id="frm" onsubmit="return false" aria-labelledby="h-a" novalidate data-show="st=new|wip|hold">
+        <h2 id="h-a">답변 작성</h2>
+        <label class="field"><span class="label">답변 <span class="muted">필수</span></span><textarea class="textarea" id="ans" rows="6" aria-describedby="ans-e ans-h"></textarea><span class="err" id="ans-e" hidden>답변을 입력해 주세요</span><span class="help" id="ans-h" style="display:block">계좌·연락처는 쓰지 마세요</span></label>
+        <p class="muted small">알림: 인앱 · 이메일 <span class="slot">알림 방식 미정</span></p>
+        <p class="help" id="off-why" hidden></p>
+        <button class="btn primary block" type="button" id="send" aria-describedby="off-why">답변 보내기</button>
+      </form>
+      <section class="panel stack" aria-labelledby="h-ar" data-show="st=answered"><h2 id="h-ar">보낸 답변</h2><p class="iq-body">샘플 답변 내용 (가상)</p><p class="muted small">샘플 운영자 · 샘플 시각</p></section>
+
+      <!-- ⑧ 상태 전환 -->
+      <section class="panel stack" aria-labelledby="h-t" data-show="st=new|wip|hold|answered"><h2 id="h-t">상태 전환</h2>
+        <p class="muted small">접수 → 처리 중(배정하면 자동) → 답변 완료 → 종결 · 종결은 답변을 보낸 뒤 할 수 있어요</p>
+        <div class="stack" data-show="st=new|wip">
+          <label class="field"><span class="label">보류 사유 <span class="muted">필수</span></span><input class="input" id="hold-r" aria-describedby="hold-e"><span class="err" id="hold-e" hidden>보류 사유를 한 줄로 입력해 주세요</span></label>
+          <p class="row"><button class="btn" type="button" id="hold-go">보류로 바꾸기</button></p></div>
+        <div class="stack" data-show="st=hold"><p>보류 사유: <span class="hold-r">샘플 사유</span></p><p class="row"><button class="btn" type="button" id="hold-off">보류 해제</button></p></div>
+        <div class="stack iq-act" data-show="st=answered"><button class="btn bad" type="button" data-open="close-dlg" id="close-go">종결</button></div>
+        <p class="help" data-show="st=new|wip|hold">종결은 답변 완료 뒤에 할 수 있어요</p>
+      </section>
+    </div>
+  </main>
+</div>
+
+<dialog id="why-dlg" aria-labelledby="why-t"><h2 id="why-t">열람 사유</h2>
+  <div class="stack" style="margin-top:12px">
+    <label class="field"><span class="label">사유 <span class="muted">필수</span></span><select class="input" id="r-sel" aria-describedby="r-e"><option value="">선택해 주세요</option><option>문의 확인</option><option>정정 요청 확인</option><option>기타</option></select></label>
+    <label class="field"><span class="label">한 줄 메모</span><input class="input" id="r-txt"></label>
+    <span class="err" id="r-e" hidden>열람 사유를 골라 주세요</span></div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn" type="button" id="r-go">열람</button></div>
+</dialog>
+
+<dialog id="close-dlg" aria-labelledby="c-t"><h2 id="c-t">이 문의를 종결할까요?</h2>
+  <p style="margin-top:12px">종결하면 답변·메모를 더 쓸 수 없어요. 요청자에게는 <strong>종결</strong>로 보여요.</p>
+  <p class="muted small">저장한 뒤에는 되돌리기 어려워요. 재문의는 새 접수번호로 받아요 <span class="slot">자동 종결 기간(정책)</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn bad" type="button" id="c-go">종결</button></div>
+</dialog>
+
+<dialog id="birthapply-dlg" aria-labelledby="b-t"><h2 id="b-t">생년월일 정정을 반영할까요?</h2>
+  <dl class="kv" style="margin-top:12px"><dt>대상</dt><dd>샘플닉네임 · 회원 번호 샘플</dd><dt>변경</dt><dd><span class="slot">전 값</span> → <span class="slot">후 값</span></dd><dt>연령 구간</dt><dd id="b-j"></dd></dl>
+  <p style="margin-top:12px">반영하면 요청자의 연령 구간 제한이 바뀔 수 있어요. 이력에 남고 요청자에게 알림이 가요.</p>
+  <p class="muted small">반영한 뒤에는 되돌리기 어려워요 <span class="slot">정정 절차 미정</span></p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn bad" type="button" id="b-go">반영</button></div>
+</dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, $ = function (i) { return document.getElementById(i); };
+  var all = function (s) { return [].slice.call(document.querySelectorAll(s)); };
+  var KN = { pay: '결제', general: '일반', birth: '생년월일 정정', blocked: '차단', late: '이의 기한 경과', station: '방송국', settle: '정산', other: '기타' };
+  var KT = { pay: '결제했는데 열매가 안 들어왔어요', general: '앱은 언제 나오나요', birth: '생년월일을 잘못 입력했어요', blocked: '채팅이 제한된 이유가 궁금해요', late: '이의제기 기간이 지났어요', station: '방송국 소개 문구를 바꾸고 싶어요', settle: '정산 내역이 달라 보여요', other: '이용 방법을 알려 주세요' };
+  var SN = { new: ['접수', 'wait', '접수'], wip: ['처리 중', 'wip', '확인 중'], hold: ['보류', 'off', '확인 중'], answered: ['답변 완료', 'ok', '답변 왔어요'], closed: ['종결', 'off', '종결'] };
+  var DL = { new: ['기한 지남', 'bad'], wip: ['기한 임박', 'wait'], hold: ['기한 미정', 'off'] };
+  var AN = { none: '담당자 없음', me: '샘플 운영자 (나)', other: '샘플 운영자2' };
+    function set(k, v) { b.dataset[k] = v; window.mockRender(); }
+  function reasonOf() {
+    var s = b.dataset.s, st = b.dataset.st;
+    if (s === 'self') return '내가 조치한 제재에 관한 문의라 처리할 수 없어요';
+    if (s === 'conflict') return '다른 운영자가 이미 처리해서 저장할 수 없어요';
+    if (st === 'hold') return '보류 중이라 답변할 수 없어요. 보류를 해제하면 보낼 수 있어요';
+    return '';
+  }
+  window.mockAfter = function () {
+    var D = b.dataset, st = D.st, k = D.k, s = D.s;
+    // 상태 정합: 답변 보냄 상태는 답변 완료, 배정된 처리 단계는 담당자가 있다
+    if ((s === 'sent' || s === 'notifyfail') && (st === 'new' || st === 'wip' || st === 'hold')) { D.st = 'answered'; return window.mockRender(); }
+    if (st !== 'new' && D.a === 'none') { D.a = 'me'; return window.mockRender(); }
+    if (k === 'birth' && D.u !== 'member') { D.u = 'member'; return window.mockRender(); }
+    $('k-tag').textContent = KN[k]; $('q-t').textContent = KT[k];
+    $('st-tag').textContent = SN[st][0]; $('st-tag').className = 'tag ' + SN[st][1]; $('rq-st').textContent = '“' + SN[st][2] + '”';
+    var d = DL[st]; $('dl-tag').hidden = !d; if (d) { $('dl-tag').textContent = d[0]; $('dl-tag').className = 'tag ' + d[1]; }
+    $('hold-line').hidden = st !== 'hold';
+    $('u-tag').textContent = D.u === 'member' ? '회원' : '목회자';
+    var stn = D.u === 'pastor' || /^(blocked|late|station|settle)$/.test(k); $('stn-dt').hidden = $('stn-dd').hidden = !stn;
+    $('q-b').textContent = '샘플 문의 내용입니다.\n여러 줄로 쓴 내용도 줄바꿈이 그대로 보여요 (가상 내용).';
+    var noAtt = k === 'birth'; $('att').hidden = noAtt; $('att-none').hidden = !noAtt;
+    $('asg-t').textContent = AN[D.a]; $('asg-h').textContent = D.a === 'other' ? '다른 운영자가 맡은 건이에요. 최고 관리자만 배정을 바꿀 수 있어요' : '';
+    $('asg-me').disabled = s === 'self' || s === 'conflict' || st === 'closed'; $('asg-off').disabled = $('asg-me').disabled;
+    all('.asg-n').forEach(function (x) { x.textContent = D.a === 'other' ? '샘플 운영자2' : '샘플 운영자'; });
+    all('.dyn').forEach(function (x) { x.hidden = D.a === 'none'; });
+    $('close-go').disabled = false;
+    // 답변 폼 잠금
+    var why = reasonOf();
+    all('#frm textarea, #send').forEach(function (x) { x.disabled = !!why; });
+    $('off-why').hidden = !why; $('off-why').textContent = why;
+    all('#memo, #memo-add, #hold-r, #hold-go, #hold-off').forEach(function (x) { x.disabled = s === 'self' || s === 'conflict'; });
+    if (s === 'self' || s === 'conflict') $('close-go').disabled = true;
+    // 생년월일 정정 판정
+    if (k === 'birth') {
+      var up = D.ag === 'up', hold = st === 'hold';
+      $('bd-j').textContent = up ? '연령 구간 상승 → 보류 대상' : '같거나 내려감 → 즉시 반영 가능';
+      $('b-j').textContent = up ? '구간 상승' : '같거나 내려감';
+      var cant = hold ? '보류 건은 법무 확인 후 처리해요' : up ? '구간이 올라가는 정정은 먼저 보류해요. 법무 확인 뒤 처리해요 ' : st === 'closed' ? '종결된 건이에요' : s === 'self' || s === 'conflict' ? reasonOf() : '';
+      var done = !$('bd-done').hidden;
+      $('bd-go').disabled = !!cant || done; $('bd-h').textContent = cant;
+      if (!cant) $('bd-h').textContent = '반영하면 확인 대화상자가 열려요';
+    }
+    var key = D.dlg, dd = key !== 'closed' && $(key + '-dlg');
+    if (dd && !dd.open) dd.showModal();
+  };
+  ['why', 'close', 'birthapply'].forEach(function (k) {
+    $(k + '-dlg').addEventListener('close', function () { if (b.dataset.dlg === k) { b.dataset.dlg = 'closed'; window.mockRender(); } });
+  });
+  // 답변 보내기
+  $('send').addEventListener('click', function () {
+    var bad = !$('ans').value.trim();
+    $('ans-e').hidden = !bad; $('ans').setAttribute('aria-invalid', String(bad));
+    if (bad) { $('ans').focus(); return; }
+    if (b.dataset.s === 'saveerr') { return; } // 저장 실패 목업: 입력은 그대로 둔다
+    $('ans').value = ''; b.dataset.st = 'answered'; set('s', 'sent'); $('sent').focus();
+  });
+  $('ans').addEventListener('input', function () { if ($('ans').value.trim()) { $('ans-e').hidden = true; $('ans').setAttribute('aria-invalid', 'false'); } });
+  // 배정
+  $('asg-me').addEventListener('click', function () { if (b.dataset.st === 'new') b.dataset.st = 'wip'; set('a', 'me'); $('asg-live').textContent = '나에게 배정했어요'; $('asg-off').focus(); });
+  $('asg-off').addEventListener('click', function () { if (b.dataset.st === 'wip') b.dataset.st = 'new'; set('a', 'none'); $('asg-live').textContent = '배정을 해제했어요'; $('asg-me').focus(); });
+  $('asg-go').addEventListener('click', function () { b.dataset.a = 'other'; if (b.dataset.st === 'new') b.dataset.st = 'wip'; window.mockRender(); $('asg-live').textContent = $('asg-sel').value + '에게 배정했어요'; });
+  // 보류
+  $('hold-go').addEventListener('click', function () {
+    var v = $('hold-r').value.trim(), bad = !v;
+    $('hold-e').hidden = !bad; $('hold-r').setAttribute('aria-invalid', String(bad)); if (bad) { $('hold-r').focus(); return; }
+    all('.hold-r').forEach(function (x) { x.textContent = v; }); $('hold-line').textContent = '보류 사유: ' + v; set('st', 'hold'); $('hold-off').focus();
+  });
+  $('hold-off').addEventListener('click', function () { $('hold-r').value = ''; set('st', 'wip'); $('hold-r').focus(); });
+  // 메모
+  $('memo-add').addEventListener('click', function () {
+    var v = $('memo').value.trim(), bad = !v; $('memo-e').hidden = !bad; $('memo').setAttribute('aria-invalid', String(bad)); $('memo-ok').hidden = bad;
+    if (bad) { $('memo').focus(); return; }
+    var li = document.createElement('li'); li.innerHTML = '<span class="muted small">샘플 운영자 · 방금</span><br>'; li.appendChild(document.createTextNode(v));
+    $('memos').appendChild(li); $('memo').value = '';
+  });
+  // 종결·정정 반영
+  $('c-go').addEventListener('click', function () { $('close-dlg').close(); set('st', 'closed'); });
+  $('b-go').addEventListener('click', function () {
+    $('birthapply-dlg').close(); $('bd-done').hidden = false; $('bd-go').disabled = true;
+    var li = document.createElement('li'); li.innerHTML = '<strong>정정 반영</strong> · 샘플 운영자 · 방금'; document.querySelector('.tl').prepend(li);
+  });
+  // 열람 사유: 열 곳(data-reveal)을 보여 주고 열람 기록에 남긴다
+  $('r-go').addEventListener('click', function () {
+    if (!$('r-sel').value) { $('r-e').hidden = false; $('r-sel').focus(); return; }
+    var d = $('why-dlg'), btn = d._opener && d._opener.dataset && d._opener.dataset.reveal ? d._opener : $(b.dataset.k === 'birth' ? 'bd-open' : 'att').querySelector('[data-reveal]') || $('bd-open');
+    $('r-e').hidden = true; d.close();
+    var t = $(btn.dataset.reveal); t.hidden = false; btn.hidden = true; if (t.tabIndex < 0) t.tabIndex = -1; t.focus();
+    var tr = document.createElement('tr'); tr.innerHTML = '<td>방금</td><td>샘플 운영자</td><td></td>'; tr.lastChild.textContent = $('r-sel').value + ($('r-txt').value ? ' · ' + $('r-txt').value : '');
+    $('log').insertBefore(tr, $('log').firstChild);
+    $('r-sel').value = ''; $('r-txt').value = '';
+  });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

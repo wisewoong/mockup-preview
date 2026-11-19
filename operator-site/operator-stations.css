@@ -1,0 +1,24 @@
+/* 방송국 관리·상세 전용 (신규 색 토큰 없음) */
+.st-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.st-head h1 { margin: 0; }
+.scope li, .stp li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px; }
+.stp li { align-items: flex-start; }
+.stp .stp-b { flex: 1 1 14rem; min-width: 0; }
+.stp .stp-b .help { margin-top: 2px; }
+.stp .linkbtn { padding-left: 0; text-align: left; }
+.dlg-acts { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.dlg-acts .btn { width: 100%; }
+dialog .kv { grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); }
+dialog.wide { max-width: 520px; }
+.opt .help { margin: 0 0 4px 34px; }
+.opt[hidden] { display: none; }
+.xin { border-left: 3px solid var(--line); padding-left: 14px; }
+@media (max-width: 1023px) {
+  dialog .kv { grid-template-columns: 1fr; gap: 0; }
+  dialog .kv dd { margin-bottom: 8px; }
+  .stp .linkbtn { min-height: var(--tap); }
+}
+.mb li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.mb .tag { margin-right: 0; }
+.tbl-wrap td.c-title .small, .tbl-wrap th.c-title .small { display: block; font-weight: 400; }
+@media (max-width: 1023px) { .tbl-wrap.cards.v td.c-act .go { display: flex; align-items: center; width: 100%; min-height: var(--tap); } }

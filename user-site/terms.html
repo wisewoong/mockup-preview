@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>약관·정책 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 720px; margin: 0 auto; padding: 24px 0 64px; }
+  .col > * + * { margin-top: 16px; }
+  .verline { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  details.fold { border-top: 1px solid var(--line); padding: 4px 0; }
+  details.fold > summary { min-height: var(--tap); display: flex; align-items: center; cursor: pointer; font-weight: 700; color: var(--strong); }
+  details.fold ul { list-style: none; margin: 0; padding: 0 0 8px; }
+  details.fold li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: var(--tap); }
+  .doc h2 { margin-top: 24px; font-size: 1.1rem; scroll-margin-top: 72px; }
+  .doc p { margin-top: 8px; }
+</style>
+</head>
+<body data-default="k:terms v:cur s:normal n:none auth:user">
+<!-- 약관·정책 열람. 비로그인도 볼 수 있다. 본문·버전·시행일은 법무 확정 전이라 모두 슬롯이고, 개정 전후 비교(diff)는 없고 변경 요약만 보여 준다(D8).
+     상태 글자는 운영사 documents.html 과 같다: 현재 적용 중 / 이전 버전 / 시행 전 · 미리보기. -->
+<header id="site-header"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>문서</b><button data-set="k:terms">이용약관</button><button data-set="k:privacy">개인정보 처리방침</button><button data-set="k:policy">운영정책</button></div>
+  <div class="group"><b>버전</b><button data-set="v:cur">현재</button><button data-set="v:old">이전</button><button data-set="v:new">예정(미리보기)</button></div>
+  <div class="group"><b>상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">문서 없음</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button></div>
+  <div class="group"><b>개정 예고</b><button data-set="n:none">없음</button><button data-set="n:upcoming">예고 중</button></div>
+  <div class="group"><b>로그인</b><button data-set="auth:user">로그인</button><button data-set="auth:guest">비로그인</button></div>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-terms" tabindex="-1">약관·정책</h1>
+  <p class="muted small" data-show="auth=guest">로그인하지 않아도 볼 수 있어요.</p>
+
+  <div class="chips" role="group" aria-label="문서 종류">
+    <button class="chip" type="button" data-set="k:terms" aria-pressed="true">이용약관</button><button class="chip" type="button" data-set="k:privacy" aria-pressed="false">개인정보 처리방침</button><button class="chip" type="button" data-set="k:policy" aria-pressed="false">운영정책</button>
+  </div>
+
+  <div data-show="s=normal">
+    <!-- 개정 예고(고지 기간 중, 현재 버전 보는 중에만) -->
+    <div class="notice" role="status" data-show="n=upcoming v=cur"><strong><span data-kn>이용약관</span>이 곧 바뀌어요</strong>
+      <p class="small">시행일 <span class="slot">날짜</span></p>
+      <p class="small">변경 요약 <span class="slot">변경 요약 문구 [법무 확정 전]</span></p>
+      <p style="margin-top:8px"><a class="btn" id="a-new" href="terms.html?k=terms&v=new">예정 약관 미리보기</a></p></div>
+    <div class="notice" role="status" data-show="v=old"><strong>지금 적용 중인 문서가 아니에요</strong>
+      <p class="small">이전 버전이라 참고용으로만 볼 수 있어요.</p><p style="margin-top:8px"><a class="btn" id="a-cur" href="terms.html?k=terms&v=cur">현재 버전 보기</a></p></div>
+    <div class="notice" role="status" data-show="v=new"><strong>아직 적용되지 않은 문서예요</strong>
+      <p class="small">시행일 <span class="slot">날짜</span> 부터 적용돼요. 변경 요약 <span class="slot">변경 요약 문구 [법무 확정 전]</span></p><p style="margin-top:8px"><a class="btn" id="a-cur2" href="terms.html?k=terms&v=cur">현재 버전 보기</a></p></div>
+
+    <div class="verline" style="margin-top:16px">
+      <h2 style="font-size:1.25rem" data-kn>이용약관</h2>
+      <span class="tag ok" data-show="v=cur">현재 적용 중</span><span class="tag off" data-show="v=old">이전 버전</span><span class="tag wait" data-show="v=new">시행 전 · 미리보기</span>
+    </div>
+    <p class="muted small" style="margin-top:4px">버전 <span class="slot">샘플</span> · 시행일 <span class="slot">날짜</span></p>
+
+    <details class="fold" style="margin-top:16px"><summary>이전 버전 보기</summary>
+      <ul><li><span>버전 <span class="slot">샘플</span> · 적용 기간 <span class="slot">기간</span></span><a id="a-old" href="terms.html?k=terms&v=old">보기</a></li>
+      <li><span>버전 <span class="slot">샘플</span> · 적용 기간 <span class="slot">기간</span></span><a id="a-old2" href="terms.html?k=terms&v=old">보기</a></li></ul></details>
+    <details class="fold"><summary>목차</summary>
+      <ul><li><a href="#c1">제1장 <span class="slot">장 제목</span></a></li><li><a href="#c2">제2장 <span class="slot">장 제목</span></a></li><li><a href="#c3">제3장 <span class="slot">장 제목</span></a></li></ul></details>
+
+    <article class="doc" aria-label="문서 본문">
+      <h2 id="c1">제1장 <span class="slot">장 제목</span></h2><p><span class="slot">본문 [법무 확정 전, 문구를 쓰지 않아요]</span></p>
+      <h2 id="c2">제2장 <span class="slot">장 제목</span></h2><p><span class="slot">본문 [법무 확정 전, 문구를 쓰지 않아요]</span></p>
+      <h2 id="c3">제3장 <span class="slot">장 제목</span></h2><p><span class="slot">본문 [법무 확정 전, 문구를 쓰지 않아요]</span></p>
+    </article>
+  </div>
+
+  <div class="empty" data-show="s=empty"><p><strong>아직 등록된 문서가 없어요</strong></p><p class="muted">문서가 올라오면 여기서 볼 수 있어요.</p></div>
+  <div data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:28px;width:60%;margin-top:12px"></div><div class="skeleton" style="height:20px;margin-top:12px"></div><div class="skeleton" style="height:20px;margin-top:12px"></div><div class="skeleton" style="height:20px;margin-top:12px"></div></div>
+  <div class="notice danger" role="alert" data-show="s=loaderr"><strong>문서를 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+</div></main>
+<script src="mock.js"></script>
+<script>
+// 목업: 문서 종류에 맞춰 이름·링크를 채운다
+var KN = { terms: '이용약관', privacy: '개인정보 처리방침', policy: '운영정책' };
+function paint() {
+  var b = document.body, k = KN[b.dataset.k] ? b.dataset.k : 'terms', u = function (v) { return 'terms.html?k=' + k + '&v=' + v; };
+  document.querySelectorAll('[data-kn]').forEach(function (e) { e.textContent = KN[k]; });
+  ['a-new:new', 'a-cur:cur', 'a-cur2:cur', 'a-old:old', 'a-old2:old'].forEach(function (x) { var p = x.split(':'); document.getElementById(p[0]).href = u(p[1]); });
+  document.querySelectorAll('.chips .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.set === 'k:' + k)); });
+  document.title = KN[k] + ' - 말씀ON';
+}
+document.addEventListener('click', function () { setTimeout(paint, 0); });
+paint();
+</script>
+</body>
+</html>

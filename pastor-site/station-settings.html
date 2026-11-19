@@ -5,14 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>방송국 설정 - 말씀ON 목회자</title>
 <link rel="stylesheet" href="styles.css">
-<style>
-.pre{display:flex;align-items:stretch;gap:0}
-.pre .px{display:flex;align-items:center;padding:0 10px;border:1px solid var(--line,#ccc);border-right:0;border-radius:8px 0 0 8px;background:var(--bg-sub,#f3f3f3);white-space:nowrap}
-.pre .input{border-radius:0 8px 8px 0;min-width:0;flex:1}
-.clamp2{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
-.cs-save{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-@media (max-width:700px){.pre .px{font-size:.85em}}
-</style>
 </head>
 <body data-default="role:owner s:normal f:none st:active cert:on img:ok dlg:closed">
 <!-- data-active="station"은 NAV 키에 없는 값이라 상단·하단 메뉴 강조 없음이 의도(진입점은 내 정보 메뉴). 방송국 설정(DESIGN-REMAINING 2묶음). 글자수·형식·용량·주소 규칙은 슬롯. 탐지 문구는 create-station과 통일. 제재 예고 표현 없음 -->
@@ -85,7 +77,7 @@
       <h2 id="h-ad">공개 주소</h2>
       <div class="field"><label class="label" for="ur">주소</label>
         <div class="pre"><span class="px" aria-hidden="true"><span class="slot">주소 접두</span></span><input class="input" id="ur" readonly value="sample-church" aria-describedby="ur-h"></div>
-        <p class="help" id="ur-h">방송국을 만들 때 정한 주소는 바꿀 수 없어요. 바꾸려면 운영팀에 문의해 주세요 <span class="slot">사용자 결정 전</span></p></div>
+        <p class="help" id="ur-h">방송국을 만들 때 정한 주소는 바꿀 수 없어요. 바꾸려면 <a href="inquiry.html">운영팀 문의</a>로 알려 주세요 <span class="slot">사용자 결정 전</span></p></div>
       <p class="row"><button class="btn lnk ik" type="button" id="ur-cp" data-icon="copy" data-keep>주소 복사</button><span class="help" role="status" id="ur-ok" hidden>복사했어요.</span></p>
     </section>
 
@@ -96,6 +88,7 @@
 
     <div class="cs-save"><button class="btn primary" type="submit" id="go">저장</button><span class="help" role="status" id="dirty" hidden style="margin-top:0">저장하지 않은 변경이 있어요</span></div>
   </form>
+  <p class="help" data-show="role=owner">후원 받을 계좌는 <a href="payout-info.html">수령 정보</a>에서 정해요.</p>
 </div>
 </div>
 </div></main>

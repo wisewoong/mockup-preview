@@ -1,0 +1,22 @@
+/* 문의 접수함·문의 상세 전용 (신규 색 토큰 없음). 모바일 카드 .iq: 1행 요약+상태 / 2행 유형·날짜·담당 / 3행 기한 / 전체 폭 [상세] */
+.iq td.c-req .tag { margin-left: 6px; }
+@media (max-width: 1023px) {
+  .tbl-wrap.cards.iq tr[hidden] { display: none; }
+  .tbl-wrap.cards.iq tr { gap: 4px 8px; }
+  .tbl-wrap.cards.iq tr::after { content: ""; order: 3; flex: 1 0 100%; height: 0; }
+  .tbl-wrap.cards.iq td.c-title { flex: 1 1 50%; min-width: 0; font-size: 1.05rem; overflow-wrap: break-word; word-break: keep-all; }
+  .tbl-wrap.cards.iq td.c-tag { max-width: 45%; text-align: right; }
+  .tbl-wrap.cards.iq td.c-kind { order: 4; width: auto; }
+  .tbl-wrap.cards.iq td.c-date { order: 5; width: auto; }
+  .tbl-wrap.cards.iq td.c-req { order: 6; width: auto; }
+  .tbl-wrap.cards.iq td.c-asg { order: 7; width: auto; }
+  .tbl-wrap.cards.iq td.c-date::before, .tbl-wrap.cards.iq td.c-req::before, .tbl-wrap.cards.iq td.c-asg::before { display: inline; content: "· "; }
+  .tbl-wrap.cards.iq td.c-dl { order: 8; width: 100%; }
+  .tbl-wrap.cards.iq td.c-act { order: 9; margin-top: 8px; }
+  .tbl-wrap.cards.iq td.c-act .go { display: flex; align-items: center; justify-content: center; width: 100%; min-height: var(--tap); }
+}
+/* 상세 */
+.iq-body { white-space: pre-wrap; overflow-wrap: anywhere; }
+.iq-act { display: block; }
+@media (max-width: 1023px) { .iq-act .btn, .iq-act .linkbtn { width: 100%; } .iq-row { flex-direction: column; align-items: stretch; } }
+.iq-danger { margin-top: 8px; }

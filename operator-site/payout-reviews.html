@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>수령 정보 확인 - 말씀ON 운영사</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-settlements.css">
+</head>
+<body data-default="role:op s:normal rf:wait rv:wait dlg:closed">
+<!-- 수령 정보(후원 수령) 확인. 일반 운영자도 확인·반려 가능, 전체 열람은 최고 관리자+사유+열람 로그. 헌금 수령 주체는 미정 -->
+<header id="site-header" data-active="payout-reviews"></header>
+<div class="mockbar"><div class="wrap">
+  <div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:saveerr">저장 실패</button></div>
+  <div class="group"><b>상세 건 상태</b><button data-set="rv:wait">확인 대기</button><button data-set="rv:ok">확인됨</button><button data-set="rv:rej">반려</button></div>
+</div></div>
+
+<div class="wrap op">
+  <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
+  <main class="op-main stack">
+    <h1>수령 정보 확인</h1>
+    <p class="muted small">후원 수령 정보만 다뤄요. 헌금 수령 주체는 <span class="slot">미정</span>이라 이 화면에 없어요.</p>
+    <section data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:120px"></div></section>
+    <div class="notice danger" role="alert" data-show="s=loaderr"><strong>수령 정보 목록을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-set="s:normal">다시 시도</button></p></div>
+
+    <div class="stack" data-show="s=normal|empty|saveerr">
+      <div class="notice danger" role="alert" data-show="s=saveerr"><strong>저장하지 못했어요</strong><p>입력한 사유는 그대로 두었어요. 잠시 뒤 다시 시도해 주세요.</p></div>
+      <div class="chips" role="group" aria-label="상태" id="chips"><button class="chip" type="button" data-set="rf:all">전체</button><button class="chip" type="button" data-set="rf:wait">확인 대기</button><button class="chip" type="button" data-set="rf:rej">반려</button><button class="chip" type="button" data-set="rf:ok">확인됨</button><button class="chip" type="button" data-set="rf:none">미제출</button></div>
+      <div class="empty" data-show="s=empty"><p><strong>확인할 수령 정보가 없어요</strong></p><p>목회자가 제출하면 여기에 나와요.</p></div>
+      <div class="empty" id="none" hidden><p><strong>이 상태의 건이 없어요</strong></p><p><button class="btn" type="button" data-set="rf:all">전체 보기</button></p></div>
+      <div class="tbl-wrap cards" data-show="s=normal|saveerr"><table><caption class="sr">수령 정보 제출 목록</caption>
+        <thead><tr><th scope="col">제출일</th><th scope="col">방송국</th><th scope="col">소유자</th><th scope="col">유형</th><th scope="col">상태</th><th scope="col"><span class="sr">상세</span></th></tr></thead>
+        <tbody id="tb"></tbody></table></div>
+    </div>
+  </main>
+</div>
+
+<dialog class="sheet wide" id="det-dlg" aria-labelledby="det-t"><h2 id="det-t">수령 정보 상세</h2>
+  <div class="stack" style="margin-top:12px">
+    <p class="tags" id="det-tag"></p>
+    <div class="limit"><dl>
+      <dt>은행</dt><dd><span class="slot">샘플은행</span></dd>
+      <dt>계좌번호</dt><dd><span class="mask">•••• 1234</span></dd>
+      <dt>예금주</dt><dd>샘플 이름</dd>
+      <dt>계정 실명과 일치</dt><dd><span class="tag ok">일치</span> <span class="muted small">불일치면 이 줄에 '불일치'가 나와요 · 제출은 허용돼요</span></dd>
+      <dt>증빙</dt><dd><span class="slot">증빙 종류 · 미정</span></dd></dl></div>
+    <h3>제출 이력</h3>
+    <ul class="plain"><li style="padding:8px 0;border-bottom:1px solid var(--line)">샘플 시각 · 제출 · <span class="slot">유형</span></li><li style="padding:8px 0;border-bottom:1px solid var(--line)">샘플 시각 · 반려 · 사유 <span class="slot">샘플 사유</span> · 샘플 운영자</li></ul>
+    <div class="notice" id="det-note" hidden></div>
+    <p class="act-bar"><button class="btn primary" type="button" id="b-ok" data-open="ok-dlg">확인 처리</button><button class="btn bad" type="button" id="b-rej" data-open="rej-dlg">반려</button><button class="linkbtn" type="button" id="b-rev" data-open="rev-dlg" data-role="super" aria-describedby="rev-why">전체 열람</button></p>
+    <p class="help" id="rev-why" data-show="role=op">전체 열람은 최고 관리자만 할 수 있어요</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>닫기</button></div>
+  </div></dialog>
+
+<dialog id="ok-dlg" aria-labelledby="ok-t"><h2 id="ok-t">수령 정보를 확인 처리할까요?</h2><p class="small" style="margin-top:8px">확인되면 보류가 없는 정산은 지급 대기가 돼요. 처리자와 시각이 기록돼요.</p>
+  <div class="row" style="margin-top:20px;justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn primary" type="button" data-go="ok">확인 처리</button></div></dialog>
+
+<dialog id="rej-dlg" aria-labelledby="rej-t"><h2 id="rej-t">반려할까요?</h2>
+  <form class="stack" onsubmit="return false" style="margin-top:12px" aria-label="반려">
+    <label class="field"><span class="label">반려 사유 <span class="muted">필수</span></span><span class="help">목회자에게 그대로 보여요</span><textarea class="textarea" rows="3" data-req aria-describedby="rej-e"></textarea><span class="err" id="rej-e" hidden>반려 사유를 입력해 주세요.</span></label>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>취소</button><button class="btn danger" type="button" data-go="rej">반려</button></div>
+  </form></dialog>
+
+<dialog id="rev-dlg" aria-labelledby="rev-t"><h2 id="rev-t">전체 계좌 열람</h2>
+  <p class="small" style="margin-top:8px">열람 사유와 시각이 감사 로그에 남아요.</p>
+  <form class="stack" onsubmit="return false" style="margin-top:12px" aria-label="열람 사유">
+    <label class="field"><span class="label">열람 사유 <span class="muted">필수</span></span><textarea class="textarea" rows="3" data-req aria-describedby="rev-e"></textarea><span class="err" id="rev-e" hidden>열람 사유를 입력해 주세요.</span></label>
+    <p class="mask" id="rev-val" hidden>샘플은행 000-000-000000</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-close autofocus>닫기</button><button class="btn primary" type="button" data-go="rev">열람</button></div>
+  </form></dialog>
+
+<script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, d = b.dataset, $ = function (i) { return document.getElementById(i); };
+  var RV = { none: ['off', '미제출'], wait: ['wait', '확인 대기'], ok: ['ok', '확인됨'], rej: ['bad', '반려'] };
+  var ROWS = [['wait', '최초', 'A'], ['wait', '변경', 'B'], ['rej', '소유자 교체 후 재제출', 'C'], ['ok', '최초', 'D'], ['none', '', 'E']];
+  var cur = 'A';
+  window.mockAfter = function () {
+    var out = ROWS.filter(function (r) { return d.rf === 'all' || r[0] === d.rf; });
+    $('tb').innerHTML = out.map(function (r) {
+      var v = RV[r[0]], nm = '샘플 방송국 ' + r[2];
+      return '<tr><td data-label="제출일">' + (r[0] === 'none' ? '<span class="muted">—</span>' : '<span class="slot">샘플 날짜</span>') + '</td><td data-label="방송국"><strong>' + nm + '</strong></td><td data-label="소유자">샘플 목회자 ' + r[2] + '</td><td data-label="유형">' + (r[1] || '<span class="muted">—</span>') + '</td><td data-label="상태"><span class="tag ' + v[0] + '">' + v[1] + '</span></td><td class="c-act"><button class="btn" type="button" data-row="' + r[0] + '" aria-label="' + nm + ' 수령 정보 상세"' + (r[0] === 'none' ? ' disabled' : '') + '>상세 ›</button></td></tr>';
+    }).join('');
+    $('none').hidden = !(d.s === 'normal' && !out.length);
+    document.querySelectorAll('#chips .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.set === 'rf:' + d.rf)); });
+    var v = RV[d.rv]; $('det-tag').innerHTML = '<span class="tag ' + v[0] + '">' + v[1] + '</span>';
+    var n = $('det-note'); n.hidden = d.rv === 'wait'; n.innerHTML = d.rv === 'ok' ? '<strong>확인된 정보예요</strong>' : '<strong>반려했어요</strong><p class="small">사유는 목회자에게 보여요.</p>';
+    $('b-ok').hidden = $('b-rej').hidden = d.rv !== 'wait';
+    $('b-rev').disabled = d.role !== 'super';
+    if (d.dlg !== 'closed' && !document.querySelector('dialog[open]')) { var t = { detail: 'det', ok: 'ok', rej: 'rej', reveal: 'rev' }[d.dlg]; if (t) $(t + '-dlg').showModal(); }
+  };
+  document.addEventListener('click', function (e) {
+    var r = e.target.closest('[data-row]'); if (r) { d.rv = r.dataset.row; window.mockRender(); var m = $('det-dlg'); m._opener = r; m.showModal(); return; }
+    var g = e.target.closest('[data-go]'); if (!g) return;
+    var dl = g.closest('dialog'), first = null;
+    dl.querySelectorAll('[data-req]').forEach(function (f) {
+      var bad = !f.value.trim(), er = $(f.getAttribute('aria-describedby')); er.hidden = !bad; f.setAttribute('aria-invalid', String(bad)); if (bad && !first) first = f;
+    });
+    if (first) { first.focus(); return; }
+    if (g.dataset.go === 'rev') { $('rev-val').hidden = false; return; }
+    g.disabled = true;
+    setTimeout(function () { g.disabled = false; d.rv = g.dataset.go; d.dlg = 'closed'; dl.close(); window.mockRender(); }, 500);
+  });
+  document.querySelectorAll('dialog').forEach(function (x) { x.addEventListener('close', function () { d.dlg = 'closed'; var rv = $('rev-val'); if (rv) rv.hidden = true; }); });
+  window.mockRender();
+})();
+</script>
+</body>
+</html>

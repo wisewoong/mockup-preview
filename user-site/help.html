@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>도움말·공지 - 말씀ON</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .col { max-width: 720px; margin: 0 auto; padding: 24px 0 64px; }
+  .col > * + * { margin-top: 16px; }
+  ul.qa { list-style: none; margin: 0; padding: 0; }
+  ul.qa > li { border-top: 1px solid var(--line); }
+  ul.qa details > summary { min-height: var(--tap); display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; padding: 8px 0; cursor: pointer; color: var(--strong); font-weight: 600; }
+  ul.qa details > div { padding: 0 0 16px; }
+  .nmeta { margin-left: auto; }
+</style>
+</head>
+<body data-default="t:faq s:normal c:all bn:on auth:user">
+<!-- 도움말·공지사항. FAQ 본문·공지 본문은 운영 확정 전이라 슬롯이다(검색 없음, FAQ 관리 화면도 1차 제외 D10). 공지 종류 글자는 운영사 notices.html 과 같다: 안내 / 점검 / 약관 개정. -->
+<header id="site-header"></header>
+
+<div class="mockbar"><div class="wrap">
+  <div class="group"><b>상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">로드 실패</button></div>
+  <div class="group"><b>상단 배너 공지</b><button data-set="bn:on">있음</button><button data-set="bn:off">없음</button></div>
+  <div class="group"><b>로그인</b><button data-set="auth:user">로그인</button><button data-set="auth:guest">비로그인</button></div>
+</div></div>
+
+<main class="wrap"><div class="col">
+  <h1 id="h-help" tabindex="-1">도움말·공지</h1>
+
+  <div class="notice" role="status" data-show="bn=on"><strong>안내 <span class="slot">상단 배너 공지 제목</span></strong><p class="small"><span class="slot">점검 등 노출 중인 공지 한 줄</span> <a href="help.html?t=notice" data-set="t:notice">공지 보기</a></p></div>
+
+  <div class="tabs" role="tablist" aria-label="도움말 구분">
+    <button role="tab" type="button" data-set="t:faq" aria-selected="true">도움말</button><button role="tab" type="button" data-set="t:notice" aria-selected="false">공지사항</button>
+  </div>
+
+  <!-- 도움말 -->
+  <div data-show="t=faq s=normal">
+    <div class="chips" role="group" aria-label="도움말 분류">
+      <button class="chip" type="button" data-set="c:all" aria-pressed="true">전체</button><button class="chip" type="button" data-set="c:pay" aria-pressed="false">충전·후원</button><button class="chip" type="button" data-set="c:watch" aria-pressed="false">시청·채팅</button><button class="chip" type="button" data-set="c:acct" aria-pressed="false">계정·약관</button>
+    </div>
+    <ul class="qa" style="margin-top:12px">
+      <li data-show="c=all|pay"><details><summary><span class="tag">충전·후원</span><span class="slot">질문 샘플 1</span></summary><div><p><span class="slot">답변 [운영 확정 전]</span></p></div></details></li>
+      <li data-show="c=all|pay"><details><summary><span class="tag">충전·후원</span><span class="slot">질문 샘플 2</span></summary><div><p><span class="slot">답변 [운영 확정 전]</span></p></div></details></li>
+      <li data-show="c=all|watch"><details><summary><span class="tag">시청·채팅</span><span class="slot">질문 샘플 3</span></summary><div><p><span class="slot">답변 [운영 확정 전]</span></p></div></details></li>
+      <li data-show="c=all|acct"><details><summary><span class="tag">계정·약관</span><span class="slot">질문 샘플 4</span></summary><div><p><span class="slot">답변 [운영 확정 전]</span></p><p class="small" style="margin-top:8px"><a href="terms.html">약관·정책 보기</a></p></div></details></li>
+    </ul>
+    <p class="small muted" style="border-top:1px solid var(--line);padding-top:12px">찾는 답이 없으면 <a href="inquiry.html">문의하기</a>를 이용해 주세요.</p>
+  </div>
+
+  <!-- 공지사항: 고정 먼저, 그다음 최신순 -->
+  <div data-show="t=notice s=normal">
+    <ul class="qa">
+      <li><details id="n1"><summary><span class="tag wip">고정</span><span class="tag">안내</span><span class="slot">공지 제목 샘플 1</span><span class="muted small nmeta">게시일 <span class="slot">날짜</span></span></summary><div><p><span class="slot">공지 본문 [운영 작성]</span></p></div></details></li>
+      <li><details id="n2"><summary><span class="tag wait">점검</span><span class="slot">공지 제목 샘플 2</span><span class="muted small nmeta">게시일 <span class="slot">날짜</span></span></summary><div><p><span class="slot">공지 본문 [운영 작성]</span></p></div></details></li>
+      <li><details id="n3"><summary><span class="tag">약관 개정</span><span class="slot">공지 제목 샘플 3</span><span class="muted small nmeta">게시일 <span class="slot">날짜</span></span></summary><div><p><span class="slot">개정 요약 [법무 확정 전]</span></p><p class="small" style="margin-top:8px"><a href="terms.html?k=terms&v=new">예정 약관 보기</a></p></div></details></li>
+      <li><details id="n4"><summary><span class="tag">안내</span><span class="slot">공지 제목 샘플 4</span><span class="muted small nmeta">게시일 <span class="slot">날짜</span></span></summary><div><p><span class="slot">공지 본문 [운영 작성]</span></p></div></details></li>
+    </ul>
+  </div>
+
+  <div class="empty" data-show="s=empty"><p><strong data-show="t=faq">아직 등록된 도움말이 없어요</strong><strong data-show="t=notice">아직 공지가 없어요</strong></p><p class="muted">궁금한 점은 <a href="inquiry.html">문의하기</a>로 알려 주세요.</p></div>
+  <div data-show="s=loading" role="status" aria-busy="true"><p class="muted">불러오는 중</p><div class="skeleton" style="height:48px;margin-top:12px"></div><div class="skeleton" style="height:48px;margin-top:12px"></div><div class="skeleton" style="height:48px;margin-top:12px"></div></div>
+  <div class="notice danger" role="alert" data-show="s=loaderr"><strong>불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-icon="retry" data-keep data-set="s:normal">다시 시도</button></p></div>
+</div></main>
+<script src="mock.js"></script>
+<script>
+// 목업: 공지 탭에서 #n3 같은 앵커로 들어오면 해당 공지를 펼친다
+var h = location.hash && document.querySelector('details' + location.hash); if (h) h.open = true;
+</script>
+</body>
+</html>

@@ -6,29 +6,177 @@
 <title>운영사 홈 - 말씀ON 운영사</title>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="operator-shell.css">
+<link rel="stylesheet" href="operator-audit.css">
 </head>
-<body data-default="role:op">
+<body data-default="role:op s:normal v:all r:some">
 <header id="site-header" data-active="index"></header>
-<div class="mockbar"><div class="wrap"><div data-rolebar></div></div></div>
+<div class="mockbar"><div class="wrap"><div data-rolebar></div>
+  <div class="group"><b>화면 상태</b><button data-set="s:normal">정상</button><button data-set="s:empty">0건</button><button data-set="s:loading">로딩</button><button data-set="s:loaderr">불러오기 실패</button><button data-set="s:partial">일부 실패</button><button data-set="s:nomine">내 담당 0건</button><button data-set="s:noperm">권한 없음</button></div><div class="group" data-show="role=super"><b>위험 설정 예정</b><button data-set="r:some">있음</button><button data-set="r:none">0건</button></div></div></div>
 <div class="wrap op">
   <nav id="op-nav" class="op-nav" aria-label="운영사 메뉴"></nav>
   <main class="op-main stack">
-    <h1>운영사 홈</h1>
-    <section class="notice" data-show="role=op"><strong>일반 운영자예요</strong><p>신고·심사·환불·파트너 화면에서 처리할 수 있어요. 위험 설정(상품·수수료율·한도)은 볼 수만 있고, 변경은 최고 관리자만 할 수 있어요.</p></section>
-    <section class="notice" data-show="role=super"><strong>최고 관리자예요</strong><p>모든 화면을 쓸 수 있고, 위험 설정은 새 버전을 추가해 바꿔요. 운영자 권한도 이곳에서 관리해요.</p></section>
-    <section aria-labelledby="h-go"><h2 id="h-go">바로가기</h2>
-      <ul class="plain nav-list" style="margin-top:8px">
-        <li><a href="reports.html">신고·모더레이션</a></li>
-        <li><a href="verification.html">목회자 심사</a></li>
-        <li><a href="refunds.html">환불·결제 오류</a></li>
-        <li><a href="partners.html">파트너 지정</a></li>
-        <li><a href="products.html">열매 충전 상품</a> <span class="tag adm">최고 관리자</span></li>
-        <li><a href="fees.html">수수료율</a> <span class="tag adm">최고 관리자</span></li>
-        <li><a href="limits.html">후원·TTS 한도</a> <span class="tag adm">최고 관리자</span></li>
-        <li><a href="audit.html">감사 로그·운영자 권한</a></li>
+    <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <h1>운영사 홈</h1>
+      <p class="muted small"><span class="slot">기준 시각 샘플</span> · <button class="btn" type="button" id="refresh">새로고침</button></p>
+    </div>
+    <p class="sr" id="sum" aria-live="polite"></p>
+    <div data-show="s=noperm"><div class="empty"><p><strong>운영자 권한이 없어요</strong></p><p>운영자 권한이 필요해요. 최고 관리자에게 문의해 주세요.</p></div></div>
+    <div class="stack" id="all" data-show="s=normal|empty|loading|loaderr|partial|nomine">
+    <section aria-labelledby="h-q" id="sec-q">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
+        <h2 id="h-q">내가 처리할 일</h2>
+        <div class="chips" role="group" aria-label="보기 범위"><button class="chip" type="button" data-set="v:all">전체</button><button class="chip" type="button" data-set="v:mine">내 담당</button></div>
+      </div>
+      <p class="muted small" style="margin-top:4px">정렬 기준: 기한 지남 &gt; 기한 임박 &gt; 오래된 순 · 기한 기준은 <span class="slot">처리 기한(정책)</span></p>
+      <p class="muted small">이중 집계 방지: 문의 접수함은 '문의 접수' 건 수, 환불·결제 오류는 '처리 결정 대기' 건 수만 세요. 결제 문의가 환불 결정 단계로 넘어가면 그 건은 환불·결제 오류에서만 세요.</p>
+      <div id="q-area" style="margin-top:8px"></div>
+    </section>
+    <section aria-labelledby="h-sys"><h2 id="h-sys">시스템 상태</h2>
+      <ul class="plain" style="margin-top:8px">
+        <li class="queue"><div class="q-b"><strong>결제 대사 불일치</strong><span class="small muted">화면 작성 후 건수 <span class="slot">건수</span></span></div><span class="tag off">화면 미작성</span></li>
+        <li class="queue"><div class="q-b"><strong>방송 송출 불일치</strong><span class="small muted">화면 작성 후 건수 <span class="slot">건수</span></span></div><span class="tag off">화면 미작성</span></li>
+        <li><a class="queue" href="settlement-batch.html"><span class="q-b"><strong>정산 배치 상태</strong><span class="small muted">최근 실행 <span class="slot">샘플 시각</span> · 오류 <span class="slot">N</span>건</span></span><span class="tag ok">정상</span><span class="go">보기 ›</span></a></li>
       </ul></section>
+    <section aria-labelledby="h-risk" data-show="role=super"><h2 id="h-risk">위험 설정 예정</h2>
+      <ul class="plain" id="risk" style="margin-top:8px">
+        <li><a class="queue" href="fees.html"><span class="q-b"><strong>수수료율</strong><span class="small muted">새 버전 · 적용 시작일 <span class="slot">샘플</span></span></span><span class="tag wait">적용 예정</span><span class="go">보기 ›</span></a></li>
+        <li><a class="queue" href="products.html"><span class="q-b"><strong>열매 충전 상품</strong><span class="small muted">새 버전 · 적용 시작일 <span class="slot">샘플</span></span></span><span class="tag wait">적용 예정</span><span class="go">보기 ›</span></a></li>
+        <li><a class="queue" href="limits.html"><span class="q-b"><strong>후원·TTS 한도</strong><span class="small muted">새 버전 · 적용 시작일 <span class="slot">샘플</span></span></span><span class="tag wait">적용 예정</span><span class="go">보기 ›</span></a></li>
+      </ul>
+      <p class="muted" id="risk0" hidden>예정된 변경이 없어요</p></section>
+    <section aria-labelledby="h-rec" data-show="role=super"><div class="row" style="justify-content:space-between;align-items:center"><h2 id="h-rec">최근 운영 기록</h2><a class="go" href="audit.html">전체 보기 ›</a></div>
+      <div class="tbl-wrap cards k" style="margin-top:8px"><table><caption class="sr">최근 감사 로그 5건 (샘플)</caption>
+        <thead><tr><th scope="col">시각</th><th scope="col">담당자</th><th scope="col">종류</th><th scope="col">행위</th><th scope="col">대상</th></tr></thead>
+        <tbody id="aud"></tbody></table></div></section>
+    <section aria-labelledby="h-rec2" data-show="role=op"><h2 id="h-rec2">최근 운영 기록</h2>
+      <p class="muted small">내가 처리한 최근 5건이에요.</p>
+      <div class="tbl-wrap cards k" style="margin-top:8px"><table><caption class="sr">내가 처리한 최근 5건 (샘플)</caption>
+        <thead><tr><th scope="col">시각</th><th scope="col">종류</th><th scope="col">결과</th></tr></thead>
+        <tbody id="mine5"></tbody></table></div></section>
+    </div>
   </main>
 </div>
 <script src="operator-shell.js"></script>
+<script>
+(function () {
+  var b = document.body, q = new URLSearchParams(location.search);
+  // 샘플 데이터. a=전체, m=내 담당(담당자 열이 있는 큐만). o=기한 지남, s=임박, w=다른 운영자 처리 중, age=가장 오래된 건 경과일(샘플), dl=기한 정책 있음
+  var Q = [
+    { t: '신고·모더레이션', h: 'reports.html', asg: 1, dl: 1, age: 6, a: { n: 12, o: 3, s: 2 }, m: { n: 5, o: 1, s: 1 }, w: 4 },
+    { t: '이의제기', h: 'appeals.html', asg: 1, dl: 1, age: 4, a: { n: 5, o: 1, s: 1 }, m: { n: 2, o: 0, s: 1 }, w: 1 },
+    { t: '환불·결제 오류', h: 'refunds.html', dl: 1, age: 3, a: { n: 7, o: 0, s: 2 }, w: 0, note: '처리 결정 대기 건' },
+    { t: '문의 접수함', h: 'inquiries.html', asg: 1, dl: 1, age: 5, a: { n: 9, o: 2, s: 2 }, m: { n: 3, o: 1, s: 1 }, w: 2, note: '문의 접수 건' },
+    { t: 'VOD 재처리(실패)', h: 'vod-reprocess.html', fail: 1, age: 2, a: { n: 4, o: 0, s: 0 }, w: 0 },
+    { t: '목회자 심사', h: 'verification.html', asg: 1, dl: 1, age: 2, a: { n: 6, o: 0, s: 0 }, m: { n: 2, o: 0, s: 0 }, w: 2 },
+    { t: '인증 취소 검토', h: 'verification.html?f=cancel', asg: 1, age: 5, a: { n: 2, o: 0, s: 0 }, m: { n: 1, o: 0, s: 0 }, w: 0 },
+    { t: '방송국 조치 대기열', stn: 1, asg: 1, age: 3, a: { n: 3, o: 0, s: 1 }, m: { n: 1, o: 0, s: 0 }, w: 0 },
+    { t: '약관·정책 개정 고지', doc: 1, a: { n: 3, o: 1, s: 1 } }, // 담당자 없음(asg 없음) → 내 담당 보기에서 숨김
+    { t: '수령 정보 확인 대기', h: 'payout-reviews.html', age: 2, a: { n: 4, o: 0, s: 0 }, w: 0 },
+    { t: '지급 실패', h: 'settlements.html?f=fail', fail: 1, age: 1, a: { n: 1, o: 0, s: 0 }, w: 0 },
+    { t: '파트너 해제 검토', h: 'partners.html', asg: 1, dl: 1, age: 0, a: { n: 0, o: 0, s: 0 }, m: { n: 0, o: 0, s: 0 }, w: 0 }
+  ];
+  var AUD = [['정책', '파트너 요율 새 버전 추가', '수수료율'], ['제재', '이용 제한 조치', '샘플 방송국'], ['심사', '인증 신청 승인', '샘플 목회자'], ['정책', '한도 새 버전 추가', '후원·TTS 한도'], ['금칙어', '금칙어 추가', '샘플 금칙어']];
+  var MINE5 = [['신고 처리', 'ok', '조치 완료'], ['이의제기', 'bad', '반려'], ['목회자 심사', 'ok', '승인'], ['환불·결제 오류', 'ok', '처리 완료'], ['신고 처리', 'off', '조치 없음']];
+  function href(h) {
+    var u = new URL(h, location.href); u.searchParams.set('role', b.dataset.role);
+    if (q.get('theme')) u.searchParams.set('theme', q.get('theme'));
+    return u.pathname.split('/').pop() + u.search;
+  }
+  // 방송국 조치 대기열: 조건 3개만(신고 건수로 올리지 않는다). 일반 운영자에게 정지·폐쇄 단계는 읽기 전용 + 최고 관리자 처리
+  var STN = [
+    { t: '이의제기가 접수된 방송국 조치', s: '샘플 방송국 나', h: 'appeal-detail.html', adm: 0, go: '처리하기' },
+    { t: '폐쇄 진행 중', s: '샘플 방송국 라 · 다음 단계: 3 방송 종료 · 예정일 샘플 날짜', h: 'station-detail.html?g=closing&step=3', adm: 1, go: '보기' },
+    { t: '폐쇄 예정일 임박', s: '샘플 방송국 아 · 기준 <span class="slot">임박 기준</span>', h: 'station-detail.html?g=closing&step=2', adm: 1, go: '보기' }
+  ];
+  function stnRow(x, st, mine) {
+    var load = st === 'loading', n = mine ? x.m.n : x.a.n, super_ = b.dataset.role === 'super', its = mine ? STN.slice(0, 1) : STN;
+    var head = '<div class="queue"><span class="q-n">' + (load ? '—' : n + '<small>샘플</small>') + '</span><span class="q-b"><strong>' + x.t + '</strong><span class="small muted">조건: 이의제기 접수 · 폐쇄 진행 중 · 폐쇄 예정일 임박 (신고 건수는 보지 않아요)</span></span></div>';
+    if (load) return '<li>' + head + '</li>';
+    return '<li>' + head + '<ul class="plain" style="padding-left:16px">' + its.map(function (i) {
+      var ro = i.adm && !super_;
+      return '<li><a class="queue" href="' + href(i.h) + '" aria-label="' + i.t + ' ' + i.s.replace(/<[^>]+>/g, '') + (ro ? ' 읽기 전용' : '') + '"><span class="q-b"><strong>' + i.t + '</strong><span class="small muted">' + i.s + '</span></span>' +
+        (ro ? '<span class="tag adm">최고 관리자 처리</span>' : '') + '<span class="go">' + (ro ? '보기' : i.go) + ' ›</span></a></li>';
+    }).join('') + '</ul></li>';
+  }
+  // 약관·정책 개정 고지: 승인 대기는 최고 관리자 처리, 기한 임박·지남·일부 실패는 고지 화면에서 처리
+  var DOC = [
+    { t: '승인 대기', s: '개인정보 처리방침 · 승인 요청 샘플 시각', h: 'document-detail.html?k=privacy&p=wait&m=minor', tg: 'wait', adm: 1, go: '처리하기' },
+    { t: '고지 기한 임박', s: '운영정책 · 고지 기한 <span class="slot">날짜</span>', h: 'document-detail.html?k=policy&p=due&m=major', tg: 'wait', go: '처리하기' },
+    { t: '고지 기한 지남 · 발송 일부 실패', s: '이용약관 · 고지 기한 <span class="slot">날짜</span>', h: 'document-detail.html?k=terms&p=late&m=major', tg: 'bad', go: '처리하기' }
+  ];
+  function docRow(x, st) {
+    var load = st === 'loading', super_ = b.dataset.role === 'super';
+    var head = '<div class="queue"><span class="q-n">' + (load ? '—' : x.a.n + '<small>샘플</small>') + '</span><span class="q-b"><strong>' + x.t + '</strong><span class="small muted">조건: 승인 대기 · 고지 기한 임박 · 기한 지남·발송 일부 실패</span></span></div>';
+    if (load) return '<li>' + head + '</li>';
+    return '<li>' + head + '<ul class="plain" style="padding-left:16px">' + DOC.map(function (i) {
+      var ro = i.adm && !super_;
+      return '<li><a class="queue" href="' + href(i.h) + '" aria-label="' + i.t + ' ' + i.s.replace(/<[^>]+>/g, '') + (ro ? ' 최고 관리자 처리' : '') + '"><span class="q-b"><strong>' + i.t + '</strong><span class="small muted">' + i.s + '</span></span>' +
+        (ro ? '<span class="tag adm">최고 관리자 처리</span>' : '<span class="tag ' + i.tg + '">' + (i.tg === 'bad' ? '기한 지남' : i.tg === 'wait' ? '대기' : '') + '</span>') + '<span class="go">' + (ro ? '보기' : i.go) + ' ›</span></a></li>';
+    }).join('') + '</ul></li>';
+  }
+  function row(x, st, mine) {
+    if (x.stn) return stnRow(x, st, mine);
+    if (x.doc) return docRow(x, st);
+    var d = mine ? x.m : x.a, nm = st === 'nomine' && mine ? { n: 0, o: 0, s: 0 } : d;
+    var fail = st === 'partial' && x.fail, load = st === 'loading', n = nm.n;
+    var cnt = fail || load ? '—' : n;
+    var tag = '';
+    if (load) tag = '';
+    else if (fail) tag = '<span class="tag bad">불러오지 못했어요</span>';
+    else if (x.fail) tag = '<span class="tag bad">처리 필요</span>';
+    else if (nm.o) tag = '<span class="tag bad">기한 지남 샘플 ' + nm.o + '건</span>';
+    else if (nm.s) tag = '<span class="tag wait">기한 임박 샘플 ' + nm.s + '건</span>';
+    else tag = x.dl ? '<span class="tag off">기한 안</span>' : '<span class="tag off">기한 미정</span>';
+    var sub = load ? '' : '가장 오래된 건 샘플 ' + x.age + '일 경과 · 기한 <span class="slot">처리 기한(정책)</span>' + (!mine && x.w ? ' · 처리 중 샘플 ' + x.w + '건' : '') + (x.note ? ' · 집계 기준: ' + x.note : '');
+    var inner = '<span class="q-n">' + cnt + (fail || load ? '' : '<small>샘플</small>') + '</span>' +
+      '<span class="q-b"><strong>' + x.t + '</strong><span class="small muted">' + sub + '</span></span>' + tag;
+    if (fail) return '<li><div class="queue">' + inner + '<button class="btn" type="button" data-retry>다시 시도</button></div></li>';
+    var lbl = x.t + (load ? ' 불러오는 중' : ' 샘플 ' + n + '건') + ' 처리하기';
+    return '<li><a class="queue" href="' + href(x.h) + '" aria-label="' + lbl + '">' + inner + '<span class="go">처리하기 ›</span></a></li>';
+  }
+  function rank(x, mine, st) {
+    var d = mine ? x.m : x.a;
+    return (d.o ? 0 : x.fail ? 1 : d.s ? 2 : 3);
+  }
+  function build() {
+    var st = b.dataset.s || 'normal', mine = b.dataset.v === 'mine', A = document.getElementById('q-area'), sum = '', h = '';
+    var list = Q.filter(function (x) { return !mine || x.asg; });
+    var cn = function (x) { return st === 'nomine' && mine ? 0 : (mine ? x.m : x.a).n; };
+    var fl = function (x) { return st === 'partial' && x.fail; };
+    list.sort(function (x, y) { return rank(x, mine) - rank(y, mine) || y.age - x.age; });
+    var act = list.filter(function (x) { return fl(x) || st === 'loading' || cn(x) > 0; });
+    var zero = list.filter(function (x) { return act.indexOf(x) < 0; });
+    var tot = 0, ov = 0;
+    list.forEach(function (x) { if (!fl(x)) { tot += cn(x); ov += st === 'nomine' && mine ? 0 : (mine ? x.m : x.a).o; } });
+    document.getElementById('sec-q').setAttribute('aria-busy', String(st === 'loading'));
+    if (st === 'loaderr') {
+      h = '<div class="notice danger" role="alert"><strong>대기열을 불러오지 못했어요</strong><p style="margin-top:8px"><button class="btn" type="button" data-retry>다시 시도</button></p></div>';
+      sum = '대기열을 불러오지 못했어요';
+    } else if (st === 'empty') {
+      h = '<div class="empty"><p><strong>지금 처리할 건이 없어요</strong></p></div>'; sum = '처리할 일이 없어요';
+    } else {
+      if (st === 'nomine' && mine || (mine && !act.length)) {
+        var all = Q.reduce(function (s, x) { return s + x.a.n; }, 0);
+        h = '<div class="empty"><p><strong>맡은 건이 없어요</strong></p><p>전체에는 샘플 ' + all + '건이 있어요.</p><button class="btn" type="button" data-set="v:all">전체 보기</button></div>';
+      } else if (st === 'loading') sum = '불러오는 중';
+      else sum = '처리할 일 샘플 ' + tot + '건, 기한 지남 샘플 ' + ov + '건';
+      if (act.length) h += '<ul class="plain">' + act.map(function (x) { return row(x, st, mine); }).join('') + '</ul>';
+      if (zero.length && !(mine && !act.length)) h += '<details style="margin-top:8px"><summary class="linkbtn" style="display:inline-flex;align-items:center">대기 없는 항목 샘플 ' + zero.length + '개</summary><ul class="plain">' + zero.map(function (x) { return row(x, st, mine); }).join('') + '</ul></details>';
+      if (st === 'partial') sum += ' · 일부 집계를 불러오지 못했어요';
+    }
+    A.innerHTML = h;
+    var r0 = b.dataset.r === 'none'; document.getElementById('risk').hidden = r0; document.getElementById('risk0').hidden = !r0;
+    document.getElementById('sum').textContent = sum;
+    document.getElementById('aud').innerHTML = AUD.map(function (r) { return '<tr><td class="c-m" data-label="시각">샘플 시각</td><td class="c-m c-dot" data-label="담당자">샘플 운영자</td><td class="c-s" data-label="종류"><span class="tag">' + r[0] + '</span></td><td class="c-t" data-label="행위">' + r[1] + '</td><td class="c-m c-dot c-last" data-label="대상">' + r[2] + '</td></tr>'; }).join('');
+    document.getElementById('mine5').innerHTML = MINE5.map(function (r) { return '<tr><td class="c-m" data-label="시각">샘플 시각</td><td class="c-t" data-label="종류">' + r[0] + '</td><td class="c-s" data-label="결과"><span class="tag ' + r[1] + '">' + r[2] + '</span></td></tr>'; }).join('');
+  }
+  window.mockAfter = build;
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-retry]')) { e.preventDefault(); b.dataset.s = 'normal'; window.mockRender(); }
+    if (e.target.closest('#refresh')) build();
+  });
+  build();
+})();
+</script>
 </body>
 </html>
